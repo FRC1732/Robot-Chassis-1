@@ -7,7 +7,8 @@ public class WPIEncoder extends EncoderBase {
 	private final Encoder wpiEncoder;
 
 	public WPIEncoder(int channelA, int channelB) {
-		wpiEncoder = new Encoder(0, 0);
+		wpiEncoder = new Encoder(channelA, channelB);
+		wpiEncoder.setSamplesToAverage(4);
 	}
 
 	@Override
@@ -24,10 +25,7 @@ public class WPIEncoder extends EncoderBase {
 		return wpiEncoder.getRaw();
 	}
 
-	public void setSamplesToAverage(int samplesToAverage) {
-		wpiEncoder.setSamplesToAverage(samplesToAverage);
-	}
-
+	@Override
 	public void setDistancePerPulse(double distancePerPulse) {
 		wpiEncoder.setDistancePerPulse(distancePerPulse);
 	}
