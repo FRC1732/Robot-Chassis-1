@@ -6,18 +6,20 @@ public abstract class EncoderBase {
 		return new EncoderReader(this);
 	}
 
-	abstract double getDistance();
+	/**
+	 * @return current position in units determined by setDistancePerPulse
+	 */
+	abstract double getPosition();
 
+	/**
+	 * @return current rate in units per 100ms
+	 */
 	abstract double getRate();
 
-	public abstract double getPulses();
-
-	public abstract void setSamplesToAverage(int samples);
-
-	public abstract void setPulsesPerUnitDistance(int pulses);
-
-	public abstract void setPulsesPerRotation(int pulses);
-
-	public abstract void setReversed(boolean isReversed);
+	/**
+	 * @param distancePerPulse
+	 *            the distance per sensor unit
+	 */
+	abstract void setDistancePerPulse(double distancePerPulse);
 
 }

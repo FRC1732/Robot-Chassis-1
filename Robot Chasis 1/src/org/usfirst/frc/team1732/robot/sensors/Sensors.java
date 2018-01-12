@@ -1,10 +1,10 @@
 package org.usfirst.frc.team1732.robot.sensors;
 
-import edu.wpi.first.wpilibj.Encoder;
+import org.usfirst.frc.team1732.robot.Robot;
 
 public class Sensors {
 
-	public Encoder left;
-	public Encoder right;
+	TalonEncoder leftEncoder = Robot.drivetrain.leftEncoder;
+	TalonEncoder rightEncoder = Robot.drivetrain.rightEncoder;
 
 }

@@ -10,11 +10,11 @@ public class EncoderReader {
 	}
 
 	public void zero() {
-		position = e.getDistance();
+		position = e.getPosition();
 	}
 
-	public double getDistance() {
-		return e.getDistance() - position;
+	public double getPosition() {
+		return e.getPosition() - position;
 	}
 
 	public double getRate() {

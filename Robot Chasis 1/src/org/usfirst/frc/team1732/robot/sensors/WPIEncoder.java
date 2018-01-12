@@ -11,35 +11,27 @@ public class WPIEncoder extends EncoderBase {
 	}
 
 	@Override
-	public double getDistance() {
+	public double getPosition() {
 		return wpiEncoder.getDistance();
 	}
 
 	@Override
 	public double getRate() {
-		return wpiEncoder.getRate();
+		return wpiEncoder.getRate() / 100.0;
 	}
 
-	@Override
 	public double getPulses() {
 		return wpiEncoder.getRaw();
 	}
 
-	@Override
 	public void setSamplesToAverage(int samplesToAverage) {
 		wpiEncoder.setSamplesToAverage(samplesToAverage);
 	}
 
-	@Override
-	public void setPulsesPerUnitDistance(int pulses) {
-		wpiEncoder.setDistancePerPulse(1.0 / pulses);
+	public void setDistancePerPulse(double distancePerPulse) {
+		wpiEncoder.setDistancePerPulse(distancePerPulse);
 	}
 
-	@Override
-	public void setPulsesPerRotation(int pulses) {
-	}
-
-	@Override
 	public void setReversed(boolean isReversed) {
 		wpiEncoder.setReverseDirection(isReversed);
 	}

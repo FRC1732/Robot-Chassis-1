@@ -29,15 +29,19 @@ import edu.wpi.first.wpilibj.command.Scheduler;
  */
 public class Robot extends TimedRobot {
 
-	public Document robotConfig;
-
+	// subsystems
 	public static Drivetrain drivetrain;
+
+	// config
+	public Document robotConfig;
+	public static final int PERIOD_MS = 10;
+	public static final int CONFIG_TIMEOUT = 10; // recommended timeout by CTRE
 
 	// avoid using this method, put everything that doesn't HAVE to be here in
 	// robotInit()
 	public Robot() throws SAXException, IOException, ParserConfigurationException {
 		super();
-		setPeriod(0.01); // periodic methods will loop every 10 ms (1/100 sec)
+		setPeriod(PERIOD_MS / 1000.0); // periodic methods will loop every 10 ms (1/100 sec)
 	}
 
 	/**
