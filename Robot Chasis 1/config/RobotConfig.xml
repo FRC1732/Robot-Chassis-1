@@ -64,12 +64,12 @@
 			</masterCANid>
 			<isInverted>false</isInverted>
 		</otherTalon1>
-		<otherTalon1>
+		<otherTalon2>
 			<CANid>2</CANid>
 			<isFollower>false</isFollower>
 			<masterCANid>2
 			</masterCANid>
 			<isInverted>false</isInverted>
-		</otherTalon1>
+		</otherTalon2>
 	</otherMotors>
 </robot>

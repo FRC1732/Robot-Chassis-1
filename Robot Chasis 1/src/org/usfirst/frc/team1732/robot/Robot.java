@@ -15,6 +15,7 @@ import org.usfirst.frc.team1732.robot.config.ConfigUtils;
 import org.usfirst.frc.team1732.robot.config.RobotConfig;
 import org.usfirst.frc.team1732.robot.sensors.Sensors;
 import org.usfirst.frc.team1732.robot.subsystems.Drivetrain;
+import org.usfirst.frc.team1732.robot.subsystems.OtherMotors;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -32,6 +33,7 @@ public class Robot extends TimedRobot {
 
 	// subsystems
 	public static Drivetrain drivetrain;
+	public static OtherMotors otherMotors;
 	public static Sensors sensors;
 
 	// config
@@ -59,6 +61,7 @@ public class Robot extends TimedRobot {
 			e.printStackTrace();
 		}
 		drivetrain = new Drivetrain(ConfigUtils.getElement(robotConfig, "drivetrain"));
+		otherMotors = new OtherMotors(ConfigUtils.getElement(robotConfig, "otherMotors"));
 		sensors = new Sensors();
 	}
 
