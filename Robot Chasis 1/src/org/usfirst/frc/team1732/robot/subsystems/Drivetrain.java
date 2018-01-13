@@ -1,6 +1,7 @@
 package org.usfirst.frc.team1732.robot.subsystems;
 
 import org.usfirst.frc.team1732.robot.Robot;
+import org.usfirst.frc.team1732.robot.commands.DriveWithJoysticks;
 import org.usfirst.frc.team1732.robot.config.ConfigUtils;
 import org.usfirst.frc.team1732.robot.drivercontrol.DifferentialDrive;
 import org.usfirst.frc.team1732.robot.sensors.TalonEncoder;
@@ -43,7 +44,7 @@ public class Drivetrain extends Subsystem {
 
 	@Override
 	public void initDefaultCommand() {
-
+		setDefaultCommand(new DriveWithJoysticks());
 	}
 
 	@Override

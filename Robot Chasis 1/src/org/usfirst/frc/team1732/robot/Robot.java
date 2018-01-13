@@ -13,6 +13,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.usfirst.frc.team1732.robot.config.ConfigUtils;
 import org.usfirst.frc.team1732.robot.config.RobotConfig;
+import org.usfirst.frc.team1732.robot.input.Joysticks;
 import org.usfirst.frc.team1732.robot.sensors.Sensors;
 import org.usfirst.frc.team1732.robot.subsystems.Drivetrain;
 import org.usfirst.frc.team1732.robot.subsystems.OtherMotors;
@@ -35,6 +36,7 @@ public class Robot extends TimedRobot {
 	public static Drivetrain drivetrain;
 	public static OtherMotors otherMotors;
 	public static Sensors sensors;
+	public static Joysticks joysticks;
 
 	// config
 	public Document robotConfig;
@@ -63,6 +65,7 @@ public class Robot extends TimedRobot {
 		drivetrain = new Drivetrain(ConfigUtils.getElement(robotConfig, "drivetrain"));
 		otherMotors = new OtherMotors(ConfigUtils.getElement(robotConfig, "otherMotors"));
 		sensors = new Sensors();
+		joysticks = new Joysticks(ConfigUtils.getElement(robotConfig, "joysticks"));
 	}
 
 	@Override

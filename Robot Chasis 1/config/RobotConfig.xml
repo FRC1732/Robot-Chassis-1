@@ -5,6 +5,14 @@
 	<!ENTITY rightMasterCANid '0'>
 ]>
 <robot>
+	<joysticks>
+		<left>
+			<port>1</port>
+		</left>
+		<right>
+			<port>2</port>
+		</right>
+	</joysticks>
 	<drivetrain>
 		<leftTalon1>
 			<CANid>&leftMasterCANid;
