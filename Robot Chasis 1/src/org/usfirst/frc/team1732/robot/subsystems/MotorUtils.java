@@ -1,26 +1,28 @@
 package org.usfirst.frc.team1732.robot.subsystems;
 
-import org.usfirst.frc.team1732.robot.config.ConfigUtils;
-import org.w3c.dom.Element;
+import org.usfirst.frc.team1732.robot.config.Node;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
+import edu.wpi.first.wpilibj.Spark;
+
 public class MotorUtils {
 
-	public static TalonSRX configureTalon(Element talonElement, double percentDeadband, int configTimout) {
-		int CANid = ConfigUtils.getInteger(talonElement, "CANid");
+	public static TalonSRX configureTalon(Node talonNode, double percentDeadband, int configTimout) {
+		int CANid = talonNode.getData("CANid");
 		TalonSRX talon = new TalonSRX(CANid);
 		talon.setNeutralMode(NeutralMode.Coast);
-		talon.setInverted(ConfigUtils.getBoolean(talonElement, "isInverted"));
 		// we need to figure out exactly what the follower motors will "follow" (do we
 		// need to configure current limit for followers too, or just master?
 
-		boolean isFollower = ConfigUtils.getBoolean(talonElement, "isFollower");
+		boolean isFollower = talonNode.getData("isFollower");
 		if (isFollower) {
-			talon.set(ControlMode.Follower, ConfigUtils.getInteger(talonElement, "masterCANid"));
+			talon.set(ControlMode.Follower, (int) talonNode.getData("masterCANid"));
 		} else {
+			talon.setInverted(talonNode.getData("isInverted"));
+
 			// I have methods commented out here that we might want to use, but am waiting
 			// for more documentation
 
@@ -50,5 +52,11 @@ public class MotorUtils {
 
 		}
 		return talon;
+	}
+
+	public static Spark configureSpark(Node sparkNode) {
+		Spark spark = new Spark(sparkNode.getData("PWMchannel"));
+		spark.setInverted(sparkNode.getData("isInverted"));
+		return spark;
 	}
 }

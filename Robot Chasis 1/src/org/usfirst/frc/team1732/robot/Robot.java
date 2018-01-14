@@ -7,18 +7,13 @@
 
 package org.usfirst.frc.team1732.robot;
 
-import java.io.IOException;
-
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.usfirst.frc.team1732.robot.config.ConfigUtils;
 import org.usfirst.frc.team1732.robot.config.RobotConfig;
 import org.usfirst.frc.team1732.robot.input.Joysticks;
 import org.usfirst.frc.team1732.robot.sensors.Sensors;
+import org.usfirst.frc.team1732.robot.subsystems.Arm;
+import org.usfirst.frc.team1732.robot.subsystems.Claw;
 import org.usfirst.frc.team1732.robot.subsystems.Drivetrain;
 import org.usfirst.frc.team1732.robot.subsystems.OtherMotors;
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Scheduler;
@@ -35,20 +30,14 @@ public class Robot extends TimedRobot {
 	// subsystems
 	public static Drivetrain drivetrain;
 	public static OtherMotors otherMotors;
+	public static Claw claw;
+	public static Arm arm;
 	public static Sensors sensors;
 	public static Joysticks joysticks;
 
 	// config
-	public Document robotConfig;
 	public static final int PERIOD_MS = 10;
 	public static final int CONFIG_TIMEOUT = 10; // recommended timeout by CTRE
-
-	// avoid using this method, put everything that doesn't HAVE to be here in
-	// robotInit()
-	public Robot() throws SAXException, IOException, ParserConfigurationException {
-		super();
-		setPeriod(PERIOD_MS / 1000.0); // periodic methods will loop every 10 ms (1/100 sec)
-	}
 
 	/**
 	 * This function is run when the robot is first started up and should be used
@@ -56,21 +45,20 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void robotInit() {
-		try {
-			robotConfig = RobotConfig.getSavedRobotConfig();
-		} catch (SAXException | IOException | ParserConfigurationException e) {
-			System.err.println("Error reading the XML Config. Check the syntax and the path");
-			e.printStackTrace();
-		}
-		drivetrain = new Drivetrain(ConfigUtils.getElement(robotConfig, "drivetrain"));
-		otherMotors = new OtherMotors(ConfigUtils.getElement(robotConfig, "otherMotors"));
+		setPeriod(PERIOD_MS / 1000.0); // periodic methods will loop every 10 ms (1/100 sec)
+		drivetrain = new Drivetrain(RobotConfig.config.getNode("drivetrain"));
+		otherMotors = new OtherMotors(RobotConfig.config.getNode("otherMotors"));
 		sensors = new Sensors();
-		joysticks = new Joysticks(ConfigUtils.getElement(robotConfig, "joysticks"));
+		arm = new Arm(RobotConfig.config.getNode("arm"));
+		claw = new Claw(RobotConfig.config.getNode("claw"));
+
+		joysticks = new Joysticks(RobotConfig.config.getNode("joysticks"));
+
 	}
 
 	@Override
 	public void robotPeriodic() {
-
+		Scheduler.getInstance().run();
 	}
 
 	@Override
@@ -80,7 +68,6 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void disabledPeriodic() {
-		Scheduler.getInstance().run();
 	}
 
 	@Override
@@ -93,7 +80,6 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void autonomousPeriodic() {
-		Scheduler.getInstance().run();
 	}
 
 	@Override
@@ -106,7 +92,6 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void teleopPeriodic() {
-		Scheduler.getInstance().run();
 	}
 
 	@Override
