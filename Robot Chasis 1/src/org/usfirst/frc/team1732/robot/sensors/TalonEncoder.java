@@ -33,12 +33,12 @@ public class TalonEncoder extends EncoderBase {
 	}
 
 	@Override
-	double getPosition() {
+	public double getPosition() {
 		return talon.getSensorCollection().getQuadraturePosition() * distancePerPulse;
 	}
 
 	@Override
-	double getRate() {
+	public double getRate() {
 		return talon.getSensorCollection().getQuadratureVelocity() * distancePerPulse;
 	}
 

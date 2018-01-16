@@ -9,17 +9,17 @@ public abstract class EncoderBase {
 	/**
 	 * @return current position in units determined by setDistancePerPulse
 	 */
-	abstract double getPosition();
+	public abstract double getPosition();
 
 	/**
 	 * @return current rate in units per 100ms
 	 */
-	abstract double getRate();
+	public abstract double getRate();
 
 	/**
 	 * @param distancePerPulse
 	 *            the distance per sensor unit
 	 */
-	abstract void setDistancePerPulse(double distancePerPulse);
+	public abstract void setDistancePerPulse(double distancePerPulse);
 
 }
