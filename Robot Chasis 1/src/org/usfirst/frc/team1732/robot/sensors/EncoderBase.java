@@ -16,6 +16,8 @@ public abstract class EncoderBase {
 	 */
 	public abstract double getRate();
 
+	public abstract double getPulses();
+
 	/**
 	 * @param distancePerPulse
 	 *            the distance per sensor unit

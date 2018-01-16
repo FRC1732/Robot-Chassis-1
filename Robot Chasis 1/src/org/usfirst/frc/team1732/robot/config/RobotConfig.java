@@ -11,14 +11,14 @@ public class RobotConfig {
 				"isFollower", false, "isInverted", false).addData(rightMasterCANid);
 
 		drivetrain.addNode("rightTalon2").addData("CANid", 2,
-				"isFollower", true, "isInverted", false).addData(rightMasterCANid);
+				"isFollower", false, "isInverted", false).addData(rightMasterCANid);
 
 		drivetrain.addNode("rightTalon3").addData("CANid", 7,
-				"isFollower", true, "isInverted", false).addData(rightMasterCANid);
+				"isFollower", false, "isInverted", false).addData(rightMasterCANid);
 
 		Node leftMasterCANid = new Node("masterCANid", 0);
 		drivetrain.addNode("leftTalon1").addData("CANid", leftMasterCANid.getOwnData(),
-				"isFollower", false, "isInverted", false).addData(leftMasterCANid);
+				"isFollower", true, "isInverted", false).addData(leftMasterCANid);
 
 		drivetrain.addNode("leftTalon2").addData("CANid", 9,
 				"isFollower", true, "isInverted", false).addData(leftMasterCANid);
@@ -32,15 +32,15 @@ public class RobotConfig {
 
 		Node arm = config.addNode("arm");
 		arm.addNode("talon").addData("CANid", 2,
-				"isFollower", false, "masterCANid", 2, "isInverted", false);
+				"isFollower", false, "masterCANid", 2, "isInverted", true);
 
 		Node claw = config.addNode("claw");
-		claw.addNode("leftSpark").addData("PWMchannel", 2, "isInverted", false, "PDPchannel", 4);
-		claw.addNode("rightSpark").addData("PWMchannel", 3, "isInverted", false, "PDPchannel", 11);
+		claw.addNode("leftSpark").addData("PWMchannel", 0, "isInverted", true, "PDPchannel", 4);
+		claw.addNode("rightSpark").addData("PWMchannel", 1, "isInverted", false, "PDPchannel", 11);
 
 		Node joysticks = config.addNode("joysticks");
 		joysticks.addNode("left").addData("port", 0);
-		joysticks.addNode("right").addData("port", 1);
+		joysticks.addNode("right").addData("port", 0);
 	}
 
 }

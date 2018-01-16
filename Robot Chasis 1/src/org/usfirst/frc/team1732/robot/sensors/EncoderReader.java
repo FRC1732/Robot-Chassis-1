@@ -9,7 +9,7 @@ public class EncoderReader {
 	private final EncoderBase e;
 	private double position = 0;
 
-	EncoderReader(EncoderBase e) {
+	public EncoderReader(EncoderBase e) {
 		this.e = e;
 	}
 

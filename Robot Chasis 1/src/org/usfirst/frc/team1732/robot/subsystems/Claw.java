@@ -32,15 +32,15 @@ public class Claw extends Subsystem {
 	}
 
 	public void setIn() {
-		set(-0.5, -0.5);
+		set(-1, -1);
 	}
 
 	public void setHold() {
-		set(-0.1, -0.1);
+		set(-0, -0);
 	}
 
 	public void setOut() {
-		set(0.5, 0.5);
+		set(1, 1);
 	}
 
 	public void setStop() {

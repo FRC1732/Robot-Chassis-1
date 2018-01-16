@@ -21,6 +21,7 @@ public class WPIEncoder extends EncoderBase {
 		return wpiEncoder.getRate() / 100.0;
 	}
 
+	@Override
 	public double getPulses() {
 		return wpiEncoder.getRaw();
 	}

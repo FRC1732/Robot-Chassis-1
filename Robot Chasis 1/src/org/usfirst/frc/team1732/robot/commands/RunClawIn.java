@@ -19,10 +19,27 @@ public class RunClawIn extends Command {
 		Robot.claw.setIn();
 	}
 
+	private long timeFirstOver;
+	private boolean goneOver = false;
+
+	@Override
+	protected void execute() {
+		boolean isOver = (Math.abs(Robot.claw.leftSparkCurrent.get()) > Claw.currentLimit
+				|| Math.abs(Robot.claw.rightSparkCurrent.get()) > Claw.currentLimit);
+		if (isOver && !goneOver) {
+			timeFirstOver = System.currentTimeMillis();
+			goneOver = true;
+		}
+		if (!isOver) {
+			goneOver = false;
+		}
+	}
+
 	@Override
 	protected boolean isFinished() {
-		return Math.abs(Robot.claw.leftSparkCurrent.get()) > Claw.currentLimit
-				|| Math.abs(Robot.claw.rightSparkCurrent.get()) > Claw.currentLimit;
+		return (Math.abs(Robot.claw.leftSparkCurrent.get()) > Claw.currentLimit
+				|| Math.abs(Robot.claw.rightSparkCurrent.get()) > Claw.currentLimit)
+				&& (goneOver && System.currentTimeMillis() - timeFirstOver > 500);
 	}
 
 	protected void end() {

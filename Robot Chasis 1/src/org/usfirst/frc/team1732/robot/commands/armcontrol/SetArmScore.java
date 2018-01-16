@@ -10,5 +10,7 @@ public class SetArmScore extends CommandGroup {
 	public SetArmScore() {
 		addSequential(new SetArmScore_IntakeToHorizontal());
 		addSequential(new SetArmScore_HorizontalToUpright());
+		addSequential(new SetArmScore_UprightToScore());
 	}
+
 }

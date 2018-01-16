@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj.command.Command;
  */
 public class SetArmScore_IntakeToHorizontal extends Command {
 
-	public static final double START_VOLTAGE = 0;
+	public static final double START_VOLTAGE = 0.3;
 	public static final Arm.ArmPositions START_POSITION = Arm.ArmPositions.INTAKE;
 	public static final double END_VOLTAGE = 1;
 	public static final Arm.ArmPositions END_POSITION = Arm.ArmPositions.HORIZONTAL;
@@ -26,7 +26,7 @@ public class SetArmScore_IntakeToHorizontal extends Command {
 	}
 
 	protected void execute() {
-		Robot.arm.setSpeed(BasicControl.interpolate(START_VOLTAGE, Arm.ArmPositions.INTAKE.position, END_VOLTAGE,
+		Robot.arm.setSpeed(BasicControl.cosineInterpolate(START_VOLTAGE, Arm.ArmPositions.INTAKE.position, END_VOLTAGE,
 				Arm.ArmPositions.HORIZONTAL.position, Robot.arm.encoder.getPosition()));
 	}
 

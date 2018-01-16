@@ -2,12 +2,12 @@ package org.usfirst.frc.team1732.robot.commands.armcontrol;
 
 import org.usfirst.frc.team1732.robot.Robot;
 
-import edu.wpi.first.wpilibj.command.InstantCommand;
+import edu.wpi.first.wpilibj.command.Command;
 
 /**
  *
  */
-public class RunArmDown extends InstantCommand {
+public class RunArmDown extends Command {
 
 	public RunArmDown() {
 		requires(Robot.arm);
@@ -20,6 +20,13 @@ public class RunArmDown extends InstantCommand {
 
 	// Called once after isFinished returns true
 	protected void end() {
+		Robot.arm.setStop();
+	}
+
+	@Override
+	protected boolean isFinished() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }

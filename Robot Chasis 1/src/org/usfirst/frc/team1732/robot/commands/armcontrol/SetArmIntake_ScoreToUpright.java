@@ -11,9 +11,9 @@ import edu.wpi.first.wpilibj.command.Command;
  */
 public class SetArmIntake_ScoreToUpright extends Command {
 
-	public static final double START_VOLTAGE = 0;
-	public static final Arm.ArmPositions START_POSITION = Arm.ArmPositions.SCORING;
-	public static final double END_VOLTAGE = 1;
+	public static final double START_VOLTAGE = -0.2;
+	public static final Arm.ArmPositions START_POSITION = Arm.ArmPositions.SCORE;
+	public static final double END_VOLTAGE = -1;
 	public static final Arm.ArmPositions END_POSITION = Arm.ArmPositions.UPRIGHT;
 
 	public SetArmIntake_ScoreToUpright() {
@@ -26,7 +26,7 @@ public class SetArmIntake_ScoreToUpright extends Command {
 	}
 
 	protected void execute() {
-		Robot.arm.setSpeed(BasicControl.interpolate(START_VOLTAGE, START_POSITION.position, END_VOLTAGE,
+		Robot.arm.setSpeed(BasicControl.cosineInterpolate(START_VOLTAGE, START_POSITION.position, END_VOLTAGE,
 				END_POSITION.position, Robot.arm.encoder.getPosition()));
 	}
 

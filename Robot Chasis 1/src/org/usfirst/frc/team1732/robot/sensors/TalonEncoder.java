@@ -42,6 +42,7 @@ public class TalonEncoder extends EncoderBase {
 		return talon.getSensorCollection().getQuadratureVelocity() * distancePerPulse;
 	}
 
+	@Override
 	public double getPulses() {
 		return talon.getSensorCollection().getQuadraturePosition();
 	}
@@ -50,6 +51,7 @@ public class TalonEncoder extends EncoderBase {
 		talon.setSensorPhase(sensorPhase);
 	}
 
+	@Override
 	public void setDistancePerPulse(double distancePerPulse) {
 		this.distancePerPulse = distancePerPulse;
 	}

@@ -13,7 +13,7 @@ public class SetArmScore_HorizontalToUpright extends Command {
 
 	public static final double START_VOLTAGE = 1;
 	public static final Arm.ArmPositions START_POSITION = Arm.ArmPositions.HORIZONTAL;
-	public static final double END_VOLTAGE = 0;
+	public static final double END_VOLTAGE = 0.6;
 	public static final Arm.ArmPositions END_POSITION = Arm.ArmPositions.UPRIGHT;
 
 	public SetArmScore_HorizontalToUpright() {
@@ -26,7 +26,7 @@ public class SetArmScore_HorizontalToUpright extends Command {
 	}
 
 	protected void execute() {
-		Robot.arm.setSpeed(BasicControl.interpolate(START_VOLTAGE, START_POSITION.position, END_VOLTAGE,
+		Robot.arm.setSpeed(BasicControl.cosineInterpolate(START_VOLTAGE, START_POSITION.position, END_VOLTAGE,
 				END_POSITION.position, Robot.arm.encoder.getPosition()));
 	}
 

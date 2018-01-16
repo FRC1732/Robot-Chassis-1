@@ -2,12 +2,12 @@ package org.usfirst.frc.team1732.robot.commands.armcontrol;
 
 import org.usfirst.frc.team1732.robot.Robot;
 
-import edu.wpi.first.wpilibj.command.InstantCommand;
+import edu.wpi.first.wpilibj.command.Command;
 
 /**
  *
  */
-public class RunArmUp extends InstantCommand {
+public class RunArmUp extends Command {
 
 	public RunArmUp() {
 		requires(Robot.arm);
@@ -20,5 +20,11 @@ public class RunArmUp extends InstantCommand {
 
 	// Called once after isFinished returns true
 	protected void end() {
+		Robot.arm.setStop();
+	}
+
+	@Override
+	protected boolean isFinished() {
+		return false;
 	}
 }

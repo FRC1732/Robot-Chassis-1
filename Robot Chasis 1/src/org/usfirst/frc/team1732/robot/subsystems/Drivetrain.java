@@ -9,6 +9,7 @@ import org.usfirst.frc.team1732.robot.sensors.TalonEncoder;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.wpilibj.command.Subsystem;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Drivetrain extends Subsystem {
 
@@ -48,6 +49,8 @@ public class Drivetrain extends Subsystem {
 
 	@Override
 	public void periodic() {
+		SmartDashboard.putNumber("Left Encoder Pulses", leftEncoder.getPulses());
+		SmartDashboard.putNumber("Right Encoder Pulses", rightEncoder.getPulses());
 
 	}
 }

@@ -19,7 +19,7 @@ public class DriveWithJoysticks extends Command {
 
 	// Called repeatedly when this Command is scheduled to run
 	protected void execute() {
-		Robot.drivetrain.drive.tankDrive(Robot.joysticks.left.getY(), Robot.joysticks.right.getY());
+		Robot.drivetrain.drive.tankDrive(Robot.joysticks.getLeft(), Robot.joysticks.getRight());
 	}
 
 	// Make this return true when this Command no longer needs to run execute()

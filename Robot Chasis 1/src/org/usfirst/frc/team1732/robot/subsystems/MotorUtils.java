@@ -22,7 +22,7 @@ public class MotorUtils {
 
 		boolean isFollower = talonNode.getData("isFollower");
 		if (isFollower) {
-			talon.set(ControlMode.Follower, talonNode.getData("masterCANid"));
+			talon.set(ControlMode.Follower, (int) talonNode.getData("masterCANid"));
 		} else {
 
 			// I have methods commented out here that we might want to use, but am waiting
