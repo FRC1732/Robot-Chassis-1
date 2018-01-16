@@ -10,18 +10,20 @@ import edu.wpi.first.wpilibj.Spark;
 
 public class MotorUtils {
 
-	public static TalonSRX configureTalon(Node talonNode, double percentDeadband, int configTimout) {
+	public static TalonSRX configureTalon(Node talonNode, double percentDeadband,
+			int configTimout) {
 		int CANid = talonNode.getData("CANid");
 		TalonSRX talon = new TalonSRX(CANid);
 		talon.setNeutralMode(NeutralMode.Coast);
+		talon.setInverted(talonNode.getData("isInverted"));
+
 		// we need to figure out exactly what the follower motors will "follow" (do we
 		// need to configure current limit for followers too, or just master?
 
 		boolean isFollower = talonNode.getData("isFollower");
 		if (isFollower) {
-			talon.set(ControlMode.Follower, (int) talonNode.getData("masterCANid"));
+			talon.set(ControlMode.Follower, talonNode.getData("masterCANid"));
 		} else {
-			talon.setInverted(talonNode.getData("isInverted"));
 
 			// I have methods commented out here that we might want to use, but am waiting
 			// for more documentation

@@ -29,6 +29,11 @@ public class Node {
 		return this;
 	}
 
+	public Node addData(Node data) {
+		addNode(data);
+		return this;
+	}
+
 	public Node addNode(Node child) {
 		if (getNode(child.name) != null)
 			return this;
@@ -55,7 +60,7 @@ public class Node {
 		return getNode(child).getOwnData();
 	}
 
-	private <T> T getOwnData() {
+	public <T> T getOwnData() {
 		return (T) data;
 	}
 
