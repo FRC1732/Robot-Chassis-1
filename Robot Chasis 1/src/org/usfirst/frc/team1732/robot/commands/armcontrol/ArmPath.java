@@ -24,22 +24,37 @@ public class ArmPath extends Command {
 	}
 
 	// Called just before this Command runs the first time
+	@Override
 	protected void initialize() {
 		Robot.arm.setSpeed(START_VOLTAGE);
+		if (START_POSITION.equals(Arm.ArmPositions.INTAKE)) {
+			Robot.arm.encoder.zero();
+		}
 	}
 
+	@Override
 	protected void execute() {
 		Robot.arm.setSpeed(BasicControl.cosineInterpolate(START_VOLTAGE, START_POSITION.position, END_VOLTAGE,
 				END_POSITION.position, Robot.arm.encoder.getPosition()));
 	}
 
 	// Make this return true when this Command no longer needs to run execute()
+	@Override
 	protected boolean isFinished() {
 		return Math.abs(Robot.arm.encoder.getPosition()) > Math.abs(END_POSITION.position - BIAS);
 	}
 
 	// Called once after isFinished returns true
+	@Override
 	protected void end() {
+		Robot.arm.setStop();
+		if (END_POSITION.equals(Arm.ArmPositions.INTAKE)) {
+			Robot.arm.encoder.zero();
+		}
+	}
+
+	@Override
+	protected void interrupted() {
 		Robot.arm.setStop();
 	}
 }
