@@ -7,7 +7,8 @@
 
 package org.usfirst.frc.team1732.robot;
 
-import org.usfirst.frc.team1732.robot.config.RobotConfig;
+import static org.usfirst.frc.team1732.robot.config.RobotConfig.config;
+
 import org.usfirst.frc.team1732.robot.input.Joysticks;
 import org.usfirst.frc.team1732.robot.sensors.Sensors;
 import org.usfirst.frc.team1732.robot.subsystems.Arm;
@@ -46,13 +47,13 @@ public class Robot extends TimedRobot {
 	@Override
 	public void robotInit() {
 		setPeriod(PERIOD_MS / 1000.0); // periodic methods will loop every 10 ms (1/100 sec)
-		drivetrain = new Drivetrain(RobotConfig.config.getNode("drivetrain"));
-		otherMotors = new OtherMotors(RobotConfig.config.getNode("otherMotors"));
+		drivetrain = new Drivetrain(config.getNode("drivetrain"));
+		otherMotors = new OtherMotors(config.getNode("otherMotors"));
 		sensors = new Sensors();
-		arm = new Arm(RobotConfig.config.getNode("arm"));
-		claw = new Claw(RobotConfig.config.getNode("claw"));
+		arm = new Arm(config.getNode("arm"));
+		claw = new Claw(config.getNode("claw"));
 
-		joysticks = new Joysticks(RobotConfig.config.getNode("joysticks"));
+		joysticks = new Joysticks(config.getNode("joysticks"));
 
 	}
 
@@ -67,8 +68,7 @@ public class Robot extends TimedRobot {
 	}
 
 	@Override
-	public void disabledPeriodic() {
-	}
+	public void disabledPeriodic() {}
 
 	@Override
 	public void autonomousInit() {
@@ -79,8 +79,7 @@ public class Robot extends TimedRobot {
 	 * This function is called periodically during autonomous.
 	 */
 	@Override
-	public void autonomousPeriodic() {
-	}
+	public void autonomousPeriodic() {}
 
 	@Override
 	public void teleopInit() {
