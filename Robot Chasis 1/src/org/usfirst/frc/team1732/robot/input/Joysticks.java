@@ -18,8 +18,11 @@ public class Joysticks {
 		left = new Joystick(joysticksNode.getNode("left").getData("port"));
 		right = new Joystick(joysticksNode.getNode("right").getData("port"));
 
-		new JoystickButton(left, 1).whileHeld(new RunClawIn());
-		new JoystickButton(right, 2).whileHeld(new RunClawOut());
+		// new JoystickButton(left, 1).whileHeld(new RunClawIn());
+		// new JoystickButton(right, 2).whileHeld(new RunClawOut());
+
+		new JoystickRangeButton(left, 2, 0.5).whileHeld(new RunClawIn());;
+		new JoystickRangeButton(right, 3, 0.5).whileHeld(new RunClawOut());;
 
 		new JoystickButton(left, 5).whileHeld(new SetArmScore());
 		new JoystickButton(right, 6).whileHeld(new SetArmIntake());
