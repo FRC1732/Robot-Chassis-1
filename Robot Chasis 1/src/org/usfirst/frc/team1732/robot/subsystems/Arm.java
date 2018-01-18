@@ -64,6 +64,27 @@ public class Arm extends Subsystem {
 		SmartDashboard.putNumber("Arm Angle", encoder.getPosition());
 		SmartDashboard.putNumber("Arm Pulses", talonEncoder.getPulses());
 		SmartDashboard.putNumber("Arm Voltage %", talon.getMotorOutputPercent());
+		leverArmToVoltage = SmartDashboard.getNumber("LeverArmToVoltage", leverArmToVoltage);
+	}
+
+	private static final double restingOffset = 90 - 65;
+	private static final double armLength = 25.5;
+	private double leverArmToVoltage = 0.001;
+
+	public double getTorqueCompensation(double angle) {
+		angle = angle + restingOffset;
+		double leverArm;
+		if (angle < 90) {
+			angle = 90 - angle;
+			leverArm = Math.cos(angle) * armLength;
+		}
+		if (90 < angle && angle < 180) {
+			leverArm = Math.cos(angle) * armLength;
+			leverArm = -leverArm;
+		} else {
+			leverArm = Math.cos(angle) * armLength;
+		}
+		return leverArm * leverArmToVoltage;
 	}
 
 }
