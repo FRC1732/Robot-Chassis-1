@@ -2,9 +2,9 @@ package org.usfirst.frc.team1732.robot.subsystems;
 
 import org.usfirst.frc.team1732.robot.Robot;
 import org.usfirst.frc.team1732.robot.config.Node;
-import org.usfirst.frc.team1732.robot.sensors.EncoderBase;
-import org.usfirst.frc.team1732.robot.sensors.EncoderReader;
-import org.usfirst.frc.team1732.robot.sensors.TalonEncoder;
+import org.usfirst.frc.team1732.robot.sensors.encoders.EncoderBase;
+import org.usfirst.frc.team1732.robot.sensors.encoders.EncoderReader;
+import org.usfirst.frc.team1732.robot.sensors.encoders.TalonEncoder;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;

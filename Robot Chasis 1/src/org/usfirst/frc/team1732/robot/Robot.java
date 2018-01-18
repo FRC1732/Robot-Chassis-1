@@ -90,7 +90,7 @@ public class Robot extends TimedRobot {
 
 	}
 
-	private long totalTime = 0;
+	private long timeTotal = 0;
 	private double times = 0;
 
 	/**
@@ -120,9 +120,9 @@ public class Robot extends TimedRobot {
 		final FalconPathPlanner path = new FalconPathPlanner(waypoints);
 		path.calculate(totalTime, timeStep, robotTrackWidth);
 
-		totalTime += System.currentTimeMillis() - start;
+		timeTotal += System.currentTimeMillis() - start;
 		times += 1;
-		SmartDashboard.putNumber("Avg execution time", totalTime / times);
+		SmartDashboard.putNumber("Avg execution time", timeTotal / times);
 	}
 
 	@Override
