@@ -9,6 +9,7 @@ package org.usfirst.frc.team1732.robot;
 
 import static org.usfirst.frc.team1732.robot.config.RobotConfig.config;
 
+import org.usfirst.frc.team1732.robot.controlutils.FalconPathPlanner;
 import org.usfirst.frc.team1732.robot.input.Joysticks;
 import org.usfirst.frc.team1732.robot.sensors.Sensors;
 import org.usfirst.frc.team1732.robot.subsystems.Arm;
@@ -18,6 +19,7 @@ import org.usfirst.frc.team1732.robot.subsystems.OtherMotors;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Scheduler;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -68,7 +70,8 @@ public class Robot extends TimedRobot {
 	}
 
 	@Override
-	public void disabledPeriodic() {}
+	public void disabledPeriodic() {
+	}
 
 	@Override
 	public void autonomousInit() {
@@ -79,12 +82,16 @@ public class Robot extends TimedRobot {
 	 * This function is called periodically during autonomous.
 	 */
 	@Override
-	public void autonomousPeriodic() {}
+	public void autonomousPeriodic() {
+	}
 
 	@Override
 	public void teleopInit() {
 
 	}
+
+	private long totalTime = 0;
+	private double times = 0;
 
 	/**
 	 * This function is called periodically during operator control.
@@ -92,6 +99,30 @@ public class Robot extends TimedRobot {
 	@Override
 	public void teleopPeriodic() {
 		Scheduler.getInstance().run();
+		long start = System.currentTimeMillis();
+		// System.setProperty("java.awt.headless", "true"); //enable this to true to
+		// emulate roboRio environment
+
+		// create waypoint path
+		double[][] waypoints = new double[][] {
+				{ 1, 1 },
+				{ 5, 1 },
+				{ 9, 12 },
+				{ 12, 9 },
+				{ 15, 6 },
+				{ 19, 12 }
+		};
+
+		double totalTime = 8; // seconds
+		double timeStep = 0.1; // period of control loop on Rio, seconds
+		double robotTrackWidth = 2; // distance between left and right wheels, feet
+
+		final FalconPathPlanner path = new FalconPathPlanner(waypoints);
+		path.calculate(totalTime, timeStep, robotTrackWidth);
+
+		totalTime += System.currentTimeMillis() - start;
+		times += 1;
+		SmartDashboard.putNumber("Avg execution time", totalTime / times);
 	}
 
 	@Override
