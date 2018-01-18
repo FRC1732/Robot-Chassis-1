@@ -1,9 +1,6 @@
 package org.usfirst.frc.team1732.robot.input;
 
-import org.usfirst.frc.team1732.robot.commands.RunClawIn;
-import org.usfirst.frc.team1732.robot.commands.RunClawOut;
-import org.usfirst.frc.team1732.robot.commands.armcontrol.SetArmIntake;
-import org.usfirst.frc.team1732.robot.commands.armcontrol.SetArmScore;
+import org.usfirst.frc.team1732.robot.commands.RunArmWithTorqueCompensation;
 import org.usfirst.frc.team1732.robot.config.Node;
 
 import edu.wpi.first.wpilibj.Joystick;
@@ -21,11 +18,13 @@ public class Joysticks {
 		// new JoystickButton(left, 1).whileHeld(new RunClawIn());
 		// new JoystickButton(right, 2).whileHeld(new RunClawOut());
 
-		new JoystickRangeButton(left, 2, 0.5).whileHeld(new RunClawIn());;
-		new JoystickRangeButton(right, 3, 0.5).whileHeld(new RunClawOut());;
+		new JoystickButton(left, 1).whileHeld(new RunArmWithTorqueCompensation(0));
 
-		new JoystickButton(left, 5).whileHeld(new SetArmScore());
-		new JoystickButton(right, 6).whileHeld(new SetArmIntake());
+		// new JoystickRangeButton(left, 2, 0.5).whileHeld(new RunClawIn());
+		// new JoystickRangeButton(right, 3, 0.5).whileHeld(new RunClawOut());
+		//
+		// new JoystickButton(left, 5).whileHeld(new SetArmScore());
+		// new JoystickButton(right, 6).whileHeld(new SetArmIntake());
 	}
 
 	public double getLeft() {

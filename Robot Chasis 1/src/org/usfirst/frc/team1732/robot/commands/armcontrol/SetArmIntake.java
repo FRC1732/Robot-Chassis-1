@@ -10,8 +10,8 @@ import edu.wpi.first.wpilibj.command.CommandGroup;
 public class SetArmIntake extends CommandGroup {
 
 	public SetArmIntake() {
-		addSequential(new ArmPath(-0.2, -1, ArmPositions.SCORE, ArmPositions.UPRIGHT, 0));
-		addSequential(new ArmPath(-1, -0.2, ArmPositions.UPRIGHT, ArmPositions.HORIZONTAL, 0));
+		addSequential(new ArmPath(-0.1, -0.5, ArmPositions.SCORE, ArmPositions.UPRIGHT, 0));
+		addSequential(new ArmPath(-0.5, -0.2, ArmPositions.UPRIGHT, ArmPositions.HORIZONTAL, 0));
 		addSequential(new ArmPath(-0.2, 0, ArmPositions.HORIZONTAL, ArmPositions.INTAKE, -5));
 	}
 }

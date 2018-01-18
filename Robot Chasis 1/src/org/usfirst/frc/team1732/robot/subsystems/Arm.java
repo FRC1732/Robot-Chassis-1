@@ -36,6 +36,7 @@ public class Arm extends Subsystem {
 		talonEncoder.setDistancePerPulse(DEGREES_PER_PULSE);
 		encoder = new EncoderReader(talonEncoder);
 		encoder.zero();
+		SmartDashboard.putNumber("LeverArmToVoltage", leverArmToVoltage);
 	}
 
 	public void setUp() {
@@ -69,20 +70,20 @@ public class Arm extends Subsystem {
 
 	private static final double restingOffset = 90 - 65;
 	private static final double armLength = 25.5;
-	private double leverArmToVoltage = 0.001;
+	private double leverArmToVoltage = 0.01;
 
 	public double getTorqueCompensation(double angle) {
 		angle = angle + restingOffset;
 		double leverArm;
 		if (angle < 90) {
 			angle = 90 - angle;
-			leverArm = Math.cos(angle) * armLength;
+			leverArm = Math.cos(Math.toRadians(angle)) * armLength;
 		}
 		if (90 < angle && angle < 180) {
-			leverArm = Math.cos(angle) * armLength;
+			leverArm = Math.cos(Math.toRadians(angle)) * armLength;
 			leverArm = -leverArm;
 		} else {
-			leverArm = Math.cos(angle) * armLength;
+			leverArm = Math.cos(Math.toRadians(angle)) * armLength;
 		}
 		return leverArm * leverArmToVoltage;
 	}
