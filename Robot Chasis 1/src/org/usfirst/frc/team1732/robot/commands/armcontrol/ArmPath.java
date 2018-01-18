@@ -34,9 +34,9 @@ public class ArmPath extends Command {
 
 	@Override
 	protected void execute() {
-		Robot.arm.setSpeed(Robot.arm.getTorqueCompensation(Robot.arm.encoder.getPosition())
-				+ BasicControl.cosineInterpolate(START_VOLTAGE, START_POSITION.position, END_VOLTAGE,
-						END_POSITION.position, Robot.arm.encoder.getPosition()));
+		Robot.arm.setSpeed(BasicControl.cosineInterpolate(START_VOLTAGE, START_POSITION.position, END_VOLTAGE,
+				END_POSITION.position, Robot.arm.encoder.getPosition()));
+		// Robot.arm.setSpeed(Robot.arm.getTorqueCompensation(Robot.arm.encoder.getPosition())
 	}
 
 	// Make this return true when this Command no longer needs to run execute()
