@@ -21,15 +21,13 @@ public class Joysticks {
 		buttons = new Joystick(joysticksNode.getNode("buttons").getData("port"));
 
 		new JoystickButton(left, 1).whileHeld(new RunClawIn());
-		new JoystickButton(right, 2).whileHeld(new RunClawOut());
 
 		// new JoystickButton(left, 1).whileHeld(new RunArmWithTorqueCompensation(0));
 
-		new JoystickRangeButton(left, 2, 0.5).whileHeld(new RunClawIn());
-		new JoystickRangeButton(right, 3, 0.5).whileHeld(new RunClawOut());
+		new JoystickButton(right, 1).whileHeld(new RunClawOut());
 		//
-		new JoystickButton(left, 5).whileHeld(new SetArmScore());
-		new JoystickButton(right, 6).whileHeld(new SetArmIntake());
+		new JoystickButton(left, 2).whileHeld(new SetArmScore());
+		new JoystickButton(right, 2).whileHeld(new SetArmIntake());
 	}
 
 	public double getLeft() {
@@ -37,7 +35,7 @@ public class Joysticks {
 	}
 
 	public double getRight() {
-		return -right.getRawAxis(5);
+		return -right.getRawAxis(1);
 	}
 
 	public boolean isReversed() {

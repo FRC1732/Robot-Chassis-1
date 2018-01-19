@@ -17,7 +17,8 @@ public class Claw extends Subsystem {
 	public final Supplier<Double> rightSparkCurrent;
 
 	private final PowerDistributionPanel panel = new PowerDistributionPanel();
-	public static final double currentLimit = 10;
+	public static final double rightCurrentLimit = 30;
+	public static final double leftCurrentLimit = 20;
 
 	public Claw(Node clawNode) {
 		leftSpark = MotorUtils.configureSpark(clawNode.getNode("leftSpark"));

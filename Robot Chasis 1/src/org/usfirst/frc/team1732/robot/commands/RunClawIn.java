@@ -21,11 +21,12 @@ public class RunClawIn extends Command {
 
 	private long timeFirstOver;
 	private boolean goneOver = false;
+	public static final double currentOverTime = 500;
 
 	@Override
 	protected void execute() {
-		boolean isOver = (Math.abs(Robot.claw.leftSparkCurrent.get()) > Claw.currentLimit
-				|| Math.abs(Robot.claw.rightSparkCurrent.get()) > Claw.currentLimit);
+		boolean isOver = (Math.abs(Robot.claw.leftSparkCurrent.get()) > Claw.leftCurrentLimit
+				|| Math.abs(Robot.claw.rightSparkCurrent.get()) > Claw.rightCurrentLimit);
 		if (isOver && !goneOver) {
 			timeFirstOver = System.currentTimeMillis();
 			goneOver = true;
@@ -37,9 +38,9 @@ public class RunClawIn extends Command {
 
 	@Override
 	protected boolean isFinished() {
-		return (Math.abs(Robot.claw.leftSparkCurrent.get()) > Claw.currentLimit
-				|| Math.abs(Robot.claw.rightSparkCurrent.get()) > Claw.currentLimit)
-				&& (goneOver && System.currentTimeMillis() - timeFirstOver > 500);
+		return (Math.abs(Robot.claw.leftSparkCurrent.get()) > Claw.leftCurrentLimit
+				|| Math.abs(Robot.claw.rightSparkCurrent.get()) > Claw.rightCurrentLimit)
+				&& (goneOver && System.currentTimeMillis() - timeFirstOver > currentOverTime);
 	}
 
 	protected void end() {
