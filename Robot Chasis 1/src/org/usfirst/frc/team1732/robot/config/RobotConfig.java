@@ -40,7 +40,8 @@ public class RobotConfig {
 
 		Node joysticks = config.addNode("joysticks");
 		joysticks.addNode("left").addData("port", 0);
-		joysticks.addNode("right").addData("port", 0);
+		joysticks.addNode("right").addData("port", 1);
+		joysticks.addNode("buttons").addData("port", 2);
 	}
 
 }

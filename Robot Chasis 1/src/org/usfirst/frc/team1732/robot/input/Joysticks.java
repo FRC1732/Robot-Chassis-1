@@ -13,10 +13,12 @@ public class Joysticks {
 
 	public final Joystick left;
 	public final Joystick right;
+	public final Joystick buttons;
 
 	public Joysticks(Node joysticksNode) {
 		left = new Joystick(joysticksNode.getNode("left").getData("port"));
 		right = new Joystick(joysticksNode.getNode("right").getData("port"));
+		buttons = new Joystick(joysticksNode.getNode("buttons").getData("port"));
 
 		new JoystickButton(left, 1).whileHeld(new RunClawIn());
 		new JoystickButton(right, 2).whileHeld(new RunClawOut());
@@ -36,5 +38,9 @@ public class Joysticks {
 
 	public double getRight() {
 		return -right.getRawAxis(5);
+	}
+
+	public boolean isReversed() {
+		return buttons.getRawButton(5);
 	}
 }
