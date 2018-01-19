@@ -62,8 +62,9 @@ public class Arm extends Subsystem {
 
 	@Override
 	public void periodic() {
-		SmartDashboard.putNumber("Arm Angle", encoder.getPosition());
-		SmartDashboard.putNumber("Arm Pulses", talonEncoder.getPulses());
+		SmartDashboard.putNumber("Arm Encoder Reader Angle", encoder.getPosition());
+		SmartDashboard.putNumber("Arm Encoder Pulses", talonEncoder.getPulses());
+		SmartDashboard.putNumber("Arm Encoder Angle", talonEncoder.getPosition());
 		SmartDashboard.putNumber("Arm Voltage %", talon.getMotorOutputPercent());
 		leverArmToVoltage = SmartDashboard.getNumber("LeverArmToVoltage", leverArmToVoltage);
 	}
