@@ -21,6 +21,9 @@ public class EncoderReader {
 		return e.getPosition() - position;
 	}
 
+	/**
+	 * @return current rate in units per 100ms
+	 */
 	public double getRate() {
 		return e.getRate();
 	}

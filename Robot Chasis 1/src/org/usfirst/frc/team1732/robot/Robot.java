@@ -10,6 +10,7 @@ package org.usfirst.frc.team1732.robot;
 import static org.usfirst.frc.team1732.robot.config.RobotConfig.config;
 
 import org.usfirst.frc.team1732.robot.input.Joysticks;
+import org.usfirst.frc.team1732.robot.odomotry.PositionEstimator;
 import org.usfirst.frc.team1732.robot.sensors.Sensors;
 import org.usfirst.frc.team1732.robot.subsystems.Arm;
 import org.usfirst.frc.team1732.robot.subsystems.Claw;
@@ -35,6 +36,7 @@ public class Robot extends TimedRobot {
 	public static Arm arm;
 	public static Sensors sensors;
 	public static Joysticks joysticks;
+	public static PositionEstimator positionEstimator;
 
 	// config
 	public static final int PERIOD_MS = 10;
@@ -54,12 +56,13 @@ public class Robot extends TimedRobot {
 		claw = new Claw(config.getNode("claw"));
 
 		joysticks = new Joysticks(config.getNode("joysticks"));
-
+		positionEstimator = new PositionEstimator(sensors.navX, sensors.leftEncoder.makeReader(),
+				sensors.rightEncoder.makeReader());
 	}
 
 	@Override
 	public void robotPeriodic() {
-		// Scheduler.getInstance().run();
+		Scheduler.getInstance().run();
 	}
 
 	@Override
@@ -96,31 +99,7 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void teleopPeriodic() {
-		Scheduler.getInstance().run();
-		// long start = System.currentTimeMillis();
-		// // System.setProperty("java.awt.headless", "true"); //enable this to true to
-		// // emulate roboRio environment
-		//
-		// // create waypoint path
-		// double[][] waypoints = new double[][] {
-		// { 1, 1 },
-		// { 5, 1 },
-		// { 9, 12 },
-		// { 12, 9 },
-		// { 15, 6 },
-		// { 19, 12 }
-		// };
-		//
-		// double totalTime = 8; // seconds
-		// double timeStep = 0.1; // period of control loop on Rio, seconds
-		// double robotTrackWidth = 2; // distance between left and right wheels, feet
-		//
-		// final FalconPathPlanner path = new FalconPathPlanner(waypoints);
-		// path.calculate(totalTime, timeStep, robotTrackWidth);
 
-		// timeTotal += System.currentTimeMillis() - start;
-		// times += 1;
-		// SmartDashboard.putNumber("Avg execution time", timeTotal / times);
 	}
 
 	@Override
