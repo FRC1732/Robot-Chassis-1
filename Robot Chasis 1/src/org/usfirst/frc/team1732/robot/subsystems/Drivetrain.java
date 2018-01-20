@@ -23,6 +23,8 @@ public class Drivetrain extends Subsystem {
 
 	public static final double DRIVE_DEADBAND = 0.04; // CTRE default, but also need to pass to DifferentialDrive
 
+	public static final int ENCODER_PULSES_PER_INCH = 520;
+
 	public Drivetrain(Node drivetrainNode) {
 		leftTalon1 = MotorUtils.configureTalon(drivetrainNode.getNode("leftTalon1"), DRIVE_DEADBAND,
 				Robot.CONFIG_TIMEOUT);
@@ -40,6 +42,8 @@ public class Drivetrain extends Subsystem {
 		drive.setDeadband(DRIVE_DEADBAND); // might not need these: talon's have their own "neutral zone"
 		leftEncoder = new TalonEncoder(leftTalon1);
 		rightEncoder = new TalonEncoder(rightTalon1);
+		leftEncoder.setDistancePerPulse(1.0 / ENCODER_PULSES_PER_INCH);
+		rightEncoder.setDistancePerPulse(1.0 / ENCODER_PULSES_PER_INCH);
 	}
 
 	@Override
