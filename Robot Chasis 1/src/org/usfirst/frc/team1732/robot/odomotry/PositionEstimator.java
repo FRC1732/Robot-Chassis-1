@@ -1,5 +1,6 @@
 package org.usfirst.frc.team1732.robot.odomotry;
 
+import org.usfirst.frc.team1732.robot.sensors.Sensors;
 import org.usfirst.frc.team1732.robot.sensors.encoders.EncoderReader;
 
 import com.kauailabs.navx.frc.AHRS;
@@ -44,7 +45,7 @@ public class PositionEstimator extends Subsystem {
 	private void update() {
 		// multiply by 100 because it's in units per 100 ms
 		double velocity = (leftEncoder.getRate() * 100 + rightEncoder.getRate() * 100) / 2;
-		relativeHeading = navX.getYaw();
+		relativeHeading = Sensors.convertTotalAngle(navX.getAngle());
 		double headingRadians = Math.toRadians(relativeHeading);
 		long dt = System.currentTimeMillis() - lastLoop;
 		relativeX += Math.cos(headingRadians) + velocity * dt;
@@ -55,7 +56,7 @@ public class PositionEstimator extends Subsystem {
 	@Override
 	public void periodic() {
 		update();
-		SmartDashboard.putNumber("Heading", getRelativeHeading());
+		SmartDashboard.putNumber("Heading", Sensors.convertTotalAngle(navX.getAngle()));
 		SmartDashboard.putNumber("X", getRelativeX());
 		SmartDashboard.putNumber("Y", getRelativeY());
 	}
