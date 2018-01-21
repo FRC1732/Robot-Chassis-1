@@ -14,4 +14,11 @@ public class Sensors {
 
 	public final AHRS navX = new AHRS(SPI.Port.kMXP);
 
+	public static double convertTotalAngle(double angle) {
+		angle = angle % 360;
+		if (Math.abs(angle) > 180) {
+			angle = angle - Math.signum(angle) * 180;
+		}
+		return angle;
+	}
 }
