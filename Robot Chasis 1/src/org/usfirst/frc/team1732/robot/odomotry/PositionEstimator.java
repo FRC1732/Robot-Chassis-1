@@ -42,7 +42,8 @@ public class PositionEstimator extends Subsystem {
 	private long lastLoop = System.currentTimeMillis();
 
 	private void update() {
-		double velocity = (leftEncoder.getRate() + rightEncoder.getRate()) / 2;
+		// multiply by 100 because it's in units per 100 ms
+		double velocity = (leftEncoder.getRate() * 100 + rightEncoder.getRate() * 100) / 2;
 		relativeHeading = navX.getYaw();
 		double headingRadians = Math.toRadians(relativeHeading);
 		long dt = System.currentTimeMillis() - lastLoop;
