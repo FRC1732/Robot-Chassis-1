@@ -55,6 +55,7 @@ public class Drivetrain extends Subsystem {
 	public void periodic() {
 		SmartDashboard.putNumber("Left Encoder Pulses", leftEncoder.getPulses());
 		SmartDashboard.putNumber("Right Encoder Pulses", rightEncoder.getPulses());
-
+		SmartDashboard.putNumber("Left Rate", leftEncoder.getRate());
+		SmartDashboard.putNumber("Right Rate", rightEncoder.getRate());
 	}
 }
