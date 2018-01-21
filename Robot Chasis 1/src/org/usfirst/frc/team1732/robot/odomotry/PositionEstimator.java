@@ -41,24 +41,26 @@ public class PositionEstimator extends Subsystem {
 	}
 
 	private long lastLoop = System.currentTimeMillis();
+	private long dt;
 
 	private void update() {
-		// multiply by 100 because it's in units per 100 ms
-		double velocity = (leftEncoder.getRate() * 100 + rightEncoder.getRate() * 100) / 2;
+		// divide by 100 because it's in units per 100 ms
+		double velocity = (leftEncoder.getRate() / 100 + rightEncoder.getRate() / 100) / 2;
 		relativeHeading = Sensors.convertTotalAngle(navX.getAngle());
 		double headingRadians = Math.toRadians(relativeHeading);
-		long dt = System.currentTimeMillis() - lastLoop;
-		relativeX += Math.cos(headingRadians) + velocity * dt;
-		relativeY += Math.sin(headingRadians) + velocity * dt;
+		dt = System.currentTimeMillis() - lastLoop;
+		relativeX += Math.cos(headingRadians) * velocity * dt;
+		relativeY += Math.sin(headingRadians) * velocity * dt;
 		lastLoop = System.currentTimeMillis();
 	}
 
 	@Override
 	public void periodic() {
 		update();
-		SmartDashboard.putNumber("Heading", Sensors.convertTotalAngle(navX.getAngle()));
+		SmartDashboard.putNumber("Heading", relativeHeading);
 		SmartDashboard.putNumber("X", getRelativeX());
 		SmartDashboard.putNumber("Y", getRelativeY());
+		SmartDashboard.putNumber("dt", dt);
 	}
 
 	public double getRelativeX() {
