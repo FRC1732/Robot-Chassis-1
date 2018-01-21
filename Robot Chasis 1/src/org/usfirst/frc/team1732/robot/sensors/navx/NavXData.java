@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class NavXData {
 
-	public void sendNavXData(AHRS ahrs) {
+	public static void sendNavXData(AHRS ahrs) {
 		String imu = "IMU/";
 		/* Display 6-axis Processed Angle Data */
 		SmartDashboard.putBoolean(imu + "IMU_Connected", ahrs.isConnected());
