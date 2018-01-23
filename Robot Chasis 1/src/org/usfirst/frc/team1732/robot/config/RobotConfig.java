@@ -16,7 +16,7 @@ public class RobotConfig {
 		drivetrain.addNode("rightTalon3").addData("CANid", 7,
 				"isFollower", false, "isInverted", false).addData(rightMasterCANid);
 
-		Node leftMasterCANid = new Node("masterCANid", 0);
+		Node leftMasterCANid = new Node("masterCANid", 1);
 		drivetrain.addNode("leftTalon1").addData("CANid", leftMasterCANid.getOwnData(),
 				"isFollower", true, "isInverted", false).addData(leftMasterCANid);
 
