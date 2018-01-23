@@ -3,9 +3,11 @@ package org.usfirst.frc.team1732.robot.subsystems;
 import org.usfirst.frc.team1732.robot.Robot;
 import org.usfirst.frc.team1732.robot.commands.DriveWithJoysticks;
 import org.usfirst.frc.team1732.robot.config.Node;
+import org.usfirst.frc.team1732.robot.controlutils.GainProfile;
 import org.usfirst.frc.team1732.robot.drivercontrol.DifferentialDrive;
 import org.usfirst.frc.team1732.robot.sensors.encoders.TalonEncoder;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.wpilibj.command.Subsystem;
@@ -13,17 +15,18 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Drivetrain extends Subsystem {
 
-	public DifferentialDrive drive;
-
 	private TalonSRX leftTalon1;
 	private TalonSRX rightTalon1;
+
+	public DifferentialDrive drive;
 
 	public final TalonEncoder leftEncoder;
 	public final TalonEncoder rightEncoder;
 
-	public static final double DRIVE_DEADBAND = 0.04; // CTRE default, but also need to pass to DifferentialDrive
+	public final GainProfile profile0 = new GainProfile("Gain Profile 0", 0, 0, 0, 0, 0, 0, 0);
 
-	public static final int ENCODER_PULSES_PER_INCH = 520;
+	public static final double DRIVE_DEADBAND = 0.04; // CTRE default, but also need to pass to DifferentialDrive
+	public static final int ENCODER_PULSES_PER_INCH = 520; // probably should double check this
 
 	public Drivetrain(Node drivetrainNode) {
 		leftTalon1 = MotorUtils.configureTalon(drivetrainNode.getNode("leftTalon1"), DRIVE_DEADBAND,
@@ -57,5 +60,10 @@ public class Drivetrain extends Subsystem {
 		SmartDashboard.putNumber("Right Encoder Pulses", rightEncoder.getPulses());
 		SmartDashboard.putNumber("Left Rate", leftEncoder.getRate());
 		SmartDashboard.putNumber("Right Rate", rightEncoder.getRate());
+	}
+
+	public void setStop() {
+		leftTalon1.set(ControlMode.PercentOutput, 0);
+		rightTalon1.set(ControlMode.PercentOutput, 0);
 	}
 }

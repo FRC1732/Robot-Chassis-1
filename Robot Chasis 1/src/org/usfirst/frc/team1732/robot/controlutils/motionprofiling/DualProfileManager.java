@@ -6,13 +6,17 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 public class DualProfileManager {
 
-	private final Path path;
+	private final Path leftPath;
+	private final Path rightPath;
+
 	private final MotionProfileManager leftManager;
 	private final MotionProfileManager rightManager;
 
-	public DualProfileManager(Path path, TalonSRX left, TalonSRX right) {
-		this.path = path;
-		this.leftManager = new MotionProfileManager(right, path.leftPoints);
-		this.rightManager = new MotionProfileManager(right, path.rightPoints);
+	public DualProfileManager(Path leftPath, Path rightPath, TalonSRX left, TalonSRX right) {
+		this.leftPath = leftPath;
+		this.rightPath = rightPath;
+		this.leftManager = new MotionProfileManager(right, leftPath);
+		this.rightManager = new MotionProfileManager(right, rightPath);
 	}
+
 }

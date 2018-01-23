@@ -69,11 +69,9 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void disabledInit() {
-
-	}
-
-	@Override
-	public void disabledPeriodic() {
+		arm.setStop();
+		claw.setStop();
+		drivetrain.setStop();
 	}
 
 	@Override
@@ -81,26 +79,8 @@ public class Robot extends TimedRobot {
 
 	}
 
-	/**
-	 * This function is called periodically during autonomous.
-	 */
-	@Override
-	public void autonomousPeriodic() {
-	}
-
 	@Override
 	public void teleopInit() {
-
-	}
-
-	private long timeTotal = 0;
-	private double times = 0;
-
-	/**
-	 * This function is called periodically during operator control.
-	 */
-	@Override
-	public void teleopPeriodic() {
 
 	}
 
@@ -109,11 +89,4 @@ public class Robot extends TimedRobot {
 
 	}
 
-	/**
-	 * This function is called periodically during test mode.
-	 */
-	@Override
-	public void testPeriodic() {
-
-	}
 }

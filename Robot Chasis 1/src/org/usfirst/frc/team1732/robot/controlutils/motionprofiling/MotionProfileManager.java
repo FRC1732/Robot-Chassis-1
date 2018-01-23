@@ -1,5 +1,8 @@
 package org.usfirst.frc.team1732.robot.controlutils.motionprofiling;
 
+import org.usfirst.frc.team1732.robot.Robot;
+import org.usfirst.frc.team1732.robot.controlutils.pathing.Path;
+
 /**
  * Example logic for firing and managing motion profiles.
  * This example sends MPs, waits for them to finish
@@ -29,6 +32,7 @@ import com.ctre.phoenix.motion.SetValueMotionProfile;
 import com.ctre.phoenix.motion.TrajectoryPoint;
 import com.ctre.phoenix.motion.TrajectoryPoint.TrajectoryDuration;
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.wpilibj.DriverStation;
@@ -37,10 +41,10 @@ import edu.wpi.first.wpilibj.Notifier;
 public class MotionProfileManager {
 
 	/**
-	 * The double array holding the path to be follower
+	 * The object holding the path to be follower
 	 */
 
-	private final double[][] path;
+	private Path path;
 
 	/**
 	 * The status of the motion profile executer and buffer inside the Talon.
@@ -117,15 +121,23 @@ public class MotionProfileManager {
 	 * @param talon
 	 *            reference to Talon object to fetch motion profile status from.
 	 */
-	public MotionProfileManager(TalonSRX talon, double[][] path) {
+	public MotionProfileManager(TalonSRX talon, Path path) {
 		_talon = talon;
+		resetAndChangePath(path);
+	}
+
+	public void resetAndChangePath(Path path) {
+		reset();
 		this.path = path;
 		/*
 		 * since our MP is 10ms per point, set the control frame rate and the notifer to
 		 * half that
 		 */
-		_talon.changeMotionControlFramePeriod(5);
-		_notifer.startPeriodic(0.005);
+		_talon.changeMotionControlFramePeriod(path.baseDuration);
+		_talon.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, path.baseDuration, Robot.CONFIG_TIMEOUT);
+		_talon.changeMotionControlFramePeriod(path.baseDuration / 2);
+		_notifer.startPeriodic(path.baseDuration / 1000.0 / 2.0);
+		path.profile.applyToTalon(_talon, 0);
 	}
 
 	/**
@@ -148,6 +160,13 @@ public class MotionProfileManager {
 		 * press
 		 */
 		_bStart = false;
+	}
+
+	/**
+	 * Called every robot loop while profile is running to keep talon in right mode
+	 */
+	public void run() {
+		_talon.set(ControlMode.MotionProfile, _setValue.value);
 	}
 
 	/**
@@ -278,8 +297,7 @@ public class MotionProfileManager {
 
 	private void startFilling() {
 
-		double[][] profile = path;
-		double totalCnt = path.length;
+		double totalCnt = path.points.length;
 
 		/* create an empty point */
 		TrajectoryPoint point = new TrajectoryPoint();
@@ -304,22 +322,20 @@ public class MotionProfileManager {
 		 * set the base trajectory period to zero, use the individual trajectory period
 		 * below
 		 */
-		_talon.configMotionProfileTrajectoryPeriod(Constants.kBaseTrajPeriodMs, Constants.kTimeoutMs);
+		_talon.configMotionProfileTrajectoryPeriod(path.baseDuration, Robot.CONFIG_TIMEOUT);
 
 		/* This is fast since it's just into our TOP buffer */
 		for (int i = 0; i < totalCnt; ++i) {
-			double positionRot = profile[i][0];
-			double velocityRPM = profile[i][1];
 			/* for each point, fill our structure and pass it to API */
-			point.position = positionRot * Constants.kSensorUnitsPerRotation; // Convert Revolutions to Units
-			point.velocity = velocityRPM * Constants.kSensorUnitsPerRotation / 600.0; // Convert RPM to Units/100ms
-			point.headingDeg = 0; /* future feature - not used in this example */
+			point.position = path.points[i].position;
+			point.velocity = path.points[i].velocity;
+			point.headingDeg = path.points[i].heading;
 			point.profileSlotSelect0 = 0; /* which set of gains would you like to use [0,3]? */
-			point.profileSlotSelect1 = 0; /*
-											 * future feature - not used in this example - cascaded PID [0,1], leave
-											 * zero
-											 */
-			point.timeDur = GetTrajectoryDuration((int) profile[i][2]);
+			point.profileSlotSelect1 = path.useCascaded; /*
+															 * future feature - not used in this example - cascaded PID
+															 * [0,1], leave zero
+															 */
+			point.timeDur = GetTrajectoryDuration((int) path.points[i].duration);
 			point.zeroPos = false;
 			if (i == 0)
 				point.zeroPos = true; /* set this to true on the first point */
