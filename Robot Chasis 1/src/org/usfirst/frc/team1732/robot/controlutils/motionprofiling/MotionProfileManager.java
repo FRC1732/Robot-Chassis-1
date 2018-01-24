@@ -130,13 +130,13 @@ public class MotionProfileManager {
 		reset();
 		this.path = path;
 		/*
-		 * since our MP is 10ms per point, set the control frame rate and the notifer to
-		 * half that
+		 * since our MP is 10ms per point, set the control frame rate and the notifier
+		 * to half that
 		 */
-		_talon.changeMotionControlFramePeriod(path.baseDuration);
-		_talon.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, path.baseDuration, Robot.CONFIG_TIMEOUT);
-		_talon.changeMotionControlFramePeriod(path.baseDuration / 2);
-		_notifer.startPeriodic(path.baseDuration / 1000.0 / 2.0);
+		_talon.changeMotionControlFramePeriod(path.stepDuration);
+		_talon.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, path.stepDuration, Robot.CONFIG_TIMEOUT);
+		_talon.changeMotionControlFramePeriod(path.stepDuration / 2);
+		_notifer.startPeriodic(path.stepDuration / 1000.0 / 2.0);
 		path.profile.applyToTalon(_talon, 0);
 	}
 
@@ -167,6 +167,7 @@ public class MotionProfileManager {
 	 */
 	public void run() {
 		_talon.set(ControlMode.MotionProfile, _setValue.value);
+		control();
 	}
 
 	/**
@@ -322,7 +323,7 @@ public class MotionProfileManager {
 		 * set the base trajectory period to zero, use the individual trajectory period
 		 * below
 		 */
-		_talon.configMotionProfileTrajectoryPeriod(path.baseDuration, Robot.CONFIG_TIMEOUT);
+		_talon.configMotionProfileTrajectoryPeriod(0, Robot.CONFIG_TIMEOUT);
 
 		/* This is fast since it's just into our TOP buffer */
 		for (int i = 0; i < totalCnt; ++i) {
@@ -354,6 +355,7 @@ public class MotionProfileManager {
 	 */
 	void startMotionProfile() {
 		_bStart = true;
+		path.profile.applyToTalon(_talon, 0);
 	}
 
 	/**

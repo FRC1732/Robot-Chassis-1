@@ -7,26 +7,17 @@ import org.usfirst.frc.team1732.robot.controlutils.GainProfile;
  */
 public class Path {
 
-	public final Point[] points;
+	public final TrajPoint[] points;
 
 	public final GainProfile profile;
 	public final int useCascaded;
-	public final int baseDuration;
+	public final int stepDuration;
 
-	public Path(Point[] points, GainProfile profile, int baseDuration) {
-		this(points, profile, 0, baseDuration);
-	}
-
-	public Path(Point[] points, GainProfile profile, int useCascaded, int baseDuration) {
+	public Path(TrajPoint[] points, GainProfile profile, int useCascaded, int stepDuration) {
 		this.points = points;
 		this.profile = profile;
 		this.useCascaded = useCascaded;
-		this.baseDuration = baseDuration;
-	}
-
-	// TODO
-	public static Point[] generatePointsFromFalcon(FalconPathPlanner path) {
-		return null;
+		this.stepDuration = stepDuration;
 	}
 
 }

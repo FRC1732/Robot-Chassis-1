@@ -1,4 +1,4 @@
-package org.usfirst.frc.team1732.robot.controlutils.pathing;
+package org.usfirst.frc.team1732.robot.controlutils.pathing.falcon;
 
 import java.awt.Color;
 import java.awt.GraphicsEnvironment;
