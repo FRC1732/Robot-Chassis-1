@@ -55,17 +55,28 @@ public class DrivetrainProfileManager {
 		}
 	}
 
+	/**
+	 * Called to clear Motion profile buffer and reset state info during disabled
+	 * and when Talon is not in MP control mode.
+	 */
 	public void reset() {
 		leftManager.reset();
 		rightManager.reset();
 	}
 
+	/**
+	 * Called every robot loop while profile is running to keep talon in right mode
+	 */
 	public void run() {
 		leftManager.run();
 		rightManager.run();
 	}
 
-	public void startProfile() {
+	/**
+	 * Called by application to signal Talon to start the buffered MP (when it's
+	 * able to).
+	 */
+	public void startMotionProfile() {
 		leftManager.startMotionProfile();
 		rightManager.startMotionProfile();
 	}
