@@ -200,7 +200,7 @@ public class DifferentialDrive extends RobotDriveBase {
 		}
 
 		m_leftMotor.set(controlMode, leftMotorOutput * m_maxOutput);
-		m_rightMotor.set(controlMode, -rightMotorOutput * m_maxOutput);
+		m_rightMotor.set(controlMode, rightMotorOutput * m_maxOutput);
 	}
 
 	/**
@@ -250,7 +250,7 @@ public class DifferentialDrive extends RobotDriveBase {
 		}
 
 		m_leftMotor.set(controlMode, leftSpeed * m_maxOutput);
-		m_rightMotor.set(controlMode, -rightSpeed * m_maxOutput);
+		m_rightMotor.set(controlMode, rightSpeed * m_maxOutput);
 	}
 
 	/**

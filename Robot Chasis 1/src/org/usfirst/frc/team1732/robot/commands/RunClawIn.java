@@ -1,7 +1,6 @@
 package org.usfirst.frc.team1732.robot.commands;
 
 import org.usfirst.frc.team1732.robot.Robot;
-import org.usfirst.frc.team1732.robot.subsystems.Claw;
 
 import edu.wpi.first.wpilibj.command.Command;
 
@@ -25,22 +24,25 @@ public class RunClawIn extends Command {
 
 	@Override
 	protected void execute() {
-		boolean isOver = (Math.abs(Robot.claw.leftSparkCurrent.get()) > Claw.leftCurrentLimit
-				|| Math.abs(Robot.claw.rightSparkCurrent.get()) > Claw.rightCurrentLimit);
-		if (isOver && !goneOver) {
-			timeFirstOver = System.currentTimeMillis();
-			goneOver = true;
-		}
-		if (!isOver) {
-			goneOver = false;
-		}
+		// boolean isOver = (Math.abs(Robot.claw.leftSparkCurrent.get()) >
+		// Claw.leftCurrentLimit
+		// || Math.abs(Robot.claw.rightSparkCurrent.get()) > Claw.rightCurrentLimit);
+		// if (isOver && !goneOver) {
+		// timeFirstOver = System.currentTimeMillis();
+		// goneOver = true;
+		// }
+		// if (!isOver) {
+		// goneOver = false;
+		// }
 	}
 
 	@Override
 	protected boolean isFinished() {
-		return (Math.abs(Robot.claw.leftSparkCurrent.get()) > Claw.leftCurrentLimit
-				|| Math.abs(Robot.claw.rightSparkCurrent.get()) > Claw.rightCurrentLimit)
-				&& (goneOver && System.currentTimeMillis() - timeFirstOver > currentOverTime);
+		// return (Math.abs(Robot.claw.leftSparkCurrent.get()) > Claw.leftCurrentLimit
+		// || Math.abs(Robot.claw.rightSparkCurrent.get()) > Claw.rightCurrentLimit)
+		// && (goneOver && System.currentTimeMillis() - timeFirstOver >
+		// currentOverTime);
+		return false;
 	}
 
 	protected void end() {

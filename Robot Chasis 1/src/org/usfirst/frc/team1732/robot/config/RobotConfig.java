@@ -11,20 +11,20 @@ public class RobotConfig {
 				"isFollower", false, "isInverted", false).addData(rightMasterCANid);
 
 		drivetrain.addNode("rightTalon2").addData("CANid", 2,
-				"isFollower", false, "isInverted", false).addData(rightMasterCANid);
+				"isFollower", true, "isInverted", false).addData(rightMasterCANid);
 
 		drivetrain.addNode("rightTalon3").addData("CANid", 7,
-				"isFollower", false, "isInverted", false).addData(rightMasterCANid);
+				"isFollower", true, "isInverted", false).addData(rightMasterCANid);
 
 		Node leftMasterCANid = new Node("masterCANid", 1);
 		drivetrain.addNode("leftTalon1").addData("CANid", leftMasterCANid.getOwnData(),
-				"isFollower", true, "isInverted", false).addData(leftMasterCANid);
+				"isFollower", false, "isInverted", true).addData(leftMasterCANid);
 
 		drivetrain.addNode("leftTalon2").addData("CANid", 9,
-				"isFollower", true, "isInverted", false).addData(leftMasterCANid);
+				"isFollower", true, "isInverted", true).addData(leftMasterCANid);
 
 		drivetrain.addNode("leftTalon3").addData("CANid", 3,
-				"isFollower", true, "isInverted", false).addData(leftMasterCANid);
+				"isFollower", true, "isInverted", true).addData(leftMasterCANid);
 
 		Node otherMotors = config.addNode("otherMotors");
 		otherMotors.addNode("otherTalon1").addData("CANid", 4,

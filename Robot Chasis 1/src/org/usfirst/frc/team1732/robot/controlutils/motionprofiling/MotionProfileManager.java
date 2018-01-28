@@ -1,7 +1,6 @@
 package org.usfirst.frc.team1732.robot.controlutils.motionprofiling;
 
 import org.usfirst.frc.team1732.robot.Robot;
-import org.usfirst.frc.team1732.robot.controlutils.pathing.Path;
 
 /**
  * Example logic for firing and managing motion profiles.
@@ -32,7 +31,6 @@ import com.ctre.phoenix.motion.SetValueMotionProfile;
 import com.ctre.phoenix.motion.TrajectoryPoint;
 import com.ctre.phoenix.motion.TrajectoryPoint.TrajectoryDuration;
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.wpilibj.DriverStation;
@@ -133,11 +131,12 @@ public class MotionProfileManager {
 		 * since our MP is 10ms per point, set the control frame rate and the notifier
 		 * to half that
 		 */
-		_talon.changeMotionControlFramePeriod(path.stepDuration);
-		_talon.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, path.stepDuration, Robot.CONFIG_TIMEOUT);
-		_talon.changeMotionControlFramePeriod(path.stepDuration / 2);
-		_notifer.startPeriodic(path.stepDuration / 1000.0 / 2.0);
-		path.profile.applyToTalon(_talon, 0);
+		// _talon.changeMotionControlFramePeriod(path.stepDuration);
+		// _talon.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic,
+		// path.stepDuration, Robot.CONFIG_TIMEOUT);
+		// _talon.changeMotionControlFramePeriod(path.stepDuration / 2);
+		// _notifer.startPeriodic(path.stepDuration / 1000.0 / 2.0);
+		// path.profile.applyToTalon(_talon, 0);
 	}
 
 	/**
@@ -298,7 +297,7 @@ public class MotionProfileManager {
 
 	private void startFilling() {
 
-		double totalCnt = path.points.length;
+		double totalCnt = 0; // path.points.length;
 
 		/* create an empty point */
 		TrajectoryPoint point = new TrajectoryPoint();
@@ -328,15 +327,15 @@ public class MotionProfileManager {
 		/* This is fast since it's just into our TOP buffer */
 		for (int i = 0; i < totalCnt; ++i) {
 			/* for each point, fill our structure and pass it to API */
-			point.position = path.points[i].position;
-			point.velocity = path.points[i].velocity;
-			point.headingDeg = path.points[i].heading;
+			point.position = 0; // path.points[i].position;
+			point.velocity = 0; // path.points[i].velocity;
+			point.headingDeg = 0; // path.points[i].heading;
 			point.profileSlotSelect0 = 0; /* which set of gains would you like to use [0,3]? */
-			point.profileSlotSelect1 = path.useCascaded; /*
-															 * future feature - not used in this example - cascaded PID
-															 * [0,1], leave zero
-															 */
-			point.timeDur = GetTrajectoryDuration((int) path.points[i].duration);
+			point.profileSlotSelect1 = 0; // path.useCascaded;
+			/*
+			 * future feature - not used in this example - cascaded PID [0,1], leave zero
+			 */
+			point.timeDur = GetTrajectoryDuration((int) 0); // path.points[i].duration);
 			point.zeroPos = false;
 			if (i == 0)
 				point.zeroPos = true; /* set this to true on the first point */
@@ -355,7 +354,7 @@ public class MotionProfileManager {
 	 */
 	void startMotionProfile() {
 		_bStart = true;
-		path.profile.applyToTalon(_talon, 0);
+		// path.profile.applyToTalon(_talon, 0);
 	}
 
 	/**
