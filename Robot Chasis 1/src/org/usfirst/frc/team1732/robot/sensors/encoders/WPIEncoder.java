@@ -18,7 +18,7 @@ public class WPIEncoder extends EncoderBase {
 
 	@Override
 	public double getRate() {
-		return wpiEncoder.getRate() / 100.0;
+		return wpiEncoder.getRate();
 	}
 
 	@Override

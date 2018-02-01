@@ -29,13 +29,15 @@ public class MagneticEncoder extends EncoderBase {
 		// pidIdx, timeoutMs);
 	}
 
+	@Override
 	public double getPosition() {
 		return talon.getSensorCollection().getPulseWidthPosition() * distancePerPulse;
 
 	}
 
+	@Override
 	public double getRate() {
-		return talon.getSensorCollection().getPulseWidthVelocity() * distancePerPulse;
+		return talon.getSensorCollection().getPulseWidthVelocity() * distancePerPulse * 10;
 	}
 
 	public void setPhase(boolean phase) {

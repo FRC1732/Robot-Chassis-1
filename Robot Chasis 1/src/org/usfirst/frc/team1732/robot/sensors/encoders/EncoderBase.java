@@ -12,7 +12,7 @@ public abstract class EncoderBase {
 	public abstract double getPosition();
 
 	/**
-	 * @return current rate in units per 100ms
+	 * @return current rate in units per second
 	 */
 	public abstract double getRate();
 

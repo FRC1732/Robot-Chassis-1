@@ -15,8 +15,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Drivetrain extends Subsystem {
 
-	private TalonSRX leftTalon1;
-	private TalonSRX rightTalon1;
+	public TalonSRX leftTalon1;
+	public TalonSRX rightTalon1;
 
 	public DifferentialDrive drive;
 
@@ -31,16 +31,12 @@ public class Drivetrain extends Subsystem {
 	public Drivetrain(Node drivetrainNode) {
 		leftTalon1 = MotorUtils.configureTalon(drivetrainNode.getNode("leftTalon1"), DRIVE_DEADBAND,
 				Robot.CONFIG_TIMEOUT);
-		MotorUtils.configureTalon(drivetrainNode.getNode("leftTalon2"), DRIVE_DEADBAND,
-				Robot.CONFIG_TIMEOUT);
-		MotorUtils.configureTalon(drivetrainNode.getNode("leftTalon3"), DRIVE_DEADBAND,
-				Robot.CONFIG_TIMEOUT);
+		MotorUtils.configureTalon(drivetrainNode.getNode("leftTalon2"), DRIVE_DEADBAND, Robot.CONFIG_TIMEOUT);
+		MotorUtils.configureTalon(drivetrainNode.getNode("leftTalon3"), DRIVE_DEADBAND, Robot.CONFIG_TIMEOUT);
 		rightTalon1 = MotorUtils.configureTalon(drivetrainNode.getNode("rightTalon1"), DRIVE_DEADBAND,
 				Robot.CONFIG_TIMEOUT);
-		MotorUtils.configureTalon(drivetrainNode.getNode("rightTalon2"), DRIVE_DEADBAND,
-				Robot.CONFIG_TIMEOUT);
-		MotorUtils.configureTalon(drivetrainNode.getNode("rightTalon3"), DRIVE_DEADBAND,
-				Robot.CONFIG_TIMEOUT);
+		MotorUtils.configureTalon(drivetrainNode.getNode("rightTalon2"), DRIVE_DEADBAND, Robot.CONFIG_TIMEOUT);
+		MotorUtils.configureTalon(drivetrainNode.getNode("rightTalon3"), DRIVE_DEADBAND, Robot.CONFIG_TIMEOUT);
 		drive = new DifferentialDrive(leftTalon1, rightTalon1);
 		drive.setDeadband(DRIVE_DEADBAND); // might not need these: talon's have their own "neutral zone"
 		leftEncoder = new TalonEncoder(leftTalon1);

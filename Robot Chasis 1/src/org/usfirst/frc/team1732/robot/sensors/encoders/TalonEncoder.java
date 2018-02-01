@@ -39,7 +39,7 @@ public class TalonEncoder extends EncoderBase {
 
 	@Override
 	public double getRate() {
-		return talon.getSensorCollection().getQuadratureVelocity() * distancePerPulse;
+		return talon.getSensorCollection().getQuadratureVelocity() * distancePerPulse * 10;
 	}
 
 	@Override

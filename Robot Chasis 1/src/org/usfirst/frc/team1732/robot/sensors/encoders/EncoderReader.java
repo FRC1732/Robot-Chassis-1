@@ -22,7 +22,7 @@ public class EncoderReader {
 	}
 
 	/**
-	 * @return current rate in units per 100ms
+	 * @return current rate in units per second
 	 */
 	public double getRate() {
 		return e.getRate();
