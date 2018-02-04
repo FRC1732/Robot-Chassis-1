@@ -13,6 +13,8 @@ public class CalculateFeedForward extends Command {
 		requires(Robot.drivetrain);
 	}
 
+	// make sure not to include some stuff - see online oblarg's post
+
 	// Called just before this Command runs the first time
 	@Override
 	protected void initialize() {
