@@ -7,8 +7,6 @@
 
 package org.usfirst.frc.team1732.robot;
 
-import static org.usfirst.frc.team1732.robot.config.RobotConfig.config;
-
 import org.usfirst.frc.team1732.robot.input.Joysticks;
 import org.usfirst.frc.team1732.robot.odomotry.PositionEstimator;
 import org.usfirst.frc.team1732.robot.sensors.Sensors;
@@ -16,7 +14,6 @@ import org.usfirst.frc.team1732.robot.sensors.navx.NavXData;
 import org.usfirst.frc.team1732.robot.subsystems.Arm;
 import org.usfirst.frc.team1732.robot.subsystems.Claw;
 import org.usfirst.frc.team1732.robot.subsystems.Drivetrain;
-import org.usfirst.frc.team1732.robot.subsystems.OtherMotors;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Scheduler;
@@ -32,7 +29,6 @@ public class Robot extends TimedRobot {
 
 	// subsystems
 	public static Drivetrain drivetrain;
-	public static OtherMotors otherMotors;
 	public static Claw claw;
 	public static Arm arm;
 	public static Sensors sensors;
@@ -50,15 +46,12 @@ public class Robot extends TimedRobot {
 	@Override
 	public void robotInit() {
 		setPeriod(PERIOD_MS / 1000.0); // periodic methods will loop every 10 ms (1/100 sec)
-		drivetrain = new Drivetrain(config.getNode("drivetrain"));
-		otherMotors = new OtherMotors(config.getNode("otherMotors"));
+		drivetrain = new Drivetrain();
 		sensors = new Sensors();
-		arm = new Arm(config.getNode("arm"));
-		claw = new Claw(config.getNode("claw"));
+		arm = new Arm();
+		claw = new Claw();
 
-		joysticks = new Joysticks(config.getNode("joysticks"));
-		positionEstimator = new PositionEstimator(sensors.navX, sensors.leftEncoder.makeReader(),
-				sensors.rightEncoder.makeReader());
+		joysticks = new Joysticks();
 	}
 
 	@Override

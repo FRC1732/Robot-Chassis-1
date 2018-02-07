@@ -2,8 +2,6 @@ package org.usfirst.frc.team1732.robot.subsystems;
 
 import java.util.function.Supplier;
 
-import org.usfirst.frc.team1732.robot.config.Node;
-
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.command.Subsystem;
@@ -20,11 +18,11 @@ public class Claw extends Subsystem {
 	public static final double rightCurrentLimit = 17;
 	public static final double leftCurrentLimit = 17;
 
-	public Claw(Node clawNode) {
-		leftSpark = MotorUtils.configureSpark(clawNode.getNode("leftSpark"));
-		rightSpark = MotorUtils.configureSpark(clawNode.getNode("rightSpark"));
-		leftSparkCurrent = () -> panel.getCurrent(clawNode.getNode("leftSpark").getData("PDPchannel"));
-		rightSparkCurrent = () -> panel.getCurrent(clawNode.getNode("rightSpark").getData("PDPchannel"));
+	public Claw() {
+		leftSpark = MotorUtils.configSpark(0, true);
+		rightSpark = MotorUtils.configSpark(1, false);
+		leftSparkCurrent = () -> panel.getCurrent(4);
+		rightSparkCurrent = () -> panel.getCurrent(11);
 	}
 
 	public void set(double left, double right) {

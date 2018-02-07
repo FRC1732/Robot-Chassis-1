@@ -1,12 +1,11 @@
 package org.usfirst.frc.team1732.robot.subsystems;
 
-import org.usfirst.frc.team1732.robot.Robot;
-import org.usfirst.frc.team1732.robot.config.Node;
 import org.usfirst.frc.team1732.robot.sensors.encoders.EncoderBase;
 import org.usfirst.frc.team1732.robot.sensors.encoders.EncoderReader;
 import org.usfirst.frc.team1732.robot.sensors.encoders.TalonEncoder;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.wpilibj.command.Subsystem;
@@ -30,9 +29,9 @@ public class Arm extends Subsystem {
 		}
 	}
 
-	public Arm(Node armNode) {
-		talon = MotorUtils.configureTalon(armNode.getNode("talon"), 0, Robot.CONFIG_TIMEOUT);
-		talonEncoder = new TalonEncoder(talon);
+	public Arm() {
+		talon = MotorUtils.configTalon(2, true, TalonConfiguration.DEFAULT_CONFIG);
+		talonEncoder = new TalonEncoder(talon, FeedbackDevice.QuadEncoder);
 		talonEncoder.setDistancePerPulse(DEGREES_PER_PULSE);
 		encoder = new EncoderReader(talonEncoder);
 		encoder.zero();
