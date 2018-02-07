@@ -11,6 +11,9 @@ public class TalonConfiguration {
 
 	public static final int CONFIG_TIMEOUT = 10;
 
+	private TalonConfiguration() {
+	}
+
 	public NeutralMode neutralMode = NeutralMode.Coast;
 	public double neutralDeadbandPercent = 0.0;
 	public double nominalForward = +0.0;

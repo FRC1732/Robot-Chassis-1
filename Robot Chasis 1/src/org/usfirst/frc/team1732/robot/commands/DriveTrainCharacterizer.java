@@ -1,5 +1,6 @@
 package org.usfirst.frc.team1732.robot.commands;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
@@ -52,20 +53,22 @@ public class DriveTrainCharacterizer extends Command {
 			scale = -1;
 		}
 		if (mode.equals(TestMode.QUASI_STATIC)) {
-			Robot.drivetrain.rightTalon1.configOpenloopRamp(60, Robot.CONFIG_TIMEOUT);
-			Robot.drivetrain.leftTalon1.configOpenloopRamp(60, Robot.CONFIG_TIMEOUT);
+			Robot.drivetrain.rightTalon1.configOpenloopRamp(70, 0);
+			Robot.drivetrain.leftTalon1.configOpenloopRamp(70, 0);
 			Robot.drivetrain.drive.tankDrive(1 * scale, 1 * scale);
 			try {
-				fw = new FileWriter("/U/DriveCharacterization/velFile" + name + ".csv", true);
+				File f = new File("/U/DriveCharacterization/accFile" + name + ".csv");
+				fw = new FileWriter(f, true);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		} else {
-			Robot.drivetrain.rightTalon1.configOpenloopRamp(60, Robot.CONFIG_TIMEOUT);
-			Robot.drivetrain.leftTalon1.configOpenloopRamp(60, Robot.CONFIG_TIMEOUT);
+			Robot.drivetrain.rightTalon1.configOpenloopRamp(0, 0);
+			Robot.drivetrain.leftTalon1.configOpenloopRamp(0, 0);
 			Robot.drivetrain.drive.tankDrive(0.5 * scale, 0.5 * scale);
 			try {
-				fw = new FileWriter("/U/DriveCharacterization/accFile" + name + ".csv", true);
+				File f = new File("/U/DriveCharacterization/accFile" + name + ".csv");
+				fw = new FileWriter(f, true);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -122,8 +125,8 @@ public class DriveTrainCharacterizer extends Command {
 	// Called once after isFinished returns true
 	@Override
 	protected void end() {
-		Robot.drivetrain.leftTalon1.configOpenloopRamp(0, Robot.CONFIG_TIMEOUT);
-		Robot.drivetrain.rightTalon1.configOpenloopRamp(0, Robot.CONFIG_TIMEOUT);
+		Robot.drivetrain.leftTalon1.configOpenloopRamp(0, 0);
+		Robot.drivetrain.rightTalon1.configOpenloopRamp(0, 0);
 		Robot.drivetrain.drive.tankDrive(0, 0);
 		try {
 			fw.flush();
@@ -131,5 +134,11 @@ public class DriveTrainCharacterizer extends Command {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	protected void inturrupted() {
+		Robot.drivetrain.leftTalon1.configOpenloopRamp(0, 0);
+		Robot.drivetrain.rightTalon1.configOpenloopRamp(0, 0);
+		Robot.drivetrain.drive.tankDrive(0, 0);
 	}
 }

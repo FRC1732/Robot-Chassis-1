@@ -7,6 +7,9 @@
 
 package org.usfirst.frc.team1732.robot;
 
+import org.usfirst.frc.team1732.robot.commands.DriveTrainCharacterizer;
+import org.usfirst.frc.team1732.robot.commands.DriveTrainCharacterizer.Direction;
+import org.usfirst.frc.team1732.robot.commands.DriveTrainCharacterizer.TestMode;
 import org.usfirst.frc.team1732.robot.input.Joysticks;
 import org.usfirst.frc.team1732.robot.odomotry.PositionEstimator;
 import org.usfirst.frc.team1732.robot.sensors.Sensors;
@@ -69,7 +72,7 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void autonomousInit() {
-
+		new DriveTrainCharacterizer(TestMode.QUASI_STATIC, Direction.Forward).start();
 	}
 
 	@Override

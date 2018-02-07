@@ -24,16 +24,20 @@ public class Drivetrain extends Subsystem {
 	public static final int ENCODER_PULSES_PER_INCH = 520; // probably should double check this
 
 	public Drivetrain() {
-		int leftMaster = 0;
-		leftTalon1 = MotorUtils.configTalon(leftMaster, true, TalonConfiguration.DEFAULT_CONFIG);
-		MotorUtils.configFollowerTalon(MotorUtils.configTalon(9, true, TalonConfiguration.DEFAULT_CONFIG), leftMaster);
-		MotorUtils.configFollowerTalon(MotorUtils.configTalon(3, true, TalonConfiguration.DEFAULT_CONFIG), leftMaster);
+		int leftMaster = 1;
+		// TalonConfiguration config = TalonConfiguration.DEFAULT_CONFIG;
+		//// config.velocityMeasurementPeriod = 10;
+		//// config.velocityMeasurementWindow = 6;
+		// conf
+		leftTalon1 = MotorUtils.configTalon(leftMaster, false, TalonConfiguration.DEFAULT_CONFIG);
+		MotorUtils.configFollowerTalon(MotorUtils.configTalon(9, false, TalonConfiguration.DEFAULT_CONFIG), leftMaster);
+		MotorUtils.configFollowerTalon(MotorUtils.configTalon(3, false, TalonConfiguration.DEFAULT_CONFIG), leftMaster);
 
 		int rightMaster = 5;
-		rightTalon1 = MotorUtils.configTalon(rightMaster, false, TalonConfiguration.DEFAULT_CONFIG);
-		MotorUtils.configFollowerTalon(MotorUtils.configTalon(6, false, TalonConfiguration.DEFAULT_CONFIG),
+		rightTalon1 = MotorUtils.configTalon(rightMaster, true, TalonConfiguration.DEFAULT_CONFIG);
+		MotorUtils.configFollowerTalon(MotorUtils.configTalon(6, true, TalonConfiguration.DEFAULT_CONFIG),
 				rightMaster);
-		MotorUtils.configFollowerTalon(MotorUtils.configTalon(7, false, TalonConfiguration.DEFAULT_CONFIG),
+		MotorUtils.configFollowerTalon(MotorUtils.configTalon(7, true, TalonConfiguration.DEFAULT_CONFIG),
 				rightMaster);
 
 		drive = new DifferentialDrive(leftTalon1, rightTalon1);
