@@ -5,6 +5,7 @@ import org.usfirst.frc.team1732.robot.drivercontrol.DifferentialDrive;
 import org.usfirst.frc.team1732.robot.sensors.encoders.EncoderReader;
 import org.usfirst.frc.team1732.robot.sensors.encoders.TalonEncoder;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
@@ -27,32 +28,30 @@ public class Drivetrain extends Subsystem {
 	private final TalonEncoder leftEncoder;
 	private final TalonEncoder rightEncoder;
 
-	public static final double DRIVE_DEADBAND = 0.04; // CTRE default, but also need to pass to DifferentialDrive
+	public static final double INPUT_DEADBAND = 0.005; // 0.5%.
+	public static final double MIN_OUTPUT = 0.0;
+	public static final double MAX_OUTPUT = 1.0;
 	public static final int ENCODER_PULSES_PER_INCH = 520; // probably should double check this
 
 	public Drivetrain() {
-
 		int leftMaster = 1;
 		leftTalon1 = MotorUtils.configTalon(leftMaster, false, TalonConfiguration.DEFAULT_CONFIG);
-		leftTalon2 = MotorUtils.configTalon(9, false,
-				TalonConfiguration.DEFAULT_CONFIG);
-		MotorUtils.configFollowerTalon(leftTalon2, leftTalon1);
-		leftTalon3 = MotorUtils.configTalon(3, false,
-				TalonConfiguration.DEFAULT_CONFIG);
-		MotorUtils.configFollowerTalon(leftTalon3, leftTalon1);
+		leftTalon2 = MotorUtils.configFollowerTalon(MotorUtils.configTalon(9, false, TalonConfiguration.DEFAULT_CONFIG),
+				leftTalon1);
+		leftTalon3 = MotorUtils.configFollowerTalon(MotorUtils.configTalon(3, false, TalonConfiguration.DEFAULT_CONFIG),
+				leftTalon1);
 
 		int rightMaster = 5;
 		rightTalon1 = MotorUtils.configTalon(rightMaster, true, TalonConfiguration.DEFAULT_CONFIG);
 
-		rightTalon2 = MotorUtils.configTalon(6, true,
-				TalonConfiguration.DEFAULT_CONFIG);
-		MotorUtils.configFollowerTalon(rightTalon2, rightTalon1);
-		rightTalon3 = MotorUtils.configTalon(7, true,
-				TalonConfiguration.DEFAULT_CONFIG);
-		MotorUtils.configFollowerTalon(rightTalon3, rightTalon1);
+		rightTalon2 = MotorUtils.configFollowerTalon(MotorUtils.configTalon(6, true, TalonConfiguration.DEFAULT_CONFIG),
+				rightTalon1);
+		rightTalon3 = MotorUtils.configFollowerTalon(MotorUtils.configTalon(7, true, TalonConfiguration.DEFAULT_CONFIG),
+				rightTalon1);
 
-		drive = new DifferentialDrive(leftTalon3, rightTalon3);
-		drive.setDeadband(DRIVE_DEADBAND); // might not need these: talon's have their own "neutral zone"
+		drive = new DifferentialDrive(leftTalon1, rightTalon1, ControlMode.PercentOutput, MIN_OUTPUT, MAX_OUTPUT,
+				INPUT_DEADBAND);
+
 		leftEncoder = new TalonEncoder(leftTalon1, FeedbackDevice.QuadEncoder);
 		rightEncoder = new TalonEncoder(rightTalon1, FeedbackDevice.QuadEncoder);
 		leftEncoder.setPhase(true);

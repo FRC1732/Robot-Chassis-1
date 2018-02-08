@@ -1,38 +1,24 @@
 package org.usfirst.frc.team1732.robot.drivercontrol;
 
-public class RobotDriveBase {
-	public static final double kDefaultDeadband = 0.02;
+import org.usfirst.frc.team1732.robot.math.Util;
+
+public abstract class RobotDriveBase {
+	public static final double kDefaultDeadband = 0.0;
+	public static final double kDefaultMinOutput = 0.0;
 	public static final double kDefaultMaxOutput = 1.0;
 
-	protected double m_deadband = kDefaultDeadband;
-	protected double m_maxOutput = kDefaultMaxOutput;
+	protected final double m_minOut;
+	protected final double m_deadband;
+	protected final double m_maxOut;
 
-	/**
-	 * Change the default value for deadband scaling. The default value is
-	 * {@value #kDefaultDeadband}. Values smaller then the deadband are set to 0,
-	 * while values larger then the deadband are scaled from 0.0 to 1.0. See
-	 * {@link #applyDeadband}.
-	 *
-	 * @param deadband
-	 *            The deadband to set.
-	 */
-	public void setDeadband(double deadband) {
+	public RobotDriveBase(double minOut, double maxOut, double deadband) {
+		m_minOut = minOut;
 		m_deadband = deadband;
+		m_maxOut = maxOut;
 	}
 
-	/**
-	 * Configure the scaling factor for using drive methods with motor controllers
-	 * in a mode other than PercentVbus or to limit the maximum output.
-	 *
-	 * <p>
-	 * The default value is {@value #kDefaultMaxOutput}.
-	 *
-	 * @param maxOutput
-	 *            Multiplied with the output percentage computed by the drive
-	 *            functions.
-	 */
-	public void setMaxOutput(double maxOutput) {
-		m_maxOutput = maxOutput;
+	public RobotDriveBase() {
+		this(kDefaultMinOutput, kDefaultMaxOutput, kDefaultDeadband);
 	}
 
 	/**
@@ -50,23 +36,27 @@ public class RobotDriveBase {
 
 	/**
 	 * Returns 0.0 if the given value is within the specified range around zero. The
-	 * remaining range between the deadband and 1.0 is scaled from 0.0 to 1.0.
+	 * remaining range between the deadband and 1.0 is scaled from 0 to 1.0.
 	 *
 	 * @param value
 	 *            value to clip
 	 * @param deadband
 	 *            range around zero
 	 */
-	protected double applyDeadband(double value, double deadband) {
-		if (Math.abs(value) > deadband) {
+	protected double applyDeadband(double value) {
+		if (Math.abs(value) > m_deadband) {
 			if (value > 0.0) {
-				return (value - deadband) / (1.0 - deadband);
+				return (value - m_deadband) / (1.0 - m_deadband);
 			} else {
-				return (value + deadband) / (1.0 - deadband);
+				return (value + m_deadband) / (1.0 - m_deadband);
 			}
 		} else {
 			return 0.0;
 		}
+	}
+
+	protected double applyMinMax(double value) {
+		return Util.interpolate(Math.copySign(m_minOut, value), Math.copySign(m_maxOut, value), value);
 	}
 
 }

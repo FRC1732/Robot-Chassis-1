@@ -3,7 +3,6 @@ package org.usfirst.frc.team1732.robot.drivercontrol;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
-import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tInstances;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
@@ -26,26 +25,25 @@ public class DifferentialDrive extends RobotDriveBase {
 
 	private TalonSRX m_leftMotor;
 	private TalonSRX m_rightMotor;
-	private ControlMode controlMode = ControlMode.PercentOutput;
+	private final ControlMode controlMode;
 
 	private double m_quickStopThreshold = kDefaultQuickStopThreshold;
 	private double m_quickStopAlpha = kDefaultQuickStopAlpha;
 	private double m_quickStopAccumulator = 0.0;
 	private boolean m_reported = false;
 
-	/**
-	 * Construct a DifferentialDrive.
-	 *
-	 * <p>
-	 * To pass multiple motors per side, use a {@link SpeedControllerGroup}. If a
-	 * motor needs to be inverted, do so before passing it in.
-	 */
-	public DifferentialDrive(TalonSRX leftMotor, TalonSRX rightMotor) {
+	public DifferentialDrive(TalonSRX leftMotor, TalonSRX rightMotor, ControlMode mode, double minOut, double maxOut,
+			double deadband) {
+		super(minOut, maxOut, deadband);
 		m_leftMotor = leftMotor;
 		m_rightMotor = rightMotor;
+		controlMode = mode;
 	}
 
-	public void setControlMode(ControlMode mode) {
+	public DifferentialDrive(TalonSRX leftMotor, TalonSRX rightMotor, ControlMode mode) {
+		super();
+		m_leftMotor = leftMotor;
+		m_rightMotor = rightMotor;
 		controlMode = mode;
 	}
 
@@ -83,10 +81,10 @@ public class DifferentialDrive extends RobotDriveBase {
 		}
 
 		xSpeed = limit(xSpeed);
-		xSpeed = applyDeadband(xSpeed, m_deadband);
+		xSpeed = applyDeadband(xSpeed);
 
 		zRotation = limit(zRotation);
-		zRotation = applyDeadband(zRotation, m_deadband);
+		zRotation = applyDeadband(zRotation);
 
 		// Square the inputs (while preserving the sign) to increase fine control
 		// while permitting full power.
@@ -120,8 +118,8 @@ public class DifferentialDrive extends RobotDriveBase {
 			}
 		}
 
-		m_leftMotor.set(controlMode, limit(leftMotorOutput) * m_maxOutput);
-		m_rightMotor.set(controlMode, limit(rightMotorOutput) * m_maxOutput);
+		m_leftMotor.set(controlMode, limit(leftMotorOutput) * m_maxOut);
+		m_rightMotor.set(controlMode, limit(rightMotorOutput) * m_maxOut);
 	}
 
 	/**
@@ -151,10 +149,10 @@ public class DifferentialDrive extends RobotDriveBase {
 		}
 
 		xSpeed = limit(xSpeed);
-		xSpeed = applyDeadband(xSpeed, m_deadband);
+		xSpeed = applyDeadband(xSpeed);
 
 		zRotation = limit(zRotation);
-		zRotation = applyDeadband(zRotation, m_deadband);
+		zRotation = applyDeadband(zRotation);
 
 		double angularPower;
 		boolean overPower;
@@ -199,13 +197,12 @@ public class DifferentialDrive extends RobotDriveBase {
 			}
 		}
 
-		m_leftMotor.set(controlMode, leftMotorOutput * m_maxOutput);
-		m_rightMotor.set(controlMode, rightMotorOutput * m_maxOutput);
+		m_leftMotor.set(controlMode, leftMotorOutput * m_maxOut);
+		m_rightMotor.set(controlMode, rightMotorOutput * m_maxOut);
 	}
 
 	/**
-	 * Tank drive method for differential drive platform. The calculated values will
-	 * be squared to decrease sensitivity at low speeds.
+	 * Tank drive method for differential drive platform.
 	 *
 	 * @param leftSpeed
 	 *            The robot's left side speed along the X axis [-1.0..1.0]. Forward
@@ -237,10 +234,10 @@ public class DifferentialDrive extends RobotDriveBase {
 		}
 
 		leftSpeed = limit(leftSpeed);
-		leftSpeed = applyDeadband(leftSpeed, m_deadband);
+		leftSpeed = applyDeadband(leftSpeed);
 
 		rightSpeed = limit(rightSpeed);
-		rightSpeed = applyDeadband(rightSpeed, m_deadband);
+		rightSpeed = applyDeadband(rightSpeed);
 
 		// Square the inputs (while preserving the sign) to increase fine control
 		// while permitting full power.
@@ -249,8 +246,8 @@ public class DifferentialDrive extends RobotDriveBase {
 			rightSpeed = Math.copySign(rightSpeed * rightSpeed, rightSpeed);
 		}
 
-		m_leftMotor.set(controlMode, leftSpeed * m_maxOutput);
-		m_rightMotor.set(controlMode, rightSpeed * m_maxOutput);
+		m_leftMotor.set(controlMode, applyMinMax(leftSpeed));
+		m_rightMotor.set(controlMode, applyMinMax(rightSpeed));
 	}
 
 	/**

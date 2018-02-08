@@ -28,4 +28,8 @@ public class EncoderReader {
 		return e.getRate();
 	}
 
+	public double getPulses() {
+		return e.getPulses();
+	}
+
 }
