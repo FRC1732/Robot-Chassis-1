@@ -1,7 +1,6 @@
 package org.usfirst.frc.team1732.robot.subsystems;
 
 import com.ctre.phoenix.ErrorCode;
-import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
@@ -60,8 +59,8 @@ public class MotorUtils {
 		}
 	}
 
-	public static TalonSRX configFollowerTalon(TalonSRX follower, int masterTalonID) {
-		follower.set(ControlMode.Follower, masterTalonID);
+	public static TalonSRX configFollowerTalon(TalonSRX follower, TalonSRX master) {
+		follower.follow(master);
 		return follower;
 	}
 
