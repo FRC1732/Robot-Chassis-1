@@ -7,6 +7,8 @@ import java.io.IOException;
 import org.usfirst.frc.team1732.robot.Robot;
 import org.usfirst.frc.team1732.robot.sensors.encoders.EncoderReader;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+
 import edu.wpi.first.wpilibj.CircularBuffer;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Command;
@@ -27,6 +29,9 @@ public class DriveTrainCharacterizer extends Command {
 
 	private final EncoderReader leftEncoder;
 	private final EncoderReader rightEncoder;
+
+	private double speed = 0;
+	private double voltageStep;
 
 	public DriveTrainCharacterizer(TestMode mode, Direction direction) {
 		requires(Robot.drivetrain);
@@ -52,26 +57,29 @@ public class DriveTrainCharacterizer extends Command {
 			name = "Backward";
 			scale = -1;
 		}
+		System.out.println(Robot.drivetrain.rightTalon1.configOpenloopRamp(0, 10).name());
+		System.out.println(Robot.drivetrain.leftTalon1.configOpenloopRamp(0, 10).name());
+		Robot.drivetrain.drive.tankDrive(0, 0);
 		if (mode.equals(TestMode.QUASI_STATIC)) {
-			Robot.drivetrain.rightTalon1.configOpenloopRamp(70, 0);
-			Robot.drivetrain.leftTalon1.configOpenloopRamp(70, 0);
-			Robot.drivetrain.drive.tankDrive(1 * scale, 1 * scale);
+			System.out.println("QUASI STATIC");
 			try {
 				File f = new File("/U/DriveCharacterization/accFile" + name + ".csv");
 				fw = new FileWriter(f, true);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+			voltageStep = 1 / 24.0 / 100.0 * scale;
 		} else {
-			Robot.drivetrain.rightTalon1.configOpenloopRamp(0, 0);
-			Robot.drivetrain.leftTalon1.configOpenloopRamp(0, 0);
-			Robot.drivetrain.drive.tankDrive(0.5 * scale, 0.5 * scale);
+			System.out.println("STEP");
 			try {
 				File f = new File("/U/DriveCharacterization/accFile" + name + ".csv");
 				fw = new FileWriter(f, true);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+			// Robot.drivetrain.drive.tankDrive(speed * scale, speed * scale);
+			Robot.drivetrain.leftTalon1.set(ControlMode.PercentOutput, 0.5);
+			Robot.drivetrain.rightTalon1.set(ControlMode.PercentOutput, 0.5);
 		}
 		try {
 			fw.write(
@@ -90,6 +98,10 @@ public class DriveTrainCharacterizer extends Command {
 	// Called repeatedly when this Command is scheduled to run
 	@Override
 	protected void execute() {
+		if (mode == TestMode.QUASI_STATIC) {
+			speed = speed + voltageStep;
+			Robot.drivetrain.drive.tankDrive(speed, speed);
+		}
 		double leftVel = leftEncoder.getRate();
 		double rightVel = rightEncoder.getRate();
 		double leftVolt = Robot.drivetrain.leftTalon1.getMotorOutputVoltage();
@@ -106,7 +118,7 @@ public class DriveTrainCharacterizer extends Command {
 			double dt = time - timeBuff.removeFirst();
 			double leftAcc = leftDvel / dt;
 			double rightAcc = rightDvel / dt;
-			String result = String.format("%f, %f, %f, %f, %f, %f, %f, %f%n", time, leftVel, rightVel, leftAcc,
+			String result = String.format("%f, %f, %f, %f, %f, %f, %f%n", time, leftVel, rightVel, leftAcc,
 					rightAcc, leftVolt, rightVolt);
 			try {
 				fw.write(result);
@@ -125,8 +137,6 @@ public class DriveTrainCharacterizer extends Command {
 	// Called once after isFinished returns true
 	@Override
 	protected void end() {
-		Robot.drivetrain.leftTalon1.configOpenloopRamp(0, 0);
-		Robot.drivetrain.rightTalon1.configOpenloopRamp(0, 0);
 		Robot.drivetrain.drive.tankDrive(0, 0);
 		try {
 			fw.flush();
@@ -137,8 +147,6 @@ public class DriveTrainCharacterizer extends Command {
 	}
 
 	protected void inturrupted() {
-		Robot.drivetrain.leftTalon1.configOpenloopRamp(0, 0);
-		Robot.drivetrain.rightTalon1.configOpenloopRamp(0, 0);
 		Robot.drivetrain.drive.tankDrive(0, 0);
 	}
 }

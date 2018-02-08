@@ -72,7 +72,8 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void autonomousInit() {
-		new DriveTrainCharacterizer(TestMode.QUASI_STATIC, Direction.Forward).start();
+		new DriveTrainCharacterizer(TestMode.STEP_VOLTAGE, Direction.Forward).start();
+		// new TestMotors().start();
 	}
 
 	@Override

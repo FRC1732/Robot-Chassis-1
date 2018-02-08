@@ -215,7 +215,7 @@ public class DifferentialDrive extends RobotDriveBase {
 	 *            is positive.
 	 */
 	public void tankDrive(double leftSpeed, double rightSpeed) {
-		tankDrive(leftSpeed, rightSpeed, true);
+		tankDrive(leftSpeed, rightSpeed, false);
 	}
 
 	/**
