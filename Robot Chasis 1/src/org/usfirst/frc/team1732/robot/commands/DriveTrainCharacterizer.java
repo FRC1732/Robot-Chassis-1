@@ -9,7 +9,6 @@ import org.usfirst.frc.team1732.robot.sensors.encoders.EncoderReader;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 
-import edu.wpi.first.wpilibj.CircularBuffer;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Command;
 
@@ -82,8 +81,7 @@ public class DriveTrainCharacterizer extends Command {
 			Robot.drivetrain.rightTalon1.set(ControlMode.PercentOutput, 0.5);
 		}
 		try {
-			fw.write(
-					"time, Drive.left_vel, Drive.right_vel, Drive.left_acc, Drive.right_acc, Drive.left_voltage, Drive.right_voltage\n");
+			fw.write("time, Drive.left_vel, Drive.right_vel, Drive.left_voltage, Drive.right_voltage\n");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -91,9 +89,6 @@ public class DriveTrainCharacterizer extends Command {
 
 	private int i = 0;
 	private static final int length = 5;
-	CircularBuffer leftBuff = new CircularBuffer(length);
-	CircularBuffer rightBuff = new CircularBuffer(length);
-	CircularBuffer timeBuff = new CircularBuffer(length);
 
 	// Called repeatedly when this Command is scheduled to run
 	@Override
@@ -107,24 +102,12 @@ public class DriveTrainCharacterizer extends Command {
 		double leftVolt = Robot.drivetrain.leftTalon1.getMotorOutputVoltage();
 		double rightVolt = Robot.drivetrain.leftTalon1.getMotorOutputVoltage();
 		double time = Timer.getFPGATimestamp() - startTime;
-		leftBuff.addLast(leftVel);
-		rightBuff.addLast(rightVel);
-		timeBuff.addLast(time);
-		if (i < length) {
-			i++;
-		} else {
-			double leftDvel = leftVel - leftBuff.removeFirst();
-			double rightDvel = rightVel - rightBuff.removeFirst();
-			double dt = time - timeBuff.removeFirst();
-			double leftAcc = leftDvel / dt;
-			double rightAcc = rightDvel / dt;
-			String result = String.format("%f, %f, %f, %f, %f, %f, %f%n", time, leftVel, rightVel, leftAcc,
-					rightAcc, leftVolt, rightVolt);
-			try {
-				fw.write(result);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+
+		String result = String.format("%f, %f, %f, %f, %f%n", time, leftVel, rightVel, leftVolt, rightVolt);
+		try {
+			fw.write(result);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 
