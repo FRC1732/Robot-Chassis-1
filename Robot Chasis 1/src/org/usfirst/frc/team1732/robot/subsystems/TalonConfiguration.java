@@ -27,9 +27,9 @@ public class TalonConfiguration {
 	public int continousCurrentLimit = 0;
 	public int peakCurrentLimit = 0;
 	public int peakCurrentDuration = 0;
-	public VelocityMeasPeriod velocityMeasurementPeriod = VelocityMeasPeriod.Period_10Ms;
-	public int velocityMeasurementWindow = 4;
-	public int voltageMeasurementWindow = 4;
+	public VelocityMeasPeriod velocityMeasurementPeriod = VelocityMeasPeriod.Period_20Ms; // 100/5
+	public int velocityMeasurementWindow = 64 / 5;
+	public int voltageMeasurementWindow = 32;
 
 	// update rate from talon in ms
 	// these are the defaults. In general, don't change them.
