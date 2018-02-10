@@ -90,7 +90,7 @@ public class DoubleProfileManager {
 	/**
 	 * How many trajectory points do we wait for before firing the motion profile.
 	 */
-	private static final int kMinPointsInTalon = 67;
+	private static final int kMinPointsInTalon = 40;
 	/**
 	 * Just a state timeout to make sure we don't get stuck anywhere. Each loop is
 	 * about 20ms.
@@ -358,7 +358,6 @@ public class DoubleProfileManager {
 			rightPoint.zeroPos = false;
 			_leftTalon.pushMotionProfileTrajectory(leftPoint);
 			_rightTalon.pushMotionProfileTrajectory(rightPoint);
-
 		}
 	}
 

@@ -31,7 +31,7 @@ public class TestPathing extends Command {
 		path.generateProfile(Drivetrain.MAX_IN_SEC, Drivetrain.MAX_IN_SEC2);
 		System.out.println("Time to make: " + t.get());
 		Iterator<TrajectoryPoint[]> iter = path.getIterator(Robot.drivetrain.leftFFF, Robot.drivetrain.rightFFF, 29,
-				0.02, 1.0 / Drivetrain.ENCODER_INCHES_PER_PULSE);
+				0.1, 1.0 / Drivetrain.ENCODER_INCHES_PER_PULSE);
 		Robot.drivetrain.profileManager.reset(iter);
 		GainProfile leftGain = Robot.drivetrain.leftGains.clone();
 		leftGain.setFF(Robot.drivetrain.leftFFF);
