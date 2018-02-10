@@ -72,11 +72,13 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void autonomousInit() {
-//		new TestPathing().start();
+		Robot.drivetrain.rightTalon1.configOpenloopRamp(0, 10);
+		Robot.drivetrain.leftTalon1.configOpenloopRamp(0, 10);
+		new TestPathing().start();
 		// new DriveTrainCharacterizer(TestMode.QUASI_STATIC,
 		// Direction.Backward).start();
 		// new TestMotors().start();
-		new DriveTrainTester(Direction.Forward).start();
+//		new DriveTrainTester(Direction.Forward).start();
 	}
 
 	@Override

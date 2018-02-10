@@ -57,6 +57,8 @@ public class DriveTrainTester extends Command {
 	@Override
 	protected void end() {
 		Robot.drivetrain.drive.tankDrive(0, 0);
+		Robot.drivetrain.rightTalon1.configOpenloopRamp(0, 10);
+		Robot.drivetrain.leftTalon1.configOpenloopRamp(0, 10);
 	}
 
 }
