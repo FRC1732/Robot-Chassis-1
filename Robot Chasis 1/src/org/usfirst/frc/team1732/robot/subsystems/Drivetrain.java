@@ -20,11 +20,6 @@ public class Drivetrain extends Subsystem {
 	public final TalonSRX leftTalon1;
 	public final TalonSRX rightTalon1;
 
-	private final TalonSRX leftTalon2;
-	private final TalonSRX leftTalon3;
-	private final TalonSRX rightTalon2;
-	private final TalonSRX rightTalon3;
-
 	public DifferentialDrive drive;
 
 	public final TalonEncoder leftEncoder;
@@ -53,17 +48,17 @@ public class Drivetrain extends Subsystem {
 	public Drivetrain() {
 		int leftMaster = 1;
 		leftTalon1 = MotorUtils.configTalon(leftMaster, false, TalonConfiguration.DEFAULT_CONFIG);
-		leftTalon2 = MotorUtils.configFollowerTalon(MotorUtils.configTalon(9, false, TalonConfiguration.DEFAULT_CONFIG),
+		MotorUtils.configFollowerTalon(MotorUtils.configTalon(9, false, TalonConfiguration.DEFAULT_CONFIG),
 				leftTalon1);
-		leftTalon3 = MotorUtils.configFollowerTalon(MotorUtils.configTalon(3, false, TalonConfiguration.DEFAULT_CONFIG),
+		MotorUtils.configFollowerTalon(MotorUtils.configTalon(3, false, TalonConfiguration.DEFAULT_CONFIG),
 				leftTalon1);
 
 		int rightMaster = 5;
 		rightTalon1 = MotorUtils.configTalon(rightMaster, true, TalonConfiguration.DEFAULT_CONFIG);
 
-		rightTalon2 = MotorUtils.configFollowerTalon(MotorUtils.configTalon(6, true, TalonConfiguration.DEFAULT_CONFIG),
+		MotorUtils.configFollowerTalon(MotorUtils.configTalon(6, true, TalonConfiguration.DEFAULT_CONFIG),
 				rightTalon1);
-		rightTalon3 = MotorUtils.configFollowerTalon(MotorUtils.configTalon(7, true, TalonConfiguration.DEFAULT_CONFIG),
+		MotorUtils.configFollowerTalon(MotorUtils.configTalon(7, true, TalonConfiguration.DEFAULT_CONFIG),
 				rightTalon1);
 
 		drive = new DifferentialDrive(leftTalon1, rightTalon1, ControlMode.PercentOutput, MIN_OUTPUT, MAX_OUTPUT,
