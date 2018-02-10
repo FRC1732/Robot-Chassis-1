@@ -176,7 +176,6 @@ public class DoubleProfileManager {
 		 * track time, this is rudimentary but that's okay, we just want to make sure
 		 * things never get stuck.
 		 */
-<<<<<<< HEAD
 		if (_loopTimeout < 0) {
 			/* do nothing, timeout is disabled */
 		} else {
@@ -190,7 +189,6 @@ public class DoubleProfileManager {
 				_loopTimeout--;
 			}
 		}
-=======
 		// if (_loopTimeout < 0) {
 		// /* do nothing, timeout is disabled */
 		// } else {
@@ -204,8 +202,6 @@ public class DoubleProfileManager {
 		// --_loopTimeout;
 		// }
 		// }
->>>>>>> e99ea5bd49a0bccf07628a6f0150db7bef042af1
-
 		/* first check if we are in MP mode */
 		if (_leftTalon.getControlMode() != ControlMode.MotionProfile
 				|| _rightTalon.getControlMode() != ControlMode.MotionProfile) {
