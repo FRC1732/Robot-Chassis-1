@@ -56,7 +56,7 @@ public abstract class RobotDriveBase {
 	}
 
 	protected double applyMinMax(double value) {
-		return Util.interpolate(Math.copySign(m_minOut, value), Math.copySign(m_maxOut, value), value);
+		return Math.copySign(Util.interpolate(m_minOut, m_maxOut, Math.abs(value)), value);
 	}
 
 }

@@ -18,9 +18,8 @@ public class Drivetrain extends Subsystem {
 	public final TalonSRX rightTalon1;
 
 	private final TalonSRX leftTalon2;
-	private final TalonSRX rightTalon2;
-
 	private final TalonSRX leftTalon3;
+	private final TalonSRX rightTalon2;
 	private final TalonSRX rightTalon3;
 
 	public DifferentialDrive drive;
@@ -28,7 +27,7 @@ public class Drivetrain extends Subsystem {
 	private final TalonEncoder leftEncoder;
 	private final TalonEncoder rightEncoder;
 
-	public static final double INPUT_DEADBAND = 0.005; // 0.5%.
+	public static final double INPUT_DEADBAND = 0.02; // 2%.
 	public static final double MIN_OUTPUT = 0.0;
 	public static final double MAX_OUTPUT = 1.0;
 	public static final int ENCODER_PULSES_PER_INCH = 520; // probably should double check this
@@ -71,6 +70,8 @@ public class Drivetrain extends Subsystem {
 		SmartDashboard.putNumber("Right Velocity", rightEncoder.getRate());
 		SmartDashboard.putNumber("Left Position", leftEncoder.getPosition());
 		SmartDashboard.putNumber("Right Position", rightEncoder.getPosition());
+		SmartDashboard.putNumber("Left Voltage", leftTalon1.getMotorOutputVoltage());
+		SmartDashboard.putNumber("Right Voltage", rightTalon1.getMotorOutputVoltage());
 	}
 
 	public EncoderReader getRightEncoderReader() {
