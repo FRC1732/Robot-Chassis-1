@@ -3,7 +3,6 @@ package org.usfirst.frc.team1732.robot.controlutils.motionprofiling;
 import java.util.Iterator;
 
 import org.usfirst.frc.team1732.robot.Robot;
-import org.usfirst.frc.team1732.robot.subsystems.TalonConfiguration;
 
 /**
  * Example logic for firing and managing motion profiles.
@@ -91,7 +90,7 @@ public class DoubleProfileManager {
 	/**
 	 * How many trajectory points do we wait for before firing the motion profile.
 	 */
-	private static final int kMinPointsInTalon = 100;
+	private static final int kMinPointsInTalon = 67;
 	/**
 	 * Just a state timeout to make sure we don't get stuck anywhere. Each loop is
 	 * about 20ms.
@@ -126,8 +125,9 @@ public class DoubleProfileManager {
 	public DoubleProfileManager(TalonSRX left, TalonSRX right) {
 		_leftTalon = left;
 		_rightTalon = right;
-		_notifer.startPeriodic(TalonConfiguration.DEFAULT_CONFIG.controlFramePeriod / 1000.0);
-		_leftTalon.changeMotionControlFramePeriod(TalonConfiguration.DEFAULT_CONFIG.controlFramePeriod);
+		_notifer.startPeriodic(0.01);
+		_leftTalon.changeMotionControlFramePeriod(10);
+		_rightTalon.changeMotionControlFramePeriod(10);
 	}
 
 	/**
@@ -176,6 +176,7 @@ public class DoubleProfileManager {
 		 * track time, this is rudimentary but that's okay, we just want to make sure
 		 * things never get stuck.
 		 */
+<<<<<<< HEAD
 		if (_loopTimeout < 0) {
 			/* do nothing, timeout is disabled */
 		} else {
@@ -186,12 +187,28 @@ public class DoubleProfileManager {
 				 */
 				Instrumentation.OnNoProgress();
 			} else {
-				--_loopTimeout;
+				_loopTimeout--;
 			}
 		}
+=======
+		// if (_loopTimeout < 0) {
+		// /* do nothing, timeout is disabled */
+		// } else {
+		// /* our timeout is nonzero */
+		// if (_loopTimeout == 0) {
+		// /*
+		// * something is wrong. Talon is not present, unplugged, breaker tripped
+		// */
+		// Instrumentation.OnNoProgress();
+		// } else {
+		// --_loopTimeout;
+		// }
+		// }
+>>>>>>> e99ea5bd49a0bccf07628a6f0150db7bef042af1
 
 		/* first check if we are in MP mode */
-		if (_leftTalon.getControlMode() != ControlMode.MotionProfile) {
+		if (_leftTalon.getControlMode() != ControlMode.MotionProfile
+				|| _rightTalon.getControlMode() != ControlMode.MotionProfile) {
 			/*
 			 * we are not in MP mode. We are probably driving the robot around using
 			 * gamepads or some other mode.
@@ -345,6 +362,7 @@ public class DoubleProfileManager {
 		 * below
 		 */
 		_leftTalon.configMotionProfileTrajectoryPeriod(0, Robot.CONFIG_TIMEOUT);
+		_rightTalon.configMotionProfileTrajectoryPeriod(0, Robot.CONFIG_TIMEOUT);
 
 		while (pointIterator.hasNext()) {
 			TrajectoryPoint[] points = pointIterator.next();
