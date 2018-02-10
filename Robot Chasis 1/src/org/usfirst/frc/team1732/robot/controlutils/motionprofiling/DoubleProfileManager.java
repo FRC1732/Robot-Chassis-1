@@ -176,6 +176,19 @@ public class DoubleProfileManager {
 		 * track time, this is rudimentary but that's okay, we just want to make sure
 		 * things never get stuck.
 		 */
+		if (_loopTimeout < 0) {
+			/* do nothing, timeout is disabled */
+		} else {
+			/* our timeout is nonzero */
+			if (_loopTimeout == 0) {
+				/*
+				 * something is wrong. Talon is not present, unplugged, breaker tripped
+				 */
+				Instrumentation.OnNoProgress();
+			} else {
+				_loopTimeout--;
+			}
+		}
 		// if (_loopTimeout < 0) {
 		// /* do nothing, timeout is disabled */
 		// } else {
@@ -189,7 +202,6 @@ public class DoubleProfileManager {
 		// --_loopTimeout;
 		// }
 		// }
-
 		/* first check if we are in MP mode */
 		if (_leftTalon.getControlMode() != ControlMode.MotionProfile
 				|| _rightTalon.getControlMode() != ControlMode.MotionProfile) {
