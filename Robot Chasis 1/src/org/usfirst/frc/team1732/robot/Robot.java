@@ -7,6 +7,8 @@
 
 package org.usfirst.frc.team1732.robot;
 
+import org.usfirst.frc.team1732.robot.commands.DriveTrainTester;
+import org.usfirst.frc.team1732.robot.commands.DriveTrainTester.Direction;
 import org.usfirst.frc.team1732.robot.commands.TestPathing;
 import org.usfirst.frc.team1732.robot.input.Joysticks;
 import org.usfirst.frc.team1732.robot.odomotry.PositionEstimator;
@@ -70,15 +72,16 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void autonomousInit() {
-		new TestPathing().start();
+//		new TestPathing().start();
 		// new DriveTrainCharacterizer(TestMode.QUASI_STATIC,
 		// Direction.Backward).start();
 		// new TestMotors().start();
+		new DriveTrainTester(Direction.Forward).start();
 	}
 
 	@Override
 	public void teleopInit() {
-
+		
 	}
 
 	@Override
