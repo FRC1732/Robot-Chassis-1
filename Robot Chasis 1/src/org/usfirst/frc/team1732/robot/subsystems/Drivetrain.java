@@ -48,7 +48,7 @@ public class Drivetrain extends Subsystem {
 	public final GainProfile rightGains = new GainProfile("Right PID", 0, 0, 0, rightFFF, 0, 0, 0);
 
 	public static final double MAX_IN_SEC = 84;
-	public static final double MAX_IN_SEC2 = 505;
+	public static final double MAX_IN_SEC2 = 250;
 
 	public final DoubleProfileManager profileManager;
 

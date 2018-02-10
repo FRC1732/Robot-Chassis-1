@@ -16,6 +16,7 @@ public class DriveTrainTester extends Command {
 	public static enum Direction {
 		Forward, Backward;
 	}
+
 	private final Direction direction;
 	private final EncoderReader leftEncoder;
 	private final EncoderReader rightEncoder;
@@ -32,16 +33,18 @@ public class DriveTrainTester extends Command {
 	protected void initialize() {
 		leftEncoder.zero();
 		rightEncoder.zero();
-
+		
 		Robot.drivetrain.rightTalon1.configOpenloopRamp(100, 10);
 		Robot.drivetrain.leftTalon1.configOpenloopRamp(100, 10);
 		
+		Robot.drivetrain.drive.tankDrive(1, 1);
 	}
 
 	// Called repeatedly when this Command is scheduled to run
 	@Override
 	protected void execute() {
-		System.out.println(Robot.drivetrain.rightTalon1.getMotorOutputVoltage() + ", " + Robot.drivetrain.leftTalon1.getMotorOutputVoltage());
+		System.out.println(Robot.drivetrain.rightTalon1.getMotorOutputVoltage() + ", "
+				+ Robot.drivetrain.leftTalon1.getMotorOutputVoltage());
 	}
 
 	// Make this return true when this Command no longer needs to run execute()
