@@ -7,6 +7,7 @@ import java.io.IOException;
 import org.usfirst.frc.team1732.robot.Robot;
 import org.usfirst.frc.team1732.robot.sensors.encoders.EncoderReader;
 
+import edu.wpi.first.wpilibj.CircularBuffer;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Command;
 
@@ -25,81 +26,91 @@ public class DriveTrainCharacterizer extends Command {
 	private final EncoderReader leftEncoder;
 	private final EncoderReader rightEncoder;
 
-	private FileWriter fw;
-
-	private double speed = 0;
-	private double voltageStep;
-	private double startTime = 0;
-
 	public DriveTrainCharacterizer(TestMode mode, Direction direction) {
 		requires(Robot.drivetrain);
 		this.mode = mode;
 		this.direction = direction;
-		this.leftEncoder = Robot.drivetrain.getLeftEncoderReader();
-		this.rightEncoder = Robot.drivetrain.getRightEncoderReader();
+		this.leftEncoder = Robot.drivetrain.makeLeftEncoderReader();
+		this.rightEncoder = Robot.drivetrain.makeRightEncoderReader();
 	}
+
+	private FileWriter fw;
 
 	// Called just before this Command runs the first time
 	@Override
 	protected void initialize() {
 		leftEncoder.zero();
 		rightEncoder.zero();
-		startTime = Timer.getFPGATimestamp();
 
-		String name = "Forward";
-		double scale = 1;
-		if (direction.equals(Direction.Backward)) {
+		String name;
+		double scale;
+		if (direction.equals(Direction.Forward)) {
+			name = "Forward";
+			scale = 1;
+		} else {
 			name = "Backward";
 			scale = -1;
 		}
 
+		String path = "/U/DriveCharacterization/" + name;
+
 		if (mode.equals(TestMode.QUASI_STATIC)) {
 			System.out.println("QUASI STATIC");
-			System.out.println(Robot.drivetrain.rightTalon1.configOpenloopRamp(60, 10).name());
-			System.out.println(Robot.drivetrain.leftTalon1.configOpenloopRamp(60, 10).name());
-			try {
-				File f = new File("/U/DriveCharacterization/velFile" + name + ".csv");
-				fw = new FileWriter(f, true);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			voltageStep = 1 / 24.0 / 100.0 * scale;
+			System.out.println(Robot.drivetrain.rightTalon1.configOpenloopRamp(90, 10).name());
+			System.out.println(Robot.drivetrain.leftTalon1.configOpenloopRamp(90, 10).name());
+			path = path + "QuasiStatic.csv";
+			// voltageStep = 1 / 24.0 / 100.0 * scale;
 			Robot.drivetrain.drive.tankDrive(1 * scale, 1 * scale);
 		} else {
 			System.out.println("STEP");
 			System.out.println(Robot.drivetrain.rightTalon1.configOpenloopRamp(0, 10).name());
 			System.out.println(Robot.drivetrain.leftTalon1.configOpenloopRamp(0, 10).name());
-			try {
-				File f = new File("/U/DriveCharacterization/accFile" + name + ".csv");
-				fw = new FileWriter(f, true);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			Robot.drivetrain.drive.tankDrive(0.5 * scale, 0.5 * scale);
+			path = path + "StepVoltage.csv";
+			double speed = 0.7;
+			Robot.drivetrain.drive.tankDrive(speed * scale, speed * scale);
 		}
 		try {
+			File f = new File(path);
+			if (f.exists()) {
+				f.delete();
+			}
+			fw = new FileWriter(f, true);
 			fw.write("");
 			fw.flush();
-			fw.write("time, Drive.left_vel, Drive.right_vel, Drive.left_voltage, Drive.right_voltage\n");
+			fw.write("LeftVolt, LeftVel, LeftAcc, RightVolt, RightVel, RightAcc\n");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
+	private int i = 0;
+	private int length = 3;
+	private final CircularBuffer timeBuff = new CircularBuffer(length);
+	private final CircularBuffer leftVelBuff = new CircularBuffer(length);
+	private final CircularBuffer rightVelBuff = new CircularBuffer(length);
+
 	// Called repeatedly when this Command is scheduled to run
 	@Override
 	protected void execute() {
-		if (mode.equals(TestMode.QUASI_STATIC)) {
-			speed = speed + voltageStep;
-			// Robot.drivetrain.drive.tankDrive(speed, speed);
-		}
+		double time = Timer.getFPGATimestamp();
 		double leftVel = leftEncoder.getRate();
 		double rightVel = rightEncoder.getRate();
 		double leftVolt = Robot.drivetrain.leftTalon1.getMotorOutputVoltage();
 		double rightVolt = Robot.drivetrain.leftTalon1.getMotorOutputVoltage();
-		double time = Timer.getFPGATimestamp() - startTime;
-
-		String result = String.format("%f, %f, %f, %f, %f%n", time, leftVel, rightVel, leftVolt, rightVolt);
+		timeBuff.addLast(time);
+		leftVelBuff.addLast(leftVel);
+		rightVelBuff.addLast(rightVel);
+		if (i < length - 1) {
+			i++;
+			return;
+		}
+		double dt = time - timeBuff.removeFirst();
+		double leftDv = leftVel - leftVelBuff.removeFirst();
+		double rightDv = rightVel - rightVelBuff.removeFirst();
+		double leftAcc = leftDv / dt;
+		double rightAcc = rightDv / dt;
+		String result = leftVolt + ", " + leftVel + ", " + leftAcc + ", " + rightVolt + ", " + rightVel + ", "
+				+ rightAcc + "\n";
 		try {
 			fw.write(result);
 		} catch (IOException e) {

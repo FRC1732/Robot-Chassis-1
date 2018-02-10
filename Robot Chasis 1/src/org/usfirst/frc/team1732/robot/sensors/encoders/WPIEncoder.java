@@ -35,4 +35,9 @@ public class WPIEncoder extends EncoderBase {
 		wpiEncoder.setReverseDirection(isReversed);
 	}
 
+	@Override
+	public void zero() {
+		wpiEncoder.reset();
+	}
+
 }

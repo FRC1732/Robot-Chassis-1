@@ -27,10 +27,10 @@ public class Drivetrain extends Subsystem {
 	private final TalonEncoder leftEncoder;
 	private final TalonEncoder rightEncoder;
 
-	public static final double INPUT_DEADBAND = 0.02; // 2%.
+	public static final double INPUT_DEADBAND = 0.025; // 2.5%.
 	public static final double MIN_OUTPUT = 0.0;
 	public static final double MAX_OUTPUT = 1.0;
-	public static final int ENCODER_PULSES_PER_INCH = 520; // probably should double check this
+	public static final double ENCODER_INCHES_PER_PULSE = 0.002099;
 
 	public Drivetrain() {
 		int leftMaster = 1;
@@ -55,8 +55,10 @@ public class Drivetrain extends Subsystem {
 		rightEncoder = new TalonEncoder(rightTalon1, FeedbackDevice.QuadEncoder);
 		leftEncoder.setPhase(true);
 		rightEncoder.setPhase(true);
-		leftEncoder.setDistancePerPulse(1.0 / ENCODER_PULSES_PER_INCH);
-		rightEncoder.setDistancePerPulse(1.0 / ENCODER_PULSES_PER_INCH);
+		leftEncoder.setDistancePerPulse(ENCODER_INCHES_PER_PULSE);
+		rightEncoder.setDistancePerPulse(ENCODER_INCHES_PER_PULSE);
+		rightEncoder.zero();
+		leftEncoder.zero();
 	}
 
 	@Override
@@ -72,13 +74,16 @@ public class Drivetrain extends Subsystem {
 		SmartDashboard.putNumber("Right Position", rightEncoder.getPosition());
 		SmartDashboard.putNumber("Left Voltage", leftTalon1.getMotorOutputVoltage());
 		SmartDashboard.putNumber("Right Voltage", rightTalon1.getMotorOutputVoltage());
+		SmartDashboard.putNumber("Right Pulses", leftEncoder.getPulses());
+		SmartDashboard.putNumber("Left Pulses", rightEncoder.getPulses());
+
 	}
 
-	public EncoderReader getRightEncoderReader() {
+	public EncoderReader makeRightEncoderReader() {
 		return rightEncoder.makeReader();
 	}
 
-	public EncoderReader getLeftEncoderReader() {
+	public EncoderReader makeLeftEncoderReader() {
 		return leftEncoder.makeReader();
 	}
 

@@ -39,7 +39,7 @@ public class Robot extends TimedRobot {
 	public static PositionEstimator positionEstimator;
 
 	// config
-	public static final int PERIOD_MS = 10;
+	public static final int PERIOD_MS = 20;
 	public static final int CONFIG_TIMEOUT = 10; // recommended timeout by CTRE
 
 	/**

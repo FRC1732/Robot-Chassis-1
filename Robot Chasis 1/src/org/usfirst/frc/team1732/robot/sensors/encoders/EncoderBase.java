@@ -24,4 +24,10 @@ public abstract class EncoderBase {
 	 */
 	public abstract void setDistancePerPulse(double distancePerPulse);
 
+	/**
+	 * Zeros the encoder. Be careful, this will zero all encoder readers.
+	 * 
+	 */
+	public abstract void zero();
+
 }

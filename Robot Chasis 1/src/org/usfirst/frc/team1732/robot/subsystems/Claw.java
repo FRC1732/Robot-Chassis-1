@@ -21,8 +21,10 @@ public class Claw extends Subsystem {
 	public Claw() {
 		leftSpark = MotorUtils.configSpark(0, true);
 		rightSpark = MotorUtils.configSpark(1, false);
-		leftSparkCurrent = () -> panel.getCurrent(4);
-		rightSparkCurrent = () -> panel.getCurrent(11);
+		// leftSparkCurrent = () -> panel.getCurrent(4);
+		// rightSparkCurrent = () -> panel.getCurrent(11);
+		leftSparkCurrent = () -> 0.0;
+		rightSparkCurrent = () -> 0.0;
 	}
 
 	public void set(double left, double right) {

@@ -47,4 +47,9 @@ public class TalonEncoder extends EncoderBase {
 		talon.setSensorPhase(sensorPhase);
 	}
 
+	@Override
+	public void zero() {
+		talon.setSelectedSensorPosition(0, 0, Robot.CONFIG_TIMEOUT);
+	}
+
 }
