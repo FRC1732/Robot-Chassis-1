@@ -1,6 +1,9 @@
 package org.usfirst.frc.team1732.robot.controlutils.motionprofiling;
 
+import java.util.Iterator;
+
 import org.usfirst.frc.team1732.robot.Robot;
+import org.usfirst.frc.team1732.robot.subsystems.TalonConfiguration;
 
 /**
  * Example logic for firing and managing motion profiles.
@@ -36,20 +39,17 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Notifier;
 
-public class MotionProfileManager {
+public class DoubleProfileManager {
 
-	/**
-	 * The object holding the path to be follower
-	 */
-
-	private Path path;
+	private Iterator<TrajectoryPoint[]> pointIterator;
 
 	/**
 	 * The status of the motion profile executer and buffer inside the Talon.
 	 * Instead of creating a new one every time we call getMotionProfileStatus, keep
 	 * one copy.
 	 */
-	private MotionProfileStatus _status = new MotionProfileStatus();
+	private MotionProfileStatus _leftStatus = new MotionProfileStatus();
+	private MotionProfileStatus _rightStatus = new MotionProfileStatus();
 
 	/** additional cache for holding the active trajectory point */
 	double _pos = 0, _vel = 0, _heading = 0;
@@ -59,7 +59,8 @@ public class MotionProfileManager {
 	 * call set(), just get motion profile status and make decisions based on motion
 	 * profile.
 	 */
-	private TalonSRX _talon;
+	private TalonSRX _leftTalon;
+	private TalonSRX _rightTalon;
 	/**
 	 * State machine to make sure we let enough of the motion profile stream to
 	 * talon before we fire it.
@@ -85,11 +86,12 @@ public class MotionProfileManager {
 	 * set value to be and let the calling module apply it whenever we decide to
 	 * switch to MP mode.
 	 */
-	private SetValueMotionProfile _setValue = SetValueMotionProfile.Disable;
+	private SetValueMotionProfile _leftSetValue = SetValueMotionProfile.Disable;
+	private SetValueMotionProfile _rightSetValue = SetValueMotionProfile.Disable;
 	/**
 	 * How many trajectory points do we wait for before firing the motion profile.
 	 */
-	private static final int kMinPointsInTalon = 5;
+	private static final int kMinPointsInTalon = 100;
 	/**
 	 * Just a state timeout to make sure we don't get stuck anywhere. Each loop is
 	 * about 20ms.
@@ -106,8 +108,10 @@ public class MotionProfileManager {
 	 * should call every 10ms.
 	 */
 	class PeriodicRunnable implements java.lang.Runnable {
+		@Override
 		public void run() {
-			_talon.processMotionProfileBuffer();
+			_leftTalon.processMotionProfileBuffer();
+			_rightTalon.processMotionProfileBuffer();
 		}
 	}
 
@@ -119,38 +123,28 @@ public class MotionProfileManager {
 	 * @param talon
 	 *            reference to Talon object to fetch motion profile status from.
 	 */
-	public MotionProfileManager(TalonSRX talon, Path path) {
-		_talon = talon;
-		resetAndChangePath(path);
-	}
-
-	public void resetAndChangePath(Path path) {
-		reset();
-		this.path = path;
-		/*
-		 * since our MP is 10ms per point, set the control frame rate and the notifier
-		 * to half that
-		 */
-		// _talon.changeMotionControlFramePeriod(path.stepDuration);
-		// _talon.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic,
-		// path.stepDuration, Robot.CONFIG_TIMEOUT);
-		// _talon.changeMotionControlFramePeriod(path.stepDuration / 2);
-		// _notifer.startPeriodic(path.stepDuration / 1000.0 / 2.0);
-		// path.profile.applyToTalon(_talon, 0);
+	public DoubleProfileManager(TalonSRX left, TalonSRX right) {
+		_leftTalon = left;
+		_rightTalon = right;
+		_notifer.startPeriodic(TalonConfiguration.DEFAULT_CONFIG.controlFramePeriod / 1000.0);
+		_leftTalon.changeMotionControlFramePeriod(TalonConfiguration.DEFAULT_CONFIG.controlFramePeriod);
 	}
 
 	/**
 	 * Called to clear Motion profile buffer and reset state info during disabled
 	 * and when Talon is not in MP control mode.
 	 */
-	public void reset() {
+	public void reset(Iterator<TrajectoryPoint[]> pointIterator) {
+		this.pointIterator = pointIterator;
 		/*
 		 * Let's clear the buffer just in case user decided to disable in the middle of
 		 * an MP, and now we have the second half of a profile just sitting in memory.
 		 */
-		_talon.clearMotionProfileTrajectories();
+		_leftTalon.clearMotionProfileTrajectories();
+		_rightTalon.clearMotionProfileTrajectories();
 		/* When we do re-enter motionProfile control mode, stay disabled. */
-		_setValue = SetValueMotionProfile.Disable;
+		_leftSetValue = SetValueMotionProfile.Disable;
+		_rightSetValue = SetValueMotionProfile.Disable;
 		/* When we do start running our state machine start at the beginning. */
 		_state = 0;
 		_loopTimeout = -1;
@@ -165,7 +159,8 @@ public class MotionProfileManager {
 	 * Called every robot loop while profile is running to keep talon in right mode
 	 */
 	public void run() {
-		_talon.set(ControlMode.MotionProfile, _setValue.value);
+		_leftTalon.set(ControlMode.MotionProfile, _leftSetValue.value);
+		_rightTalon.set(ControlMode.MotionProfile, _rightSetValue.value);
 		control();
 	}
 
@@ -174,7 +169,8 @@ public class MotionProfileManager {
 	 */
 	public void control() {
 		/* Get the motion profile status every loop */
-		_talon.getMotionProfileStatus(_status);
+		_leftTalon.getMotionProfileStatus(_leftStatus);
+		_rightTalon.getMotionProfileStatus(_rightStatus);
 
 		/*
 		 * track time, this is rudimentary but that's okay, we just want to make sure
@@ -195,7 +191,7 @@ public class MotionProfileManager {
 		}
 
 		/* first check if we are in MP mode */
-		if (_talon.getControlMode() != ControlMode.MotionProfile) {
+		if (_leftTalon.getControlMode() != ControlMode.MotionProfile) {
 			/*
 			 * we are not in MP mode. We are probably driving the robot around using
 			 * gamepads or some other mode.
@@ -212,7 +208,8 @@ public class MotionProfileManager {
 				if (_bStart) {
 					_bStart = false;
 
-					_setValue = SetValueMotionProfile.Disable;
+					_leftSetValue = SetValueMotionProfile.Disable;
+					_rightSetValue = SetValueMotionProfile.Disable;
 					startFilling();
 					/*
 					 * MP is being sent to CAN bus, wait a small amount of time
@@ -225,9 +222,16 @@ public class MotionProfileManager {
 					 * wait for MP to stream to Talon, really just the first few points
 					 */
 				/* do we have a minimum numberof points in Talon */
-				if (_status.btmBufferCnt > kMinPointsInTalon) {
+				if (_leftStatus.btmBufferCnt > kMinPointsInTalon) {
 					/* start (once) the motion profile */
-					_setValue = SetValueMotionProfile.Enable;
+					_leftSetValue = SetValueMotionProfile.Enable;
+					/* MP will start once the control frame gets scheduled */
+					_state = 2;
+					_loopTimeout = kNumLoopsTimeout;
+				}
+				if (_rightStatus.btmBufferCnt > kMinPointsInTalon) {
+					/* start (once) the motion profile */
+					_rightSetValue = SetValueMotionProfile.Enable;
 					/* MP will start once the control frame gets scheduled */
 					_state = 2;
 					_loopTimeout = kNumLoopsTimeout;
@@ -239,19 +243,31 @@ public class MotionProfileManager {
 				 * this is so that you can unplug your talon in the middle of an MP and react to
 				 * it.
 				 */
-				if (_status.isUnderrun == false) {
+				if (_leftStatus.isUnderrun == false) {
+					_loopTimeout = kNumLoopsTimeout;
+				}
+				if (_rightStatus.isUnderrun == false) {
 					_loopTimeout = kNumLoopsTimeout;
 				}
 				/*
 				 * If we are executing an MP and the MP finished, start loading another. We will
 				 * go into hold state so robot servo's position.
 				 */
-				if (_status.activePointValid && _status.isLast) {
+				if (_leftStatus.activePointValid && _leftStatus.isLast) {
 					/*
 					 * because we set the last point's isLast to true, we will get here when the MP
 					 * is done
 					 */
-					_setValue = SetValueMotionProfile.Hold;
+					_leftSetValue = SetValueMotionProfile.Hold;
+					_state = 0;
+					_loopTimeout = -1;
+				}
+				if (_rightStatus.activePointValid && _rightStatus.isLast) {
+					/*
+					 * because we set the last point's isLast to true, we will get here when the MP
+					 * is done
+					 */
+					_rightSetValue = SetValueMotionProfile.Hold;
 					_state = 0;
 					_loopTimeout = -1;
 				}
@@ -259,13 +275,14 @@ public class MotionProfileManager {
 			}
 
 			/* Get the motion profile status every loop */
-			_talon.getMotionProfileStatus(_status);
-			_heading = _talon.getActiveTrajectoryHeading();
-			_pos = _talon.getActiveTrajectoryPosition();
-			_vel = _talon.getActiveTrajectoryVelocity();
+			_leftTalon.getMotionProfileStatus(_leftStatus);
+			_rightTalon.getMotionProfileStatus(_rightStatus);
+			_heading = _leftTalon.getActiveTrajectoryHeading();
+			_pos = _leftTalon.getActiveTrajectoryPosition();
+			_vel = _leftTalon.getActiveTrajectoryVelocity();
 
 			/* printfs and/or logging */
-			Instrumentation.process(_status, _pos, _vel, _heading);
+			Instrumentation.process(_leftStatus, _pos, _vel, _heading);
 		}
 	}
 
@@ -275,7 +292,7 @@ public class MotionProfileManager {
 	 * @param durationMs
 	 * @return enum equivalent of durationMs
 	 */
-	private TrajectoryDuration GetTrajectoryDuration(int durationMs) {
+	public static TrajectoryDuration getTrajectoryDuration(int durationMs) {
 		/* create return value */
 		TrajectoryDuration retval = TrajectoryDuration.Trajectory_Duration_0ms;
 		/* convert duration to supported type */
@@ -297,54 +314,49 @@ public class MotionProfileManager {
 
 	private void startFilling() {
 
-		double totalCnt = 0; // path.points.length;
-
-		/* create an empty point */
-		TrajectoryPoint point = new TrajectoryPoint();
-
 		/* did we get an underrun condition since last time we checked ? */
-		if (_status.hasUnderrun) {
+		if (_leftStatus.hasUnderrun) {
 			/* better log it so we know about it */
 			Instrumentation.OnUnderrun();
 			/*
 			 * clear the error. This flag does not auto clear, this way we never miss
 			 * logging it.
 			 */
-			_talon.clearMotionProfileHasUnderrun(0);
+			_leftTalon.clearMotionProfileHasUnderrun(0);
+		}
+		if (_rightStatus.hasUnderrun) {
+			/* better log it so we know about it */
+			Instrumentation.OnUnderrun();
+			/*
+			 * clear the error. This flag does not auto clear, this way we never miss
+			 * logging it.
+			 */
+			_rightTalon.clearMotionProfileHasUnderrun(0);
 		}
 		/*
 		 * just in case we are interrupting another MP and there is still buffer points
 		 * in memory, clear it.
 		 */
-		_talon.clearMotionProfileTrajectories();
+		_leftTalon.clearMotionProfileTrajectories();
+		_rightTalon.clearMotionProfileTrajectories();
 
 		/*
 		 * set the base trajectory period to zero, use the individual trajectory period
 		 * below
 		 */
-		_talon.configMotionProfileTrajectoryPeriod(0, Robot.CONFIG_TIMEOUT);
+		_leftTalon.configMotionProfileTrajectoryPeriod(0, Robot.CONFIG_TIMEOUT);
 
-		/* This is fast since it's just into our TOP buffer */
-		for (int i = 0; i < totalCnt; ++i) {
-			/* for each point, fill our structure and pass it to API */
-			point.position = 0; // path.points[i].position;
-			point.velocity = 0; // path.points[i].velocity;
-			point.headingDeg = 0; // path.points[i].heading;
-			point.profileSlotSelect0 = 0; /* which set of gains would you like to use [0,3]? */
-			point.profileSlotSelect1 = 0; // path.useCascaded;
-			/*
-			 * future feature - not used in this example - cascaded PID [0,1], leave zero
-			 */
-			point.timeDur = GetTrajectoryDuration((int) 0); // path.points[i].duration);
-			point.zeroPos = false;
-			if (i == 0)
-				point.zeroPos = true; /* set this to true on the first point */
+		while (pointIterator.hasNext()) {
+			TrajectoryPoint[] points = pointIterator.next();
+			TrajectoryPoint leftPoint = points[0];
+			TrajectoryPoint rightPoint = points[1];
+			leftPoint.profileSlotSelect0 = 0;
+			rightPoint.profileSlotSelect1 = 0;
+			leftPoint.zeroPos = false;
+			rightPoint.zeroPos = false;
+			_leftTalon.pushMotionProfileTrajectory(leftPoint);
+			_rightTalon.pushMotionProfileTrajectory(rightPoint);
 
-			point.isLastPoint = false;
-			if ((i + 1) == totalCnt)
-				point.isLastPoint = true; /* set this to true on the last point */
-
-			_talon.pushMotionProfileTrajectory(point);
 		}
 	}
 
@@ -352,9 +364,8 @@ public class MotionProfileManager {
 	 * Called by application to signal Talon to start the buffered MP (when it's
 	 * able to).
 	 */
-	void startMotionProfile() {
+	public void startMotionProfile() {
 		_bStart = true;
-		// path.profile.applyToTalon(_talon, 0);
 	}
 
 	/**
@@ -363,7 +374,12 @@ public class MotionProfileManager {
 	 *         motion-profile output, 1 for enable motion-profile, 2 for hold
 	 *         current motion profile trajectory point.
 	 */
-	SetValueMotionProfile getSetValue() {
-		return _setValue;
+	public SetValueMotionProfile getSetLeftValue() {
+		return _leftSetValue;
 	}
+
+	public SetValueMotionProfile getSetRightValue() {
+		return _rightSetValue;
+	}
+
 }

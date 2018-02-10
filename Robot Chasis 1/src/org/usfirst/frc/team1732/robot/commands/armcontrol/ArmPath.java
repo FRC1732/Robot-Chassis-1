@@ -1,7 +1,7 @@
 package org.usfirst.frc.team1732.robot.commands.armcontrol;
 
 import org.usfirst.frc.team1732.robot.Robot;
-import org.usfirst.frc.team1732.robot.controlutils.BasicControl;
+import org.usfirst.frc.team1732.robot.Util;
 import org.usfirst.frc.team1732.robot.subsystems.Arm;
 
 import edu.wpi.first.wpilibj.command.Command;
@@ -41,8 +41,8 @@ public class ArmPath extends Command {
 
 	@Override
 	protected void execute() {
-		Robot.arm.setSpeed(BasicControl.cosineInterpolate(startVoltage, startPosition, endVoltage,
-				endPosition, Robot.arm.encoder.getPosition()));
+		Robot.arm.setSpeed(Util.cosineInterpolate(startVoltage, startPosition, endVoltage, endPosition,
+				Robot.arm.encoder.getPosition()));
 		// Robot.arm.setSpeed(Robot.arm.getTorqueCompensation(Robot.arm.encoder.getPosition())
 	}
 

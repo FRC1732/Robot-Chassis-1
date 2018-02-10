@@ -1,6 +1,9 @@
 package org.usfirst.frc.team1732.robot.subsystems;
 
 import org.usfirst.frc.team1732.robot.commands.DriveWithJoysticks;
+import org.usfirst.frc.team1732.robot.controlutils.Feedforward;
+import org.usfirst.frc.team1732.robot.controlutils.GainProfile;
+import org.usfirst.frc.team1732.robot.controlutils.motionprofiling.DoubleProfileManager;
 import org.usfirst.frc.team1732.robot.drivercontrol.DifferentialDrive;
 import org.usfirst.frc.team1732.robot.sensors.encoders.EncoderReader;
 import org.usfirst.frc.team1732.robot.sensors.encoders.TalonEncoder;
@@ -24,13 +27,26 @@ public class Drivetrain extends Subsystem {
 
 	public DifferentialDrive drive;
 
-	private final TalonEncoder leftEncoder;
-	private final TalonEncoder rightEncoder;
+	public final TalonEncoder leftEncoder;
+	public final TalonEncoder rightEncoder;
 
 	public static final double INPUT_DEADBAND = 0.025; // 2.5%.
 	public static final double MIN_OUTPUT = 0.0;
 	public static final double MAX_OUTPUT = 1.0;
 	public static final double ENCODER_INCHES_PER_PULSE = 0.002099;
+
+	public final Feedforward leftFFF = new Feedforward(0.063329, 0.010514, 1.395889);
+	public final Feedforward leftBFF = new Feedforward(0.062512, 010545, -1.407502);
+	public final Feedforward rightFFF = new Feedforward(0.062081, 0.010137, 1.486594);
+	public final Feedforward rightBFF = new Feedforward(0.062407, 0.010243, -1.465781);
+
+	public final GainProfile leftGains = new GainProfile("Left PID", 0, 0, 0, leftFFF, 0, 0, 0);
+	public final GainProfile rightGains = new GainProfile("Right PID", 0, 0, 0, rightFFF, 0, 0, 0);
+
+	public static final double MAX_IN_SEC = 84;
+	public static final double MAX_IN_SEC2 = 505;
+
+	public final DoubleProfileManager profileManager;
 
 	public Drivetrain() {
 		int leftMaster = 1;
@@ -59,6 +75,7 @@ public class Drivetrain extends Subsystem {
 		rightEncoder.setDistancePerPulse(ENCODER_INCHES_PER_PULSE);
 		rightEncoder.zero();
 		leftEncoder.zero();
+		profileManager = new DoubleProfileManager(leftTalon1, rightTalon1);
 	}
 
 	@Override

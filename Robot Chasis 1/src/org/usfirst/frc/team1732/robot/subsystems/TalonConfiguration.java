@@ -41,7 +41,7 @@ public class TalonConfiguration {
 	public int analogTemperatureBatteryStatusPeriod = 160;
 	public int pulseWidthStatusPeriod = 160;
 
-	public int currentMPtargetStatusPeriod = 160;
+	public int currentMPtargetStatusPeriod = 20;
 	public int PIDerrorStatusPeriod = 160;
 	public int controlFramePeriod = 10;
 

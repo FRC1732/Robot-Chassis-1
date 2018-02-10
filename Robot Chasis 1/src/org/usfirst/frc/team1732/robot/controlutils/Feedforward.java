@@ -1,4 +1,4 @@
-package org.usfirst.frc.team1732.robot.math;
+package org.usfirst.frc.team1732.robot.controlutils;
 
 public class Feedforward {
 

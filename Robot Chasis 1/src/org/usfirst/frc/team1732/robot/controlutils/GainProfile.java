@@ -10,19 +10,18 @@ public class GainProfile {
 	private double kP;
 	private double kI;
 	private double kD;
-	private double kF;
+	private Feedforward ff;
 	private int integralZone;
 	private int allowableError;
 	private int maxIntegralAccumulated;
 
-	public GainProfile(String name, double kP, double kI, double kD, double kF, int integralZone,
-			int allowableError,
-			int maxIntegralAccumulated) {
+	public GainProfile(String name, double kP, double kI, double kD, Feedforward ff, int integralZone,
+			int allowableError, int maxIntegralAccumulated) {
 		this.name = name;
 		this.kP = kP;
 		this.kI = kI;
 		this.kD = kD;
-		this.kF = kF;
+		this.ff = ff;
 		this.integralZone = integralZone;
 		this.allowableError = allowableError;
 		this.maxIntegralAccumulated = maxIntegralAccumulated;
@@ -42,7 +41,7 @@ public class GainProfile {
 		talon.config_kP(profile, kP, Robot.CONFIG_TIMEOUT);
 		talon.config_kI(profile, kI, Robot.CONFIG_TIMEOUT);
 		talon.config_kD(profile, kD, Robot.CONFIG_TIMEOUT);
-		talon.config_kF(profile, kF, Robot.CONFIG_TIMEOUT);
+		talon.config_kF(profile, ff.TALON_SRX_FF_GAIN, Robot.CONFIG_TIMEOUT);
 		talon.configAllowableClosedloopError(profile, allowableError, Robot.CONFIG_TIMEOUT);
 		talon.configMaxIntegralAccumulator(profile, maxIntegralAccumulated, Robot.CONFIG_TIMEOUT);
 	}
@@ -71,12 +70,12 @@ public class GainProfile {
 		this.kD = kD;
 	}
 
-	public double getkF() {
-		return kF;
+	public Feedforward getFF() {
+		return ff;
 	}
 
-	public void setkF(double kF) {
-		this.kF = kF;
+	public void setFF(Feedforward ff) {
+		this.ff = ff;
 	}
 
 	public double getIntegralZone() {
@@ -101,6 +100,11 @@ public class GainProfile {
 
 	public void setMaxIntegralAccumulated(int maxIntegralAccumulated) {
 		this.maxIntegralAccumulated = maxIntegralAccumulated;
+	}
+
+	@Override
+	public GainProfile clone() {
+		return new GainProfile(name, kP, kI, kD, ff, integralZone, allowableError, maxIntegralAccumulated);
 	}
 
 }
