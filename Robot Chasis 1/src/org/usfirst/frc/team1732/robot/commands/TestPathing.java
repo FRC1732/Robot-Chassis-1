@@ -59,8 +59,9 @@ public class TestPathing extends Command {
 	// Make this return true when this Command no longer needs to run execute()
 	@Override
 	protected boolean isFinished() {
-		return Robot.drivetrain.profileManager.getSetLeftValue().equals(SetValueMotionProfile.Hold)
-				&& Robot.drivetrain.profileManager.getSetRightValue().equals(SetValueMotionProfile.Hold);
+		return false;
+//		return Robot.drivetrain.profileManager.getSetLeftValue().equals(SetValueMotionProfile.Hold)
+//				&& Robot.drivetrain.profileManager.getSetRightValue().equals(SetValueMotionProfile.Hold);
 	}
 
 	// Called once after isFinished returns true

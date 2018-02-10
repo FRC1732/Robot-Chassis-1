@@ -36,13 +36,14 @@ public class Drivetrain extends Subsystem {
 	private static final double fix = 79.5 / 100.0;
 	public static final double ENCODER_INCHES_PER_PULSE = 0.002099 * fix;
 
-	public final Feedforward leftFFF = new Feedforward(0.063329 / fix, 0.010514 / fix, 1.395889);
-	public final Feedforward leftBFF = new Feedforward(0.062512 / fix, 010545 / fix, -1.407502);
-	public final Feedforward rightFFF = new Feedforward(0.062081 / fix, 0.010137 / fix, 1.486594);
-	public final Feedforward rightBFF = new Feedforward(0.062407 / fix, 0.010243 / fix, -1.465781);
+	public static final double PERCENT_BASE_VOLTAGE = 0.9;
+	public final Feedforward leftFFF = new Feedforward(0.063329 / fix, 0.010514 / fix, 1.395889*PERCENT_BASE_VOLTAGE);
+	public final Feedforward leftBFF = new Feedforward(0.062512 / fix, 010545 / fix, -1.407502*PERCENT_BASE_VOLTAGE);
+	public final Feedforward rightFFF = new Feedforward(0.062081 / fix, 0.010137 / fix, 1.486594*PERCENT_BASE_VOLTAGE);
+	public final Feedforward rightBFF = new Feedforward(0.062407 / fix, 0.010243 / fix, -1.465781*PERCENT_BASE_VOLTAGE);
 
-	public final GainProfile leftGains = new GainProfile("Left PID", 0, 0, 0, leftFFF, 0, 0, 0);
-	public final GainProfile rightGains = new GainProfile("Right PID", 0, 0, 0, rightFFF, 0, 0, 0);
+	public final GainProfile leftGains = new GainProfile("Left PID", 0.0, 0, 0, leftFFF, 0, 0, 0);
+	public final GainProfile rightGains = new GainProfile("Right PID", 0.0, 0, 0, rightFFF, 0, 0, 0);
 
 	public static final double MAX_IN_SEC = 84;
 	public static final double MAX_IN_SEC2 = 250;
