@@ -15,9 +15,9 @@ import org.usfirst.frc.team1732.robot.controlutils.motionprofiling.motion.Genera
 import org.usfirst.frc.team1732.robot.controlutils.motionprofiling.motion.MotionProfile;
 import org.usfirst.frc.team1732.robot.controlutils.motionprofiling.motion.MotionProfileConstraints;
 import org.usfirst.frc.team1732.robot.controlutils.motionprofiling.motion.MotionProfileGoal;
+import org.usfirst.frc.team1732.robot.controlutils.motionprofiling.motion.MotionProfileGoal.CompletionBehavior;
 import org.usfirst.frc.team1732.robot.controlutils.motionprofiling.motion.MotionSegment;
 import org.usfirst.frc.team1732.robot.controlutils.motionprofiling.motion.MotionState;
-import org.usfirst.frc.team1732.robot.controlutils.motionprofiling.motion.MotionProfileGoal.CompletionBehavior;
 
 import com.ctre.phoenix.motion.TrajectoryPoint;
 import com.ctre.phoenix.motion.TrajectoryPoint.TrajectoryDuration;
@@ -312,15 +312,15 @@ public final class Path implements Iterable<TrajectoryPoint[]> {
 	public void writeToFile(String path) {
 
 	}
-	
+
 	private static Feedforward leftFF;
 	private static Feedforward rightFF;
 	private static double robotWidth;
 	private static double pointDurationSec;
 	private static double sensorUnitsPerYourUnits;
 
-	public void setPathVars(Feedforward leftFF, Feedforward rightFF, double robotWidth,
-			double pointDurationSec, double sensorUnitsPerYourUnits) {
+	public void setPathVars(Feedforward leftFF, Feedforward rightFF, double robotWidth, double pointDurationSec,
+			double sensorUnitsPerYourUnits) {
 		this.leftFF = leftFF;
 		this.rightFF = rightFF;
 		this.robotWidth = robotWidth;

@@ -33,12 +33,16 @@ public class Drivetrain extends Subsystem {
 	public static final double INPUT_DEADBAND = 0.025; // 2.5%.
 	public static final double MIN_OUTPUT = 0.0;
 	public static final double MAX_OUTPUT = 1.0;
-	public static final double ENCODER_INCHES_PER_PULSE = 0.002099;
+	public static final double ENCODER_INCHES_PER_PULSE = 0.002099 * 79.5 / 100.0;
 
-	public final Feedforward leftFFF = new Feedforward(0.063329, 0.010514, 1.395889);
-	public final Feedforward leftBFF = new Feedforward(0.062512, 010545, -1.407502);
-	public final Feedforward rightFFF = new Feedforward(0.062081, 0.010137, 1.486594);
-	public final Feedforward rightBFF = new Feedforward(0.062407, 0.010243, -1.465781);
+	public final Feedforward leftFFF = new Feedforward(0.063329 * ENCODER_INCHES_PER_PULSE,
+			0.010514 * ENCODER_INCHES_PER_PULSE, 1.395889);
+	public final Feedforward leftBFF = new Feedforward(0.062512 * ENCODER_INCHES_PER_PULSE,
+			010545 * ENCODER_INCHES_PER_PULSE, -1.407502);
+	public final Feedforward rightFFF = new Feedforward(0.062081 * ENCODER_INCHES_PER_PULSE,
+			0.010137 * ENCODER_INCHES_PER_PULSE, 1.486594);
+	public final Feedforward rightBFF = new Feedforward(0.062407 * ENCODER_INCHES_PER_PULSE,
+			0.010243 * ENCODER_INCHES_PER_PULSE, -1.465781);
 
 	public final GainProfile leftGains = new GainProfile("Left PID", 0, 0, 0, leftFFF, 0, 0, 0);
 	public final GainProfile rightGains = new GainProfile("Right PID", 0, 0, 0, rightFFF, 0, 0, 0);
@@ -76,6 +80,11 @@ public class Drivetrain extends Subsystem {
 		rightEncoder.zero();
 		leftEncoder.zero();
 		profileManager = new DoubleProfileManager(leftTalon1, rightTalon1);
+		leftFFF.setConversion(1.0 / ENCODER_INCHES_PER_PULSE, 1000);
+		leftBFF.setConversion(1.0 / ENCODER_INCHES_PER_PULSE, 1000);
+		rightFFF.setConversion(1.0 / ENCODER_INCHES_PER_PULSE, 1000);
+		righttBFF.setConversion(1.0 / ENCODER_INCHES_PER_PULSE, 1000);
+
 	}
 
 	@Override
