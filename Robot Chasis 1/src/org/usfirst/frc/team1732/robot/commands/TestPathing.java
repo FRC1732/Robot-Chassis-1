@@ -32,12 +32,12 @@ public class TestPathing extends Command {
 		System.out.println("Time to make: " + t.get());
 		Iterator<TrajectoryPoint[]> iter = path.getIterator(Robot.drivetrain.leftFFF, Robot.drivetrain.rightFFF, 29,
 				0.02, 1.0 / Drivetrain.ENCODER_INCHES_PER_PULSE);
-		Robot.drivetrain.leftTalon1.setIntegralAccumulator(0, 0, 0);
 		Robot.drivetrain.profileManager.reset(iter);
 		GainProfile leftGain = Robot.drivetrain.leftGains.clone();
 		leftGain.setFF(Robot.drivetrain.leftFFF);
 		GainProfile rightGain = Robot.drivetrain.rightGains.clone();
 		rightGain.setFF(Robot.drivetrain.rightFFF);
+
 		leftGain.applyToTalon(Robot.drivetrain.leftTalon1, 0);
 		rightGain.applyToTalon(Robot.drivetrain.rightTalon1, 0);
 	}
