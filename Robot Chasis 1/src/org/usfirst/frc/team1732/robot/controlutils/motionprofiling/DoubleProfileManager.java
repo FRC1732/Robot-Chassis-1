@@ -235,14 +235,13 @@ public class DoubleProfileManager {
 					 * wait for MP to stream to Talon, really just the first few points
 					 */
 				/* do we have a minimum numberof points in Talon */
-				if (_leftStatus.btmBufferCnt > kMinPointsInTalon) {
+				if (_leftStatus.btmBufferCnt > kMinPointsInTalon && _rightStatus.btmBufferCnt > kMinPointsInTalon) {
 					/* start (once) the motion profile */
 					_leftSetValue = SetValueMotionProfile.Enable;
 					/* MP will start once the control frame gets scheduled */
 					_state = 2;
 					_loopTimeout = kNumLoopsTimeout;
-				}
-				if (_rightStatus.btmBufferCnt > kMinPointsInTalon) {
+					
 					/* start (once) the motion profile */
 					_rightSetValue = SetValueMotionProfile.Enable;
 					/* MP will start once the control frame gets scheduled */
@@ -272,8 +271,6 @@ public class DoubleProfileManager {
 					 * is done
 					 */
 					_leftSetValue = SetValueMotionProfile.Hold;
-					_state = 0;
-					_loopTimeout = -1;
 				}
 				if (_rightStatus.activePointValid && _rightStatus.isLast) {
 					/*
@@ -281,6 +278,9 @@ public class DoubleProfileManager {
 					 * is done
 					 */
 					_rightSetValue = SetValueMotionProfile.Hold;
+				}
+				
+				if(_rightSetValue == SetValueMotionProfile.Hold && _leftSetValue == SetValueMotionProfile.Hold) {
 					_state = 0;
 					_loopTimeout = -1;
 				}
