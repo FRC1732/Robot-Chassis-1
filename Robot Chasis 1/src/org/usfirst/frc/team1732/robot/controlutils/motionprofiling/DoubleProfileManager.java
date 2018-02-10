@@ -223,7 +223,7 @@ public class DoubleProfileManager {
 
 					_leftSetValue = SetValueMotionProfile.Disable;
 					_rightSetValue = SetValueMotionProfile.Disable;
-					fillBottomBuffers();
+					startFilling();
 					/*
 					 * MP is being sent to CAN bus, wait a small amount of time
 					 */
@@ -286,6 +286,7 @@ public class DoubleProfileManager {
 				}
 				break;
 			}
+			fill();
 
 			/* Get the motion profile status every loop */
 			_leftTalon.getMotionProfileStatus(_leftStatus);
@@ -325,7 +326,7 @@ public class DoubleProfileManager {
 	// startFilling(p.Points, p.Points.length);
 	// }
 
-	private void fillBottomBuffers() {
+	private void startFilling() {
 
 		/* did we get an underrun condition since last time we checked ? */
 		if (_leftStatus.hasUnderrun) {
@@ -359,7 +360,9 @@ public class DoubleProfileManager {
 		 */
 		_leftTalon.configMotionProfileTrajectoryPeriod(0, Robot.CONFIG_TIMEOUT);
 		_rightTalon.configMotionProfileTrajectoryPeriod(0, Robot.CONFIG_TIMEOUT);
+	}
 
+	private void fill() {
 		while (pointIterator.hasNext() && (!_leftTalon.isMotionProfileTopLevelBufferFull()
 				&& !_rightTalon.isMotionProfileTopLevelBufferFull())) {
 			TrajectoryPoint[] points = pointIterator.next();
