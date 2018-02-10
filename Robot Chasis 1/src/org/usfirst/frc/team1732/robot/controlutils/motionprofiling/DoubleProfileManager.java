@@ -223,7 +223,7 @@ public class DoubleProfileManager {
 
 					_leftSetValue = SetValueMotionProfile.Disable;
 					_rightSetValue = SetValueMotionProfile.Disable;
-					startFilling();
+					fillBottomBuffers();
 					/*
 					 * MP is being sent to CAN bus, wait a small amount of time
 					 */
@@ -241,7 +241,7 @@ public class DoubleProfileManager {
 					/* MP will start once the control frame gets scheduled */
 					_state = 2;
 					_loopTimeout = kNumLoopsTimeout;
-					
+
 					/* start (once) the motion profile */
 					_rightSetValue = SetValueMotionProfile.Enable;
 					/* MP will start once the control frame gets scheduled */
@@ -279,8 +279,8 @@ public class DoubleProfileManager {
 					 */
 					_rightSetValue = SetValueMotionProfile.Hold;
 				}
-				
-				if(_rightSetValue == SetValueMotionProfile.Hold && _leftSetValue == SetValueMotionProfile.Hold) {
+
+				if (_rightSetValue == SetValueMotionProfile.Hold && _leftSetValue == SetValueMotionProfile.Hold) {
 					_state = 0;
 					_loopTimeout = -1;
 				}
@@ -325,7 +325,7 @@ public class DoubleProfileManager {
 	// startFilling(p.Points, p.Points.length);
 	// }
 
-	private void startFilling() {
+	private void fillBottomBuffers() {
 
 		/* did we get an underrun condition since last time we checked ? */
 		if (_leftStatus.hasUnderrun) {
@@ -360,7 +360,8 @@ public class DoubleProfileManager {
 		_leftTalon.configMotionProfileTrajectoryPeriod(0, Robot.CONFIG_TIMEOUT);
 		_rightTalon.configMotionProfileTrajectoryPeriod(0, Robot.CONFIG_TIMEOUT);
 
-		while (pointIterator.hasNext()) {
+		while (pointIterator.hasNext() && (!_leftTalon.isMotionProfileTopLevelBufferFull()
+				&& !_rightTalon.isMotionProfileTopLevelBufferFull())) {
 			TrajectoryPoint[] points = pointIterator.next();
 			TrajectoryPoint leftPoint = points[0];
 			TrajectoryPoint rightPoint = points[1];
