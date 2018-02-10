@@ -83,8 +83,7 @@ public class Drivetrain extends Subsystem {
 		leftFFF.setConversion(1.0 / ENCODER_INCHES_PER_PULSE, 1000);
 		leftBFF.setConversion(1.0 / ENCODER_INCHES_PER_PULSE, 1000);
 		rightFFF.setConversion(1.0 / ENCODER_INCHES_PER_PULSE, 1000);
-		righttBFF.setConversion(1.0 / ENCODER_INCHES_PER_PULSE, 1000);
-
+		rightBFF.setConversion(1.0 / ENCODER_INCHES_PER_PULSE, 1000);
 	}
 
 	@Override
