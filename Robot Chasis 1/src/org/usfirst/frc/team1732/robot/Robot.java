@@ -7,8 +7,6 @@
 
 package org.usfirst.frc.team1732.robot;
 
-import org.usfirst.frc.team1732.robot.commands.DriveTrainTester;
-import org.usfirst.frc.team1732.robot.commands.DriveTrainTester.Direction;
 import org.usfirst.frc.team1732.robot.commands.TestPathing;
 import org.usfirst.frc.team1732.robot.input.Joysticks;
 import org.usfirst.frc.team1732.robot.odomotry.PositionEstimator;

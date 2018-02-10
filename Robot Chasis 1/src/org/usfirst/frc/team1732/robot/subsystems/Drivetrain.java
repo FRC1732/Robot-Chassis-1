@@ -20,11 +20,6 @@ public class Drivetrain extends Subsystem {
 	public final TalonSRX leftTalon1;
 	public final TalonSRX rightTalon1;
 
-	private final TalonSRX leftTalon2;
-	private final TalonSRX leftTalon3;
-	private final TalonSRX rightTalon2;
-	private final TalonSRX rightTalon3;
-
 	public DifferentialDrive drive;
 
 	public final TalonEncoder leftEncoder;
@@ -36,13 +31,14 @@ public class Drivetrain extends Subsystem {
 	private static final double fix = 79.5 / 100.0;
 	public static final double ENCODER_INCHES_PER_PULSE = 0.002099 * fix;
 
-	public final Feedforward leftFFF = new Feedforward(0.063329 / fix, 0.010514 / fix, 1.395889);
-	public final Feedforward leftBFF = new Feedforward(0.062512 / fix, 010545 / fix, -1.407502);
-	public final Feedforward rightFFF = new Feedforward(0.062081 / fix, 0.010137 / fix, 1.486594);
-	public final Feedforward rightBFF = new Feedforward(0.062407 / fix, 0.010243 / fix, -1.465781);
+	public static final double PERCENT_BASE_VOLTAGE = 0.9;
+	public final Feedforward leftFFF = new Feedforward(0.063329 / fix, 0.010514 / fix, 1.395889*PERCENT_BASE_VOLTAGE);
+	public final Feedforward leftBFF = new Feedforward(0.062512 / fix, 010545 / fix, -1.407502*PERCENT_BASE_VOLTAGE);
+	public final Feedforward rightFFF = new Feedforward(0.062081 / fix, 0.010137 / fix, 1.486594*PERCENT_BASE_VOLTAGE);
+	public final Feedforward rightBFF = new Feedforward(0.062407 / fix, 0.010243 / fix, -1.465781*PERCENT_BASE_VOLTAGE);
 
-	public final GainProfile leftGains = new GainProfile("Left PID", 0, 0, 0, leftFFF, 0, 0, 0);
-	public final GainProfile rightGains = new GainProfile("Right PID", 0, 0, 0, rightFFF, 0, 0, 0);
+	public final GainProfile leftGains = new GainProfile("Left PID", 0.0, 0, 0, leftFFF, 0, 0, 0);
+	public final GainProfile rightGains = new GainProfile("Right PID", 0.0, 0, 0, rightFFF, 0, 0, 0);
 
 	public static final double MAX_IN_SEC = 84;
 	public static final double MAX_IN_SEC2 = 250;
@@ -52,17 +48,17 @@ public class Drivetrain extends Subsystem {
 	public Drivetrain() {
 		int leftMaster = 1;
 		leftTalon1 = MotorUtils.configTalon(leftMaster, false, TalonConfiguration.DEFAULT_CONFIG);
-		leftTalon2 = MotorUtils.configFollowerTalon(MotorUtils.configTalon(9, false, TalonConfiguration.DEFAULT_CONFIG),
+		MotorUtils.configFollowerTalon(MotorUtils.configTalon(9, false, TalonConfiguration.DEFAULT_CONFIG),
 				leftTalon1);
-		leftTalon3 = MotorUtils.configFollowerTalon(MotorUtils.configTalon(3, false, TalonConfiguration.DEFAULT_CONFIG),
+		MotorUtils.configFollowerTalon(MotorUtils.configTalon(3, false, TalonConfiguration.DEFAULT_CONFIG),
 				leftTalon1);
 
 		int rightMaster = 5;
 		rightTalon1 = MotorUtils.configTalon(rightMaster, true, TalonConfiguration.DEFAULT_CONFIG);
 
-		rightTalon2 = MotorUtils.configFollowerTalon(MotorUtils.configTalon(6, true, TalonConfiguration.DEFAULT_CONFIG),
+		MotorUtils.configFollowerTalon(MotorUtils.configTalon(6, true, TalonConfiguration.DEFAULT_CONFIG),
 				rightTalon1);
-		rightTalon3 = MotorUtils.configFollowerTalon(MotorUtils.configTalon(7, true, TalonConfiguration.DEFAULT_CONFIG),
+		MotorUtils.configFollowerTalon(MotorUtils.configTalon(7, true, TalonConfiguration.DEFAULT_CONFIG),
 				rightTalon1);
 
 		drive = new DifferentialDrive(leftTalon1, rightTalon1, ControlMode.PercentOutput, MIN_OUTPUT, MAX_OUTPUT,
