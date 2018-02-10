@@ -319,13 +319,13 @@ public final class Path implements Iterable<TrajectoryPoint[]> {
 	private static double pointDurationSec;
 	private static double sensorUnitsPerYourUnits;
 
-	public void setPathVars(Feedforward leftFF, Feedforward rightFF, double robotWidth, double pointDurationSec,
+	public static void setPathVars(Feedforward leftFF, Feedforward rightFF, double robotWidth, double pointDurationSec,
 			double sensorUnitsPerYourUnits) {
-		this.leftFF = leftFF;
-		this.rightFF = rightFF;
-		this.robotWidth = robotWidth;
-		this.pointDurationSec = pointDurationSec;
-		this.sensorUnitsPerYourUnits = sensorUnitsPerYourUnits;
+		Path.leftFF = leftFF;
+		Path.rightFF = rightFF;
+		Path.robotWidth = robotWidth;
+		Path.pointDurationSec = pointDurationSec;
+		Path.sensorUnitsPerYourUnits = sensorUnitsPerYourUnits;
 	}
 
 	@Override
