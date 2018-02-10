@@ -32,7 +32,7 @@ import com.ctre.phoenix.motion.TrajectoryPoint.TrajectoryDuration;
  * @author Jay
  *
  */
-public final class Path {
+public final class Path implements Iterable<TrajectoryPoint[]> {
 
 	public final boolean driveForwards;
 	private final ArrayList<PathSegment> segments = new ArrayList<>();
@@ -312,9 +312,24 @@ public final class Path {
 	public void writeToFile(String path) {
 
 	}
+	
+	private static Feedforward leftFF;
+	private static Feedforward rightFF;
+	private static double robotWidth;
+	private static double pointDurationSec;
+	private static double sensorUnitsPerYourUnits;
 
-	public Iterator<TrajectoryPoint[]> getIterator(Feedforward leftFF, Feedforward rightFF, double robotWidth,
+	public void setPathVars(Feedforward leftFF, Feedforward rightFF, double robotWidth,
 			double pointDurationSec, double sensorUnitsPerYourUnits) {
+		this.leftFF = leftFF;
+		this.rightFF = rightFF;
+		this.robotWidth = robotWidth;
+		this.pointDurationSec = pointDurationSec;
+		this.sensorUnitsPerYourUnits = sensorUnitsPerYourUnits;
+	}
+
+	@Override
+	public Iterator<TrajectoryPoint[]> iterator() {
 		return new Iterator<TrajectoryPoint[]>() {
 			int cs = 0;
 			PathSegment currentSegment = segments.get(0);

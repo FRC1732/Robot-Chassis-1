@@ -281,6 +281,7 @@ public class DoubleProfileManager {
 				}
 
 				if (_rightSetValue == SetValueMotionProfile.Hold && _leftSetValue == SetValueMotionProfile.Hold) {
+					System.out.println("The robot reached the end.");
 					_state = 0;
 					_loopTimeout = -1;
 				}
