@@ -6,7 +6,7 @@ import java.util.Iterator;
 
 import org.usfirst.frc.team1732.robot.Util;
 import org.usfirst.frc.team1732.robot.controlutils.Feedforward;
-import org.usfirst.frc.team1732.robot.controlutils.motionprofiling.DoubleProfileManager;
+import org.usfirst.frc.team1732.robot.controlutils.motionprofiling.DoubleProfileLoader;
 import org.usfirst.frc.team1732.robot.controlutils.motionprofiling.math.BezierCurve;
 import org.usfirst.frc.team1732.robot.controlutils.motionprofiling.math.Curve;
 import org.usfirst.frc.team1732.robot.controlutils.motionprofiling.math.LineSegment;
@@ -32,7 +32,7 @@ import com.ctre.phoenix.motion.TrajectoryPoint.TrajectoryDuration;
  * @author Jay
  *
  */
-public final class Path implements Iterable<TrajectoryPoint[]> {
+public final class Path {
 
 	public final boolean driveForwards;
 	private final ArrayList<PathSegment> segments = new ArrayList<>();
@@ -313,30 +313,15 @@ public final class Path implements Iterable<TrajectoryPoint[]> {
 
 	}
 
-	private static Feedforward leftFF;
-	private static Feedforward rightFF;
-	private static double robotWidth;
-	private static double pointDurationSec;
-	private static double sensorUnitsPerYourUnits;
-
-	public static void setPathVars(Feedforward leftFF, Feedforward rightFF, double robotWidth, double pointDurationSec,
-			double sensorUnitsPerYourUnits) {
-		Path.leftFF = leftFF;
-		Path.rightFF = rightFF;
-		Path.robotWidth = robotWidth;
-		Path.pointDurationSec = pointDurationSec;
-		Path.sensorUnitsPerYourUnits = sensorUnitsPerYourUnits;
-	}
-
-	@Override
-	public Iterator<TrajectoryPoint[]> iterator() {
+	public Iterator<TrajectoryPoint[]> iterator(Feedforward leftFF, Feedforward rightFF, double robotWidth,
+			double pointDurationSec, double sensorUnitsPerYourUnits) {
 		return new Iterator<TrajectoryPoint[]>() {
 			int cs = 0;
 			PathSegment currentSegment = segments.get(0);
 			double segmentLengthSum = 0;
 
 			double totalTime = profile.duration();
-			TrajectoryDuration pointDuration = DoubleProfileManager
+			TrajectoryDuration pointDuration = DoubleProfileLoader
 					.getTrajectoryDuration((int) (pointDurationSec * 1000));
 			int pointCount = (int) (totalTime / (pointDurationSec));
 			double increment = totalTime / (pointCount - 1);
@@ -418,9 +403,9 @@ public final class Path implements Iterable<TrajectoryPoint[]> {
 				}
 				if (i == pointCount - 1) {
 					points[0].isLastPoint = true;
-					points[0].velocity = 0;
+					// points[0].velocity = 0;
 					points[1].isLastPoint = true;
-					points[1].velocity = 0;
+					// points[1].velocity = 0;
 				} else {
 					points[0].isLastPoint = false;
 					points[1].isLastPoint = false;
