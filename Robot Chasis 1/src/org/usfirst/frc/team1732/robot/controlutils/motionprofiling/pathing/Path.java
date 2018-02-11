@@ -341,15 +341,17 @@ public final class Path {
 			@Override
 			public TrajectoryPoint[] next() {
 				TrajectoryPoint[] points = { new TrajectoryPoint(), new TrajectoryPoint() };
-				points[0].timeDur = pointDuration;
-				points[1].timeDur = pointDuration;
-				points[0].headingDeg = 0;
-				points[1].headingDeg = 0;
+				TrajectoryPoint leftPoint = points[0];
+				TrajectoryPoint rightPoint = points[1];
+				leftPoint.timeDur = pointDuration;
+				rightPoint.timeDur = pointDuration;
+				leftPoint.headingDeg = 0;
+				rightPoint.headingDeg = 0;
 				if (i == 0) {
-					points[0].position = previousState.pos() * sensorUnitsPerYourUnits;
-					points[0].velocity = leftFF.getAppliedVoltage(previousState.vel(), previousState.acc());
-					points[1].position = previousState.pos() * sensorUnitsPerYourUnits;
-					points[1].velocity = rightFF.getAppliedVoltage(previousState.vel(), previousState.acc());
+					leftPoint.position = previousState.pos() * sensorUnitsPerYourUnits;
+					leftPoint.velocity = leftFF.getAppliedVoltage(previousState.vel(), previousState.acc());
+					rightPoint.position = previousState.pos() * sensorUnitsPerYourUnits;
+					rightPoint.velocity = rightFF.getAppliedVoltage(previousState.vel(), previousState.acc());
 					prevLeftPos = previousState.pos();
 					prevLeftVel = previousState.vel();
 					prevRightPos = previousState.pos();
@@ -371,10 +373,10 @@ public final class Path {
 
 					// System.out.println(coord);
 					if (Math.abs(curvature) < 1.0E-20) {
-						points[0].position = (prevLeftPos + dArc) * sensorUnitsPerYourUnits;
-						points[0].velocity = leftFF.getAppliedVoltage(state.vel(), state.acc());
-						points[1].position = (prevRightPos + dArc) * sensorUnitsPerYourUnits;
-						points[1].velocity = rightFF.getAppliedVoltage(state.vel(), state.acc());
+						leftPoint.position = (prevLeftPos + dArc) * sensorUnitsPerYourUnits;
+						leftPoint.velocity = leftFF.getAppliedVoltage(state.vel(), state.acc());
+						rightPoint.position = (prevRightPos + dArc) * sensorUnitsPerYourUnits;
+						rightPoint.velocity = rightFF.getAppliedVoltage(state.vel(), state.acc());
 						prevLeftPos = prevLeftPos + dArc;
 						prevLeftVel = state.vel();
 						prevRightPos = prevRightPos + dArc;
@@ -390,10 +392,10 @@ public final class Path {
 						double rightV = state.vel() * rK;
 						double leftA = (leftV - prevLeftVel) / pointDurationSec;
 						double rightA = (rightV - prevRightVel) / pointDurationSec;
-						points[0].position = (prevLeftPos + dArc * lK) * sensorUnitsPerYourUnits;
-						points[0].velocity = leftFF.getAppliedVoltage(leftV, leftA);
-						points[1].position = (prevRightPos + dArc * rK) * sensorUnitsPerYourUnits;
-						points[1].velocity = rightFF.getAppliedVoltage(rightV, rightA);
+						leftPoint.position = (prevLeftPos + dArc * lK) * sensorUnitsPerYourUnits;
+						leftPoint.velocity = leftFF.getAppliedVoltage(leftV, leftA);
+						rightPoint.position = (prevRightPos + dArc * rK) * sensorUnitsPerYourUnits;
+						rightPoint.velocity = rightFF.getAppliedVoltage(rightV, rightA);
 						prevLeftPos = prevLeftPos + dArc * lK;
 						prevLeftVel = leftV;
 						prevRightPos = prevRightPos + dArc * rK;
@@ -402,14 +404,18 @@ public final class Path {
 					previousState = state;
 				}
 				if (i == pointCount - 1) {
-					points[0].isLastPoint = true;
-					// points[0].velocity = 0;
-					points[1].isLastPoint = true;
-					// points[1].velocity = 0;
+					leftPoint.isLastPoint = true;
+					// leftPoint.velocity = 0;
+					rightPoint.isLastPoint = true;
+					// rightPoint.velocity = 0;
 				} else {
-					points[0].isLastPoint = false;
-					points[1].isLastPoint = false;
+					leftPoint.isLastPoint = false;
+					rightPoint.isLastPoint = false;
 				}
+				leftPoint.profileSlotSelect0 = 0;
+				rightPoint.profileSlotSelect1 = 0;
+				leftPoint.zeroPos = false;
+				rightPoint.zeroPos = false;
 				i++;
 				return points;
 			}

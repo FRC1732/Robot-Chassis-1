@@ -2,7 +2,8 @@ package org.usfirst.frc.team1732.robot.controlutils;
 
 public class Feedforward {
 
-	public final double TALON_SRX_FF_GAIN = 1023 / 12;
+	public static final double TALON_SRX_FF_GAIN = 1023 / 12;
+
 	public final double kV;
 	public final double Vintercept;
 	public final double kA;
