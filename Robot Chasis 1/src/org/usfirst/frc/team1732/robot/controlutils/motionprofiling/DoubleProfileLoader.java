@@ -115,6 +115,17 @@ public class DoubleProfileLoader extends Subsystem {
 		}
 	}
 
+	private void fillUntilFullOrIter(int iterations) {
+		for (int i = 0; i < iterations && pointIterator.hasNext() && !leftTalon.isMotionProfileTopLevelBufferFull()
+				&& !rightTalon.isMotionProfileTopLevelBufferFull(); i++) {
+			TrajectoryPoint[] points = pointIterator.next();
+			TrajectoryPoint leftPoint = points[0];
+			TrajectoryPoint rightPoint = points[1];
+			leftTalon.pushMotionProfileTrajectory(leftPoint);
+			rightTalon.pushMotionProfileTrajectory(rightPoint);
+		}
+	}
+
 	public static TrajectoryDuration getTrajectoryDuration(int durationMs) {
 		/* create return value */
 		TrajectoryDuration retval = TrajectoryDuration.Trajectory_Duration_0ms;
@@ -172,6 +183,7 @@ public class DoubleProfileLoader extends Subsystem {
 				}
 				break;
 			case LOADING:
+				fillUntilFullOrIter(minPointsInTalon * 2);
 				if (leftStatus.btmBufferCnt >= minPointsInTalon && rightStatus.btmBufferCnt >= minPointsInTalon) {
 					leftSetValue = SetValueMotionProfile.Enable;
 					rightSetValue = SetValueMotionProfile.Enable;
@@ -180,6 +192,7 @@ public class DoubleProfileLoader extends Subsystem {
 				}
 				break;
 			case EXECUTING:
+				fillUntilFullOrDone();
 				if (leftStatus.hasUnderrun) {
 					leftUnderruns++;
 					leftTalon.clearMotionProfileHasUnderrun(0);
@@ -220,8 +233,6 @@ public class DoubleProfileLoader extends Subsystem {
 				}
 				break;
 			}
-
-			fillUntilFullOrDone(); // want to start motion profiling
 
 			leftTalon.getMotionProfileStatus(leftStatus);
 			rightTalon.getMotionProfileStatus(rightStatus);
