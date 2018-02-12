@@ -25,22 +25,26 @@ public class DoubleProfileLoader extends Subsystem {
 
 	private Iterator<TrajectoryPoint[]> pointIterator;
 
+	private boolean start;
+
+	private SetValueMotionProfile leftSetValue = SetValueMotionProfile.Disable;
+	private SetValueMotionProfile rightSetValue = SetValueMotionProfile.Disable;
+	private STATE currentState = STATE.WAITING;
+
 	private MotionProfileStatus leftStatus = new MotionProfileStatus();
 	private MotionProfileStatus rightStatus = new MotionProfileStatus();
 
-	private STATE currentState = STATE.WAITING;
-	private SetValueMotionProfile leftSetValue = SetValueMotionProfile.Disable;
-	private SetValueMotionProfile rightSetValue = SetValueMotionProfile.Disable;
-
-	private final Timer timer;
+	private final Timer timer = new Timer();
 	private boolean timedOut = false;
 	private int leftUnderruns = 0;
 	private int rightUnderruns = 0;
 
+	private boolean printData = false;
+	private int header = 0;
+
 	public DoubleProfileLoader(TalonSRX leftTalon, TalonSRX rightTalon) {
 		this.leftTalon = leftTalon;
 		this.rightTalon = rightTalon;
-		this.timer = new Timer();
 		int period = 5;
 		Notifier notifier = new Notifier(() -> {
 			leftTalon.processMotionProfileBuffer();
@@ -49,15 +53,11 @@ public class DoubleProfileLoader extends Subsystem {
 		notifier.startPeriodic(period / 1000.0);
 		leftTalon.changeMotionControlFramePeriod(period);
 		rightTalon.changeMotionControlFramePeriod(period);
-		leftSetValue = SetValueMotionProfile.Disable;
-		rightSetValue = SetValueMotionProfile.Disable;
-		currentState = STATE.WAITING;
 	}
 
 	/**
-	 * Sets the new trajectory for the profile loader. If the lower talon doesn't
-	 * have enough points loaded, then this will set the current state to WAITING so
-	 * that the user must restart the loader
+	 * Sets the new trajectory for the profile loader. Use this if you want to
+	 * change trajectory mid-execution, otherwise use startProfile.
 	 * 
 	 * @param pointIterator
 	 */
@@ -66,10 +66,14 @@ public class DoubleProfileLoader extends Subsystem {
 	}
 
 	/**
-	 * Call this once to start the profile
+	 * Call this once to start the profile and erase currently stored trajectories
 	 */
-	public void startProfile() {
+	public void startProfile(Iterator<TrajectoryPoint[]> pointIterator) {
 		start = true;
+		setTrajectory(pointIterator);
+		leftSetValue = SetValueMotionProfile.Disable;
+		rightSetValue = SetValueMotionProfile.Disable;
+		currentState = STATE.WAITING;
 	}
 
 	/**
@@ -133,8 +137,6 @@ public class DoubleProfileLoader extends Subsystem {
 		WAITING, LOADING, EXECUTING;
 	}
 
-	private boolean start;
-
 	@Override
 	public void periodic() {
 		leftTalon.getMotionProfileStatus(leftStatus);
@@ -192,8 +194,8 @@ public class DoubleProfileLoader extends Subsystem {
 					timedOut = false;
 				}
 				if (timer.get() > timeoutSec) {
-					System.out.println("Have underrun for longer than " + timeoutSec
-							+ " seconds. Probably not feeding points fast enough");
+					DriverStation.reportError("Profile Loader has underrun for longer than " + timeoutSec
+							+ " seconds. Probably not feeding points fast enough", false);
 					timedOut = true;
 				}
 				// one way to be done: reach last point if user set it for both
@@ -201,14 +203,17 @@ public class DoubleProfileLoader extends Subsystem {
 						&& rightStatus.isLast) {
 					leftSetValue = SetValueMotionProfile.Hold;
 					rightSetValue = SetValueMotionProfile.Hold;
-					System.out.println("Both profile executors have reached the last point");
+					System.out.println("Both profile executors have reached the last point. Holding.");
 					currentState = STATE.WAITING;
 				}
-				// other way to be done: bottom, top buffer, and iterator is empty and user
-				// didn't set lastpoint
-				if (leftStatus.isUnderrun && rightStatus.hasUnderrun && leftStatus.topBufferCnt == 0
+				// other way to be done: executor tried to get a point, but bottom buffer is
+				// empty (underrun), top buffer is empty, and iterator is empty. This will
+				// happen if user didn't set the lastPoint flag to true for either side's last
+				// point
+				if (leftStatus.isUnderrun && rightStatus.isUnderrun && leftStatus.btmBufferCnt == 0
+						&& rightStatus.btmBufferCnt == 0 && leftStatus.topBufferCnt == 0
 						&& rightStatus.topBufferCnt == 0 && !pointIterator.hasNext()) {
-					System.out.println("Profile manager has run out of points");
+					System.out.println("Profile executor has run out of points, and no more are available. Waiting.");
 					leftSetValue = SetValueMotionProfile.Disable;
 					rightSetValue = SetValueMotionProfile.Disable;
 					currentState = STATE.WAITING;
@@ -225,37 +230,42 @@ public class DoubleProfileLoader extends Subsystem {
 			SmartDashboard.putNumber("Right Underruns", rightUnderruns);
 			SmartDashboard.putBoolean("Double Loader Timed Out", isTimedOut());
 
-			if (header % 8 == 0) {
-				printHeader();
-				header = 0;
+			if (printData) {
+				if (header % 8 == 0) {
+					printHeader();
+					header = 0;
+				}
+				header++;
+				printStatus("Left", leftStatus, leftTalon.getActiveTrajectoryPosition(),
+						leftTalon.getClosedLoopError(0), leftTalon.getActiveTrajectoryVelocity());
+				printStatus("Right", rightStatus, rightTalon.getActiveTrajectoryPosition(),
+						rightTalon.getClosedLoopError(0), rightTalon.getActiveTrajectoryVelocity());
 			}
-			header++;
-			printStatus("Left", leftStatus, leftTalon.getActiveTrajectoryPosition(), leftTalon.getClosedLoopError(0),
-					leftTalon.getActiveTrajectoryVelocity(), leftTalon.getActiveTrajectoryHeading(),
-					leftTalon.getClosedLoopError(1));
-			printStatus("Right", rightStatus, rightTalon.getActiveTrajectoryPosition(),
-					rightTalon.getClosedLoopError(0), rightTalon.getActiveTrajectoryVelocity(),
-					rightTalon.getActiveTrajectoryHeading(), rightTalon.getClosedLoopError(1));
 		}
 	}
 
-	private int header = 0;
-
-	private static void printHeader() {
-		System.out.printf("%6s%10s%10s%10s%10s%10s%10s%10s%10s%10s%10s%10s%10s%10s%10s%10s%10s%n", "Side", "Is Valid",
-				"Btm Cnt", "Has Undrn", "Is Undrn", "Mode", "Profile0", "Profile1", "Duration", "Top Cnt", "Top Rem",
-				"Pos", "Pos Err", "Vel", "Heading", "Head Err");
+	public void enablePrintingData() {
+		printData = true;
 	}
 
-	private static void printStatus(String name, MotionProfileStatus status, double pos, double error, double vel,
-			double heading, double err) {
-		System.out.printf("%6s%10s%10s%10s%10s%10s%10s%10s%10s%10s%10s%10s%10s%10s%10s%10s%10s%n", name,
-				Boolean.toString(status.activePointValid), Integer.toString(status.btmBufferCnt),
-				Boolean.toString(status.hasUnderrun), Boolean.toString(status.isLast),
-				Boolean.toString(status.isUnderrun), status.outputEnable.name(),
-				Integer.toString(status.profileSlotSelect), Integer.toString(status.profileSlotSelect1),
-				Integer.toString(status.timeDurMs), Integer.toString(status.topBufferCnt),
-				Integer.toString(status.topBufferRem));
+	public void disablePrintingData() {
+		printData = false;
+	}
+
+	private static void printHeader() {
+		System.out.printf("%6s%10s%10s%10s%10s%10s%10s%10s%10s%10s%10s%10s%10s%10s%10s%n", "Side", "Mode", "Is Valid",
+				"Is Last", "Btm Cnt", "Top Cnt", "Top Rem", "Has Undrn", "Is Undrn", "Profile0", "Profile1", "Duration",
+				"Pos", "Pos Err", "Vel");
+	}
+
+	private static void printStatus(String name, MotionProfileStatus status, double pos, double error, double vel) {
+		System.out.printf("%6s%10s%10s%10s%10s%10s%10s%10s%10s%10s%10s%10s%10s%10s%10s%n", name,
+				status.outputEnable.name(), Boolean.toString(status.activePointValid), Boolean.toString(status.isLast),
+				Integer.toString(status.btmBufferCnt), Integer.toString(status.topBufferCnt),
+				Integer.toString(status.topBufferRem), Boolean.toString(status.hasUnderrun),
+				Boolean.toString(status.isUnderrun), Integer.toString(status.profileSlotSelect),
+				Integer.toString(status.profileSlotSelect1), Integer.toString(status.timeDurMs), Double.toString(pos),
+				Double.toString(error), Double.toString(vel));
 	}
 
 }

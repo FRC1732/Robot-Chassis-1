@@ -14,11 +14,11 @@ import edu.wpi.first.wpilibj.command.Command;
  * Will erase other profiles that are currently being executed/loaded into the
  * talon.
  */
-public class TestPathing extends Command {
+public class FollowPath extends Command {
 
 	private final Iterator<TrajectoryPoint[]> iterator;
 
-	public TestPathing(Iterator<TrajectoryPoint[]> iterator) {
+	public FollowPath(Iterator<TrajectoryPoint[]> iterator) {
 		requires(Robot.drivetrain);
 		this.iterator = iterator;
 	}
@@ -30,7 +30,6 @@ public class TestPathing extends Command {
 		Robot.drivetrain.leftMPGains.applyToTalon(Robot.drivetrain.leftTalon1, 0, 0);
 		Robot.drivetrain.rightMPGains.applyToTalon(Robot.drivetrain.rightTalon1, 0, 0);
 		Robot.drivetrain.profileManager.startProfile(iterator);
-		Robot.drivetrain.profileManager.enablePrintingData();
 	}
 
 	// Called repeatedly when this Command is scheduled to run
@@ -50,7 +49,6 @@ public class TestPathing extends Command {
 	protected void end() {
 		// robot either holds last point or sits there in neutral output, depending on
 		// if the trajectory's last points has the 'isLast' flag set
-		Robot.drivetrain.profileManager.disablePrintingData();
-		System.out.println("Path test is finished!");
+		// System.out.println("Path test is finished!");
 	}
 }

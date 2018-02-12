@@ -3,10 +3,10 @@ package org.usfirst.frc.team1732.robot.controlutils.motionprofiling.pathing;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.function.Supplier;
 
 import org.usfirst.frc.team1732.robot.Util;
 import org.usfirst.frc.team1732.robot.controlutils.Feedforward;
-import org.usfirst.frc.team1732.robot.controlutils.motionprofiling.DoubleProfileLoader;
 import org.usfirst.frc.team1732.robot.controlutils.motionprofiling.math.BezierCurve;
 import org.usfirst.frc.team1732.robot.controlutils.motionprofiling.math.Curve;
 import org.usfirst.frc.team1732.robot.controlutils.motionprofiling.math.LineSegment;
@@ -313,16 +313,29 @@ public final class Path {
 
 	}
 
-	public Iterator<TrajectoryPoint[]> iterator(Feedforward leftFF, Feedforward rightFF, double robotWidth,
-			double pointDurationSec, double sensorUnitsPerYourUnits) {
+	public Iterator<TrajectoryPoint[]> getIteratorWithOffset(TrajectoryDuration pointDuration, Feedforward leftFF,
+			Feedforward rightFF, Supplier<Integer> initialLeftSensorUnitsSupplier,
+			Supplier<Integer> initialRightSensorUnitsSupplier, double robotWidth, double sensorUnitsPerYourUnits) {
+		return getIterator(pointDuration, leftFF, rightFF, initialLeftSensorUnitsSupplier,
+				initialRightSensorUnitsSupplier, robotWidth, sensorUnitsPerYourUnits, false);
+	}
+
+	public Iterator<TrajectoryPoint[]> getIteratorZeroAtStart(TrajectoryDuration pointDuration, Feedforward leftFF,
+			Feedforward rightFF, double robotWidth, double sensorUnitsPerYourUnits) {
+		return getIterator(pointDuration, leftFF, rightFF, () -> 0, () -> 0, robotWidth, sensorUnitsPerYourUnits, true);
+	}
+
+	private Iterator<TrajectoryPoint[]> getIterator(TrajectoryDuration pointDuration, Feedforward leftFF,
+			Feedforward rightFF, Supplier<Integer> initialLeftSensorUnitsSupplier,
+			Supplier<Integer> initialRightSensorUnitsSupplier, double robotWidth, double sensorUnitsPerYourUnits,
+			boolean zeroAtStart) {
 		return new Iterator<TrajectoryPoint[]>() {
 			int cs = 0;
 			PathSegment currentSegment = segments.get(0);
 			double segmentLengthSum = 0;
 
 			double totalTime = profile.duration();
-			TrajectoryDuration pointDuration = DoubleProfileLoader
-					.getTrajectoryDuration((int) (pointDurationSec * 1000));
+			double pointDurationSec = pointDuration.value / 1000.0;
 			int pointCount = (int) (totalTime / (pointDurationSec));
 			double increment = totalTime / (pointCount - 1);
 			MotionState previousState = profile.stateByTime(0).get();
@@ -332,6 +345,9 @@ public final class Path {
 			double prevLeftVel = 0;
 			double prevRightVel = 0;
 			int i = 0;
+
+			int initialLeftSensorUnits;
+			int initialRightSensorUnits;
 
 			@Override
 			public boolean hasNext() {
@@ -347,10 +363,20 @@ public final class Path {
 				rightPoint.timeDur = pointDuration;
 				leftPoint.headingDeg = 0;
 				rightPoint.headingDeg = 0;
+				leftPoint.isLastPoint = false;
+				rightPoint.isLastPoint = false;
+				leftPoint.profileSlotSelect0 = 0;
+				rightPoint.profileSlotSelect1 = 0;
+				leftPoint.zeroPos = false;
+				rightPoint.zeroPos = false;
 				if (i == 0) {
-					leftPoint.position = previousState.pos() * sensorUnitsPerYourUnits;
+					initialLeftSensorUnits = initialLeftSensorUnitsSupplier.get();
+					initialRightSensorUnits = initialRightSensorUnitsSupplier.get();
+					leftPoint.zeroPos = zeroAtStart;
+					rightPoint.zeroPos = zeroAtStart;
+					leftPoint.position = previousState.pos() * sensorUnitsPerYourUnits + initialLeftSensorUnits;
 					leftPoint.velocity = leftFF.getAppliedVoltage(previousState.vel(), previousState.acc());
-					rightPoint.position = previousState.pos() * sensorUnitsPerYourUnits;
+					rightPoint.position = previousState.pos() * sensorUnitsPerYourUnits + initialRightSensorUnits;
 					rightPoint.velocity = rightFF.getAppliedVoltage(previousState.vel(), previousState.acc());
 					prevLeftPos = previousState.pos();
 					prevLeftVel = previousState.vel();
@@ -373,9 +399,9 @@ public final class Path {
 
 					// System.out.println(coord);
 					if (Math.abs(curvature) < 1.0E-20) {
-						leftPoint.position = (prevLeftPos + dArc) * sensorUnitsPerYourUnits;
+						leftPoint.position = (prevLeftPos + dArc) * sensorUnitsPerYourUnits + initialLeftSensorUnits;
 						leftPoint.velocity = leftFF.getAppliedVoltage(state.vel(), state.acc());
-						rightPoint.position = (prevRightPos + dArc) * sensorUnitsPerYourUnits;
+						rightPoint.position = (prevRightPos + dArc) * sensorUnitsPerYourUnits + initialRightSensorUnits;
 						rightPoint.velocity = rightFF.getAppliedVoltage(state.vel(), state.acc());
 						prevLeftPos = prevLeftPos + dArc;
 						prevLeftVel = state.vel();
@@ -392,9 +418,11 @@ public final class Path {
 						double rightV = state.vel() * rK;
 						double leftA = (leftV - prevLeftVel) / pointDurationSec;
 						double rightA = (rightV - prevRightVel) / pointDurationSec;
-						leftPoint.position = (prevLeftPos + dArc * lK) * sensorUnitsPerYourUnits;
+						leftPoint.position = (prevLeftPos + dArc * lK) * sensorUnitsPerYourUnits
+								+ initialLeftSensorUnits;
 						leftPoint.velocity = leftFF.getAppliedVoltage(leftV, leftA);
-						rightPoint.position = (prevRightPos + dArc * rK) * sensorUnitsPerYourUnits;
+						rightPoint.position = (prevRightPos + dArc * rK) * sensorUnitsPerYourUnits
+								+ initialRightSensorUnits;
 						rightPoint.velocity = rightFF.getAppliedVoltage(rightV, rightA);
 						prevLeftPos = prevLeftPos + dArc * lK;
 						prevLeftVel = leftV;
@@ -405,17 +433,9 @@ public final class Path {
 				}
 				if (i == pointCount - 1) {
 					leftPoint.isLastPoint = true;
-					// leftPoint.velocity = 0;
 					rightPoint.isLastPoint = true;
-					// rightPoint.velocity = 0;
-				} else {
-					leftPoint.isLastPoint = false;
-					rightPoint.isLastPoint = false;
 				}
-				leftPoint.profileSlotSelect0 = 0;
-				rightPoint.profileSlotSelect1 = 0;
-				leftPoint.zeroPos = false;
-				rightPoint.zeroPos = false;
+
 				i++;
 				return points;
 			}

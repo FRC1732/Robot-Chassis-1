@@ -28,23 +28,39 @@ public class Drivetrain extends Subsystem {
 	public static final double INPUT_DEADBAND = 0.025; // 2.5%.
 	public static final double MIN_OUTPUT = 0.0;
 	public static final double MAX_OUTPUT = 1.0;
-	// private static final double fix = 79.5 / 100.0;
 	public static final double ENCODER_INCHES_PER_PULSE = 0.002099;
 
-	// public static final double PERCENT_BASE_VOLTAGE = 1;
+	// Forward feedforward
+	public final Feedforward leftFFF = new Feedforward(0.061137, 0.010011, 1.688535);
+	public final Feedforward rightFFF = new Feedforward(0.0597575, 0.0099831, 1.7542480);
+	// Backward feedforward
+	public final Feedforward leftBFF = new Feedforward(0, 0, 0);
+	public final Feedforward rightBFF = new Feedforward(0, 0, 0);
 
-	public final Feedforward leftFFF = new Feedforward(0.063329, 0.010514, 1.395889);
-	public final Feedforward leftBFF = new Feedforward(0.062512, 010545, -1.407502);
-	public final Feedforward rightFFF = new Feedforward(0.062081, 0.010137, 1.486594);
-	public final Feedforward rightBFF = new Feedforward(0.062407, 0.010243, -1.465781);
-
-	public final ClosedLoopProfile leftGain = new ClosedLoopProfile("Left PID", 0.0, 0, 0,
+	// keep in mind for these
+	public final ClosedLoopProfile leftMPGains = new ClosedLoopProfile("Left PID", 1.28, 0, 0,
 			Feedforward.TALON_SRX_FF_GAIN, 0, 0, 0, 0);
-	public final ClosedLoopProfile rightGain = new ClosedLoopProfile("Right PID", 0.0, 0, 0,
+	public final ClosedLoopProfile rightMPGains = new ClosedLoopProfile("Right PID", 1.28, 0, 0,
 			Feedforward.TALON_SRX_FF_GAIN, 0, 0, 0, 0);
 
-	public static final double MAX_IN_SEC = 84;
-	public static final double MAX_IN_SEC2 = 250;
+	/*
+	 * The following 2 values are determined from the feedforward constants.
+	 * 
+	 * Max vel is determined by doing (12 - voltIntercept)/2.0 / kV
+	 * 
+	 * Max acc is determined by doing (12 - voltIntercept)/2.0 / kA
+	 * 
+	 * This makes it possible to be accelerating at max acceleration near max
+	 * velocity (because we cannot exceed a voltage draw of 12V). If we made
+	 * acceleration continuous by instead changing 'jerk', then we would be able to
+	 * set these slightly higher, depending on how high we set the jerk value. Using
+	 * a very high jerk value would not be any different than what we have now, but
+	 * using too low of a jerk value would cause the robot to accelerate slowly.
+	 */
+	public static final double MAX_IN_SEC = 84; // max vel
+	public static final double MAX_IN_SEC2 = 250; // max acc
+
+	public static final double ROBOT_WIDTH_IN = 29;
 
 	public final DoubleProfileLoader profileManager;
 
@@ -63,10 +79,15 @@ public class Drivetrain extends Subsystem {
 		drive = new DifferentialDrive(leftTalon1, rightTalon1, ControlMode.PercentOutput, MIN_OUTPUT, MAX_OUTPUT,
 				INPUT_DEADBAND);
 
-		leftGain.applyToTalon(leftTalon1, 0, 0);
-		rightGain.applyToTalon(rightTalon1, 0, 0);
 		ClosedLoopProfile.applyZeroGainToTalon(leftTalon1, 0, 1);
 		ClosedLoopProfile.applyZeroGainToTalon(rightTalon1, 0, 1);
+		leftMPGains.applyToTalon(leftTalon1, 0, 0);
+		rightMPGains.applyToTalon(rightTalon1, 0, 0);
+
+		// two of these control the shifting. I didn't want to follow the wires
+		// new Solenoid(1).set(true);
+		// new Solenoid(2).set(true);
+		// new Solenoid(3).set(true);
 
 		leftEncoder = new TalonEncoder(leftTalon1, FeedbackDevice.QuadEncoder);
 		rightEncoder = new TalonEncoder(rightTalon1, FeedbackDevice.QuadEncoder);
