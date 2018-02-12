@@ -57,8 +57,8 @@ public class Drivetrain extends Subsystem {
 	 * a very high jerk value would not be any different than what we have now, but
 	 * using too low of a jerk value would cause the robot to accelerate slowly.
 	 */
-	public static final double MAX_IN_SEC = 84; // max vel
-	public static final double MAX_IN_SEC2 = 250; // max acc
+	public static final double MAX_IN_SEC = 85.021; // max vel
+	public static final double MAX_IN_SEC2 = 514.082; // max acc
 
 	public static final double ROBOT_WIDTH_IN = 29;
 
