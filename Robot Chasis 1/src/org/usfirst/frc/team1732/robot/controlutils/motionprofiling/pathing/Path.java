@@ -3,10 +3,10 @@ package org.usfirst.frc.team1732.robot.controlutils.motionprofiling.pathing;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.function.Supplier;
 
 import org.usfirst.frc.team1732.robot.Util;
 import org.usfirst.frc.team1732.robot.controlutils.Feedforward;
-import org.usfirst.frc.team1732.robot.controlutils.motionprofiling.DoubleProfileManager;
 import org.usfirst.frc.team1732.robot.controlutils.motionprofiling.math.BezierCurve;
 import org.usfirst.frc.team1732.robot.controlutils.motionprofiling.math.Curve;
 import org.usfirst.frc.team1732.robot.controlutils.motionprofiling.math.LineSegment;
@@ -32,7 +32,7 @@ import com.ctre.phoenix.motion.TrajectoryPoint.TrajectoryDuration;
  * @author Jay
  *
  */
-public final class Path implements Iterable<TrajectoryPoint[]> {
+public final class Path {
 
 	public final boolean driveForwards;
 	private final ArrayList<PathSegment> segments = new ArrayList<>();
@@ -313,31 +313,29 @@ public final class Path implements Iterable<TrajectoryPoint[]> {
 
 	}
 
-	private static Feedforward leftFF;
-	private static Feedforward rightFF;
-	private static double robotWidth;
-	private static double pointDurationSec;
-	private static double sensorUnitsPerYourUnits;
-
-	public static void setPathVars(Feedforward leftFF, Feedforward rightFF, double robotWidth, double pointDurationSec,
-			double sensorUnitsPerYourUnits) {
-		Path.leftFF = leftFF;
-		Path.rightFF = rightFF;
-		Path.robotWidth = robotWidth;
-		Path.pointDurationSec = pointDurationSec;
-		Path.sensorUnitsPerYourUnits = sensorUnitsPerYourUnits;
+	public Iterator<TrajectoryPoint[]> getIteratorWithOffset(TrajectoryDuration pointDuration, Feedforward leftFF,
+			Feedforward rightFF, Supplier<Integer> initialLeftSensorUnitsSupplier,
+			Supplier<Integer> initialRightSensorUnitsSupplier, double robotWidth, double sensorUnitsPerYourUnits) {
+		return getIterator(pointDuration, leftFF, rightFF, initialLeftSensorUnitsSupplier,
+				initialRightSensorUnitsSupplier, robotWidth, sensorUnitsPerYourUnits, false);
 	}
 
-	@Override
-	public Iterator<TrajectoryPoint[]> iterator() {
+	public Iterator<TrajectoryPoint[]> getIteratorZeroAtStart(TrajectoryDuration pointDuration, Feedforward leftFF,
+			Feedforward rightFF, double robotWidth, double sensorUnitsPerYourUnits) {
+		return getIterator(pointDuration, leftFF, rightFF, () -> 0, () -> 0, robotWidth, sensorUnitsPerYourUnits, true);
+	}
+
+	private Iterator<TrajectoryPoint[]> getIterator(TrajectoryDuration pointDuration, Feedforward leftFF,
+			Feedforward rightFF, Supplier<Integer> initialLeftSensorUnitsSupplier,
+			Supplier<Integer> initialRightSensorUnitsSupplier, double robotWidth, double sensorUnitsPerYourUnits,
+			boolean zeroAtStart) {
 		return new Iterator<TrajectoryPoint[]>() {
 			int cs = 0;
 			PathSegment currentSegment = segments.get(0);
 			double segmentLengthSum = 0;
 
 			double totalTime = profile.duration();
-			TrajectoryDuration pointDuration = DoubleProfileManager
-					.getTrajectoryDuration((int) (pointDurationSec * 1000));
+			double pointDurationSec = pointDuration.value / 1000.0;
 			int pointCount = (int) (totalTime / (pointDurationSec));
 			double increment = totalTime / (pointCount - 1);
 			MotionState previousState = profile.stateByTime(0).get();
@@ -348,6 +346,9 @@ public final class Path implements Iterable<TrajectoryPoint[]> {
 			double prevRightVel = 0;
 			int i = 0;
 
+			int initialLeftSensorUnits;
+			int initialRightSensorUnits;
+
 			@Override
 			public boolean hasNext() {
 				return i < pointCount;
@@ -356,15 +357,27 @@ public final class Path implements Iterable<TrajectoryPoint[]> {
 			@Override
 			public TrajectoryPoint[] next() {
 				TrajectoryPoint[] points = { new TrajectoryPoint(), new TrajectoryPoint() };
-				points[0].timeDur = pointDuration;
-				points[1].timeDur = pointDuration;
-				points[0].headingDeg = 0;
-				points[1].headingDeg = 0;
+				TrajectoryPoint leftPoint = points[0];
+				TrajectoryPoint rightPoint = points[1];
+				leftPoint.timeDur = pointDuration;
+				rightPoint.timeDur = pointDuration;
+				leftPoint.headingDeg = 0;
+				rightPoint.headingDeg = 0;
+				leftPoint.isLastPoint = false;
+				rightPoint.isLastPoint = false;
+				leftPoint.profileSlotSelect0 = 0;
+				rightPoint.profileSlotSelect1 = 0;
+				leftPoint.zeroPos = false;
+				rightPoint.zeroPos = false;
 				if (i == 0) {
-					points[0].position = previousState.pos() * sensorUnitsPerYourUnits;
-					points[0].velocity = leftFF.getAppliedVoltage(previousState.vel(), previousState.acc());
-					points[1].position = previousState.pos() * sensorUnitsPerYourUnits;
-					points[1].velocity = rightFF.getAppliedVoltage(previousState.vel(), previousState.acc());
+					initialLeftSensorUnits = initialLeftSensorUnitsSupplier.get();
+					initialRightSensorUnits = initialRightSensorUnitsSupplier.get();
+					leftPoint.zeroPos = zeroAtStart;
+					rightPoint.zeroPos = zeroAtStart;
+					leftPoint.position = previousState.pos() * sensorUnitsPerYourUnits + initialLeftSensorUnits;
+					leftPoint.velocity = leftFF.getAppliedVoltage(previousState.vel(), previousState.acc());
+					rightPoint.position = previousState.pos() * sensorUnitsPerYourUnits + initialRightSensorUnits;
+					rightPoint.velocity = rightFF.getAppliedVoltage(previousState.vel(), previousState.acc());
 					prevLeftPos = previousState.pos();
 					prevLeftVel = previousState.vel();
 					prevRightPos = previousState.pos();
@@ -386,10 +399,10 @@ public final class Path implements Iterable<TrajectoryPoint[]> {
 
 					// System.out.println(coord);
 					if (Math.abs(curvature) < 1.0E-20) {
-						points[0].position = (prevLeftPos + dArc) * sensorUnitsPerYourUnits;
-						points[0].velocity = leftFF.getAppliedVoltage(state.vel(), state.acc());
-						points[1].position = (prevRightPos + dArc) * sensorUnitsPerYourUnits;
-						points[1].velocity = rightFF.getAppliedVoltage(state.vel(), state.acc());
+						leftPoint.position = (prevLeftPos + dArc) * sensorUnitsPerYourUnits + initialLeftSensorUnits;
+						leftPoint.velocity = leftFF.getAppliedVoltage(state.vel(), state.acc());
+						rightPoint.position = (prevRightPos + dArc) * sensorUnitsPerYourUnits + initialRightSensorUnits;
+						rightPoint.velocity = rightFF.getAppliedVoltage(state.vel(), state.acc());
 						prevLeftPos = prevLeftPos + dArc;
 						prevLeftVel = state.vel();
 						prevRightPos = prevRightPos + dArc;
@@ -405,10 +418,12 @@ public final class Path implements Iterable<TrajectoryPoint[]> {
 						double rightV = state.vel() * rK;
 						double leftA = (leftV - prevLeftVel) / pointDurationSec;
 						double rightA = (rightV - prevRightVel) / pointDurationSec;
-						points[0].position = (prevLeftPos + dArc * lK) * sensorUnitsPerYourUnits;
-						points[0].velocity = leftFF.getAppliedVoltage(leftV, leftA);
-						points[1].position = (prevRightPos + dArc * rK) * sensorUnitsPerYourUnits;
-						points[1].velocity = rightFF.getAppliedVoltage(rightV, rightA);
+						leftPoint.position = (prevLeftPos + dArc * lK) * sensorUnitsPerYourUnits
+								+ initialLeftSensorUnits;
+						leftPoint.velocity = leftFF.getAppliedVoltage(leftV, leftA);
+						rightPoint.position = (prevRightPos + dArc * rK) * sensorUnitsPerYourUnits
+								+ initialRightSensorUnits;
+						rightPoint.velocity = rightFF.getAppliedVoltage(rightV, rightA);
 						prevLeftPos = prevLeftPos + dArc * lK;
 						prevLeftVel = leftV;
 						prevRightPos = prevRightPos + dArc * rK;
@@ -417,14 +432,10 @@ public final class Path implements Iterable<TrajectoryPoint[]> {
 					previousState = state;
 				}
 				if (i == pointCount - 1) {
-					points[0].isLastPoint = true;
-					points[0].velocity = 0;
-					points[1].isLastPoint = true;
-					points[1].velocity = 0;
-				} else {
-					points[0].isLastPoint = false;
-					points[1].isLastPoint = false;
+					leftPoint.isLastPoint = true;
+					rightPoint.isLastPoint = true;
 				}
+
 				i++;
 				return points;
 			}

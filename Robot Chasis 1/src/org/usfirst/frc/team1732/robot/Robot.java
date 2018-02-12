@@ -7,16 +7,23 @@
 
 package org.usfirst.frc.team1732.robot;
 
+import java.util.Iterator;
+
 import org.usfirst.frc.team1732.robot.commands.TestPathing;
+import org.usfirst.frc.team1732.robot.controlutils.motionprofiling.pathing.Path;
+import org.usfirst.frc.team1732.robot.controlutils.motionprofiling.pathing.Waypoint;
 import org.usfirst.frc.team1732.robot.input.Joysticks;
 import org.usfirst.frc.team1732.robot.odomotry.PositionEstimator;
 import org.usfirst.frc.team1732.robot.sensors.Sensors;
-import org.usfirst.frc.team1732.robot.sensors.navx.NavXData;
 import org.usfirst.frc.team1732.robot.subsystems.Arm;
 import org.usfirst.frc.team1732.robot.subsystems.Claw;
 import org.usfirst.frc.team1732.robot.subsystems.Drivetrain;
 
+import com.ctre.phoenix.motion.TrajectoryPoint;
+import com.ctre.phoenix.motion.TrajectoryPoint.TrajectoryDuration;
+
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Scheduler;
 
 /**
@@ -58,30 +65,34 @@ public class Robot extends TimedRobot {
 	@Override
 	public void robotPeriodic() {
 		Scheduler.getInstance().run();
-		NavXData.sendNavXData(sensors.navX);
+		// NavXData.sendNavXData(sensors.navX);
 	}
 
 	@Override
 	public void disabledInit() {
-		arm.setStop();
-		claw.setStop();
-		drivetrain.setStop();
 	}
 
 	@Override
 	public void autonomousInit() {
-		Robot.drivetrain.rightTalon1.configOpenloopRamp(0, 10);
-		Robot.drivetrain.leftTalon1.configOpenloopRamp(0, 10);
-		new TestPathing().start();
+		Timer t = new Timer();
+		t.reset();
+		t.start();
+		Path path = new Path(new Waypoint(0, 0, Math.PI / 2, 0), true);
+		path.addWaypoint(new Waypoint(0, 100, Math.PI / 2, 0));
+		path.generateProfile(Drivetrain.MAX_IN_SEC, Drivetrain.MAX_IN_SEC2 / 4.0);
+		System.out.println("Time to make path: " + t.get());
+
+		Iterator<TrajectoryPoint[]> iterator = path.getIteratorZeroAtStart(TrajectoryDuration.Trajectory_Duration_20ms,
+				Robot.drivetrain.leftFFF, Robot.drivetrain.rightFFF, 29, 1.0 / Drivetrain.ENCODER_INCHES_PER_PULSE);
+
+		new TestPathing(iterator).start();
 		// new DriveTrainCharacterizer(TestMode.QUASI_STATIC,
-		// Direction.Backward).start();
-		// new TestMotors().start();
-//		new DriveTrainTester(Direction.Forward).start();
+		// Direction.Forward).start();
 	}
 
 	@Override
 	public void teleopInit() {
-		
+
 	}
 
 	@Override
