@@ -85,8 +85,8 @@ public class DoubleProfileLoader extends Subsystem {
 	}
 
 	// use the following method to check if we need to move on
-	public boolean isWaiting() {
-		return currentState == STATE.WAITING;
+	public boolean isWaitingAndNotStarting() {
+		return currentState == STATE.WAITING && start == false;
 	}
 
 	public boolean isHolding() {
