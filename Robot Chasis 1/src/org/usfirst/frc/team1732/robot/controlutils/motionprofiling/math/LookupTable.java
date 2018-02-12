@@ -18,7 +18,7 @@ import org.usfirst.frc.team1732.robot.Util;
 
 public class LookupTable {
 
-	public static final int DEFAULT_SIZE = 250;
+	public static final int DEFAULT_SIZE = 150;
 	// private static final ExecutorService threadPool =
 	// Executors.newWorkStealingPool(); // Executors.newCachedThreadPool();
 	// private static final ExecutorService singleThread =
