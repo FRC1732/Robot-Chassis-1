@@ -31,16 +31,16 @@ public class Drivetrain extends Subsystem {
 	public static final double ENCODER_INCHES_PER_PULSE = 0.002099;
 
 	// Forward feedforward
-	public final Feedforward leftFFF = new Feedforward(0.061137, 0.010011, 1.688535);
-	public final Feedforward rightFFF = new Feedforward(0.0597575, 0.0099831, 1.7542480);
+	public final Feedforward leftFFF = new Feedforward(0.0601756, 0.0080490, 1.6159973);
+	public final Feedforward rightFFF = new Feedforward(0.0622665, 0.0080067, 1.7380342);
 	// Backward feedforward
 	public final Feedforward leftBFF = new Feedforward(0, 0, 0);
 	public final Feedforward rightBFF = new Feedforward(0, 0, 0);
 
 	// keep in mind for these
-	public final ClosedLoopProfile leftMPGains = new ClosedLoopProfile("Left PID", 1.28, 0, 0,
+	public final ClosedLoopProfile leftMPGains = new ClosedLoopProfile("Left PID", 0.32, 0, 0,
 			Feedforward.TALON_SRX_FF_GAIN, 0, 0, 0, 0);
-	public final ClosedLoopProfile rightMPGains = new ClosedLoopProfile("Right PID", 1.28, 0, 0,
+	public final ClosedLoopProfile rightMPGains = new ClosedLoopProfile("Right PID", 0.32, 0, 0,
 			Feedforward.TALON_SRX_FF_GAIN, 0, 0, 0, 0);
 
 	/*
