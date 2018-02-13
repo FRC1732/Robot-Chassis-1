@@ -31,17 +31,17 @@ public class Drivetrain extends Subsystem {
 	public static final double ENCODER_INCHES_PER_PULSE = 0.002099;
 
 	// Forward feedforward
-	public final Feedforward leftFFF = new Feedforward(0.0601756, 0.0080490, 1.6159973);
-	public final Feedforward rightFFF = new Feedforward(0.0622665, 0.0080067, 1.7380342);
+	public final Feedforward leftFFF = new Feedforward(0.0574657, 0.0089855, 1.6010019);
+	public final Feedforward rightFFF = new Feedforward(0.0560625, 0.0071341, 1.7711541);
 	// Backward feedforward
 	public final Feedforward leftBFF = new Feedforward(0, 0, 0);
 	public final Feedforward rightBFF = new Feedforward(0, 0, 0);
 
 	// keep in mind for these
-	public final ClosedLoopProfile leftMPGains = new ClosedLoopProfile("Left PID", 0.32, 0, 0,
-			Feedforward.TALON_SRX_FF_GAIN, 0, 0, 0, 0);
-	public final ClosedLoopProfile rightMPGains = new ClosedLoopProfile("Right PID", 0.32, 0, 0,
-			Feedforward.TALON_SRX_FF_GAIN, 0, 0, 0, 0);
+	private final ClosedLoopProfile mpGains = new ClosedLoopProfile("MP PID", 0.01 * Math.pow(2, 7), 0.0008, 0.01,
+			Feedforward.TALON_SRX_FF_GAIN, 800, 0, 5000, 0);
+	public final ClosedLoopProfile leftMPGains = mpGains;
+	public final ClosedLoopProfile rightMPGains = mpGains;
 
 	/*
 	 * The following 2 values are determined from the feedforward constants.
@@ -57,24 +57,27 @@ public class Drivetrain extends Subsystem {
 	 * a very high jerk value would not be any different than what we have now, but
 	 * using too low of a jerk value would cause the robot to accelerate slowly.
 	 */
-	public static final double MAX_IN_SEC = 85.021; // max vel
-	public static final double MAX_IN_SEC2 = 514.082; // max acc
+	public static final double MAX_IN_SEC = 90; // max vel
+	public static final double MAX_IN_SEC2 = 500; // max acc
 
 	public static final double ROBOT_WIDTH_IN = 29;
+	public static final double EFFECTIVE_ROBOT_WIDTH_IN = ROBOT_WIDTH_IN * 1.0;
 
 	public final DoubleProfileLoader profileManager;
 
 	public Drivetrain() {
 		int leftMaster = 1;
-		leftTalon1 = MotorUtils.configTalon(leftMaster, false, TalonConfiguration.DEFAULT_CONFIG);
-		MotorUtils.configFollowerTalon(MotorUtils.configTalon(9, false, TalonConfiguration.DEFAULT_CONFIG), leftTalon1);
-		MotorUtils.configFollowerTalon(MotorUtils.configTalon(3, false, TalonConfiguration.DEFAULT_CONFIG), leftTalon1);
+		TalonConfiguration config = TalonConfiguration.getDefaultConfig();
+		config.enableVoltageCompensation = true;
+		leftTalon1 = MotorUtils.configTalon(leftMaster, false, config);
+		MotorUtils.configFollowerTalon(MotorUtils.configTalon(9, false, config), leftTalon1);
+		MotorUtils.configFollowerTalon(MotorUtils.configTalon(3, false, config), leftTalon1);
 
 		int rightMaster = 5;
-		rightTalon1 = MotorUtils.configTalon(rightMaster, true, TalonConfiguration.DEFAULT_CONFIG);
+		rightTalon1 = MotorUtils.configTalon(rightMaster, true, config);
 
-		MotorUtils.configFollowerTalon(MotorUtils.configTalon(6, true, TalonConfiguration.DEFAULT_CONFIG), rightTalon1);
-		MotorUtils.configFollowerTalon(MotorUtils.configTalon(7, true, TalonConfiguration.DEFAULT_CONFIG), rightTalon1);
+		MotorUtils.configFollowerTalon(MotorUtils.configTalon(6, true, config), rightTalon1);
+		MotorUtils.configFollowerTalon(MotorUtils.configTalon(7, true, config), rightTalon1);
 
 		drive = new DifferentialDrive(leftTalon1, rightTalon1, ControlMode.PercentOutput, MIN_OUTPUT, MAX_OUTPUT,
 				INPUT_DEADBAND);

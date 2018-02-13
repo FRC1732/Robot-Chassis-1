@@ -69,7 +69,7 @@ public final class BezierCurve implements Curve {
 	}
 
 	public double arcLengthIntegral(double lower, double upper) {
-		return Util.gaussQuadIntegrate(this::arcLengthDerivative, lower, upper);
+		return Util.gaussQuadIntegrate64(this::arcLengthDerivative, lower, upper);
 	}
 
 	public void startMakingTable() {

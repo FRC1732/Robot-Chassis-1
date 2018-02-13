@@ -1,4 +1,4 @@
-package org.usfirst.frc.team1732.robot.motionProfiling.math;
+package org.usfirst.frc.team1732.robot.matthewProfiling.math;
 
 public class Vector {
 	

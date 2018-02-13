@@ -313,6 +313,24 @@ public final class Path {
 
 	}
 
+	private static double getLeftAdjust(Curve currentCurve, double robotWidth, double arcLength) {
+		double curvature = currentCurve.getCurvatureAtArcLength(arcLength);
+		double r = 1 / curvature;
+		double lR = Math.abs(r - robotWidth / 2);
+		double rR = Math.abs(r + robotWidth / 2);
+		r = Math.max(lR, rR);
+		return lR / r;
+	}
+
+	private static double getRightAdjust(Curve currentCurve, double robotWidth, double arcLength) {
+		double curvature = currentCurve.getCurvatureAtArcLength(arcLength);
+		double r = 1 / curvature;
+		double lR = Math.abs(r - robotWidth / 2);
+		double rR = Math.abs(r + robotWidth / 2);
+		r = Math.max(lR, rR);
+		return rR / r;
+	}
+
 	public Iterator<TrajectoryPoint[]> getIteratorWithOffset(TrajectoryDuration pointDuration, Feedforward leftFF,
 			Feedforward rightFF, Supplier<Integer> initialLeftSensorUnitsSupplier,
 			Supplier<Integer> initialRightSensorUnitsSupplier, double robotWidth, double sensorUnitsPerYourUnits) {
@@ -395,19 +413,28 @@ public final class Path {
 						}
 					}
 					double curvature = currentSegment.curve.getCurvatureAtArcLength(state.pos() - segmentLengthSum);
-					double dArc = state.pos() - previousState.pos();
+					double dCenterArc = state.pos() - previousState.pos();
 
 					// System.out.println(coord);
-					if (Math.abs(curvature) < 1.0E-20) {
-						leftPoint.position = (prevLeftPos + dArc) * sensorUnitsPerYourUnits + initialLeftSensorUnits;
+					if (Math.abs(curvature) < 1.0E-25) {
+						leftPoint.position = (prevLeftPos + dCenterArc) * sensorUnitsPerYourUnits
+								+ initialLeftSensorUnits;
 						leftPoint.velocity = leftFF.getAppliedVoltage(state.vel(), state.acc());
-						rightPoint.position = (prevRightPos + dArc) * sensorUnitsPerYourUnits + initialRightSensorUnits;
+						rightPoint.position = (prevRightPos + dCenterArc) * sensorUnitsPerYourUnits
+								+ initialRightSensorUnits;
 						rightPoint.velocity = rightFF.getAppliedVoltage(state.vel(), state.acc());
-						prevLeftPos = prevLeftPos + dArc;
+						prevLeftPos = prevLeftPos + dCenterArc;
 						prevLeftVel = state.vel();
-						prevRightPos = prevRightPos + dArc;
+						prevRightPos = prevRightPos + dCenterArc;
 						prevRightVel = state.vel();
 					} else {
+						double prevArcLength = previousState.pos() - segmentLengthSum;
+						double arcLength = state.pos() - segmentLengthSum;
+						double dArcLeft = Util.gaussQuadIntegrate64(
+								(d) -> getLeftAdjust(currentSegment.curve, robotWidth, d), prevArcLength, arcLength);
+						double dArcRight = Util.gaussQuadIntegrate64(
+								(d) -> getRightAdjust(currentSegment.curve, robotWidth, d), prevArcLength, arcLength);
+
 						double r = 1 / curvature;
 						double lR = Math.abs(r - robotWidth / 2);
 						double rR = Math.abs(r + robotWidth / 2);
@@ -418,15 +445,15 @@ public final class Path {
 						double rightV = state.vel() * rK;
 						double leftA = (leftV - prevLeftVel) / pointDurationSec;
 						double rightA = (rightV - prevRightVel) / pointDurationSec;
-						leftPoint.position = (prevLeftPos + dArc * lK) * sensorUnitsPerYourUnits
+						leftPoint.position = (prevLeftPos + dArcLeft) * sensorUnitsPerYourUnits
 								+ initialLeftSensorUnits;
 						leftPoint.velocity = leftFF.getAppliedVoltage(leftV, leftA);
-						rightPoint.position = (prevRightPos + dArc * rK) * sensorUnitsPerYourUnits
+						rightPoint.position = (prevRightPos + dArcRight) * sensorUnitsPerYourUnits
 								+ initialRightSensorUnits;
 						rightPoint.velocity = rightFF.getAppliedVoltage(rightV, rightA);
-						prevLeftPos = prevLeftPos + dArc * lK;
+						prevLeftPos = prevLeftPos + dArcLeft;
 						prevLeftVel = leftV;
-						prevRightPos = prevRightPos + dArc * rK;
+						prevRightPos = prevRightPos + dArcRight;
 						prevRightVel = rightV;
 					}
 					previousState = state;

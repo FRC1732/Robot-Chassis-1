@@ -84,7 +84,7 @@ public class DriveTrainCharacterizer extends Command {
 	}
 
 	private int i = 0;
-	private int length = 4;
+	private int length = 3;
 	private final CircularBuffer timeBuff = new CircularBuffer(length);
 	private final CircularBuffer leftVelBuff = new CircularBuffer(length);
 	private final CircularBuffer rightVelBuff = new CircularBuffer(length);

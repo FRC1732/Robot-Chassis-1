@@ -48,6 +48,7 @@ public class TestPathing extends Command {
 	// Called once after isFinished returns true
 	@Override
 	protected void end() {
+		Robot.drivetrain.profileManager.run();
 		// robot either holds last point or sits there in neutral output, depending on
 		// if the trajectory's last points has the 'isLast' flag set
 		Robot.drivetrain.profileManager.disablePrintingData();

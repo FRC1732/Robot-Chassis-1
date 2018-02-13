@@ -7,9 +7,11 @@ import com.ctre.phoenix.motorcontrol.VelocityMeasPeriod;
 
 public class TalonConfiguration {
 
-	public static final TalonConfiguration DEFAULT_CONFIG = new TalonConfiguration();
-
 	public static final int CONFIG_TIMEOUT = 10;
+
+	public static TalonConfiguration getDefaultConfig() {
+		return new TalonConfiguration();
+	}
 
 	private TalonConfiguration() {
 	}

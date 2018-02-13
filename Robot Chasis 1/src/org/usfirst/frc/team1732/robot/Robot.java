@@ -78,15 +78,16 @@ public class Robot extends TimedRobot {
 		t.reset();
 		t.start();
 		Path path = new Path(new Waypoint(0, 0, Math.PI / 2, 0), true);
-		path.addWaypoint(new Waypoint(0, 100, Math.PI / 2, 0));
+		path.addWaypoint(new Waypoint(90, 50, 0, 0));
 		path.generateProfile(Drivetrain.MAX_IN_SEC, Drivetrain.MAX_IN_SEC2 / 4.0);
 		System.out.println("Time to make path: " + t.get());
 
 		Iterator<TrajectoryPoint[]> iterator = path.getIteratorZeroAtStart(TrajectoryDuration.Trajectory_Duration_20ms,
-				Robot.drivetrain.leftFFF, Robot.drivetrain.rightFFF, 29, 1.0 / Drivetrain.ENCODER_INCHES_PER_PULSE);
+				Robot.drivetrain.leftFFF, Robot.drivetrain.rightFFF, Drivetrain.EFFECTIVE_ROBOT_WIDTH_IN,
+				1.0 / Drivetrain.ENCODER_INCHES_PER_PULSE);
 
 		new TestPathing(iterator).start();
-		// new DriveTrainCharacterizer(TestMode.QUASI_STATIC,
+		// new DriveTrainCharacterizer(TestMode.STEP_VOLTAGE,
 		// Direction.Forward).start();
 	}
 

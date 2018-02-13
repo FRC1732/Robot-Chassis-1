@@ -30,7 +30,7 @@ public class Arm extends Subsystem {
 	}
 
 	public Arm() {
-		talon = MotorUtils.configTalon(2, true, TalonConfiguration.DEFAULT_CONFIG);
+		talon = MotorUtils.configTalon(2, true, TalonConfiguration.getDefaultConfig());
 		talonEncoder = new TalonEncoder(talon, FeedbackDevice.QuadEncoder);
 		talonEncoder.setDistancePerPulse(DEGREES_PER_PULSE);
 		encoder = new EncoderReader(talonEncoder);
