@@ -78,11 +78,7 @@ public class Util {
 	}
 
 	public static double limit(double d, double min, double max) {
-		if (d < min)
-			return min;
-		if (d > max)
-			return max;
-		return d;
+		return d < min ? min : d > max ? max : d;
 	}
 
 	public static boolean epsilonEquals(double v1, double v2, double epsilon) {

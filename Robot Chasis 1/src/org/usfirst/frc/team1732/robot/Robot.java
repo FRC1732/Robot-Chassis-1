@@ -7,11 +7,7 @@
 
 package org.usfirst.frc.team1732.robot;
 
-import java.util.Iterator;
-
-import org.usfirst.frc.team1732.robot.commands.TestPathing;
-import org.usfirst.frc.team1732.robot.controlutils.motionprofiling.pathing.Path;
-import org.usfirst.frc.team1732.robot.controlutils.motionprofiling.pathing.Waypoint;
+import org.usfirst.frc.team1732.robot.commands.DriveDistance;
 import org.usfirst.frc.team1732.robot.input.Joysticks;
 import org.usfirst.frc.team1732.robot.odomotry.PositionEstimator;
 import org.usfirst.frc.team1732.robot.sensors.Sensors;
@@ -19,11 +15,7 @@ import org.usfirst.frc.team1732.robot.subsystems.Arm;
 import org.usfirst.frc.team1732.robot.subsystems.Claw;
 import org.usfirst.frc.team1732.robot.subsystems.Drivetrain;
 
-import com.ctre.phoenix.motion.TrajectoryPoint;
-import com.ctre.phoenix.motion.TrajectoryPoint.TrajectoryDuration;
-
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Scheduler;
 
 /**
@@ -45,6 +37,7 @@ public class Robot extends TimedRobot {
 
 	// config
 	public static final int PERIOD_MS = 20;
+	public static final double PERIOD_S = PERIOD_MS / 1000.0;
 	public static final int CONFIG_TIMEOUT = 10; // recommended timeout by CTRE
 
 	/**
@@ -53,7 +46,7 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void robotInit() {
-		setPeriod(PERIOD_MS / 1000.0); // periodic methods will loop every 10 ms (1/100 sec)
+		setPeriod(PERIOD_S); // periodic methods will loop every 10 ms (1/100 sec)
 		drivetrain = new Drivetrain();
 		sensors = new Sensors();
 		arm = new Arm();
@@ -69,24 +62,27 @@ public class Robot extends TimedRobot {
 	}
 
 	@Override
-	public void disabledInit() {
-	}
+	public void disabledInit() {}
 
 	@Override
 	public void autonomousInit() {
-		Timer t = new Timer();
-		t.reset();
-		t.start();
-		Path path = new Path(new Waypoint(0, 0, Math.PI / 2, 0), true);
-		path.addWaypoint(new Waypoint(90, 50, 0, 0));
-		path.generateProfile(Drivetrain.MAX_IN_SEC, Drivetrain.MAX_IN_SEC2 / 4.0);
-		System.out.println("Time to make path: " + t.get());
-
-		Iterator<TrajectoryPoint[]> iterator = path.getIteratorZeroAtStart(TrajectoryDuration.Trajectory_Duration_20ms,
-				Robot.drivetrain.leftFFF, Robot.drivetrain.rightFFF, Drivetrain.EFFECTIVE_ROBOT_WIDTH_IN,
-				1.0 / Drivetrain.ENCODER_INCHES_PER_PULSE);
-
-		new TestPathing(iterator).start();
+		/*
+		 * Timer t = new Timer();
+		 * t.reset();
+		 * t.start();
+		 * Path path = new Path(new Waypoint(0, 0, Math.PI / 2, 0), true);
+		 * path.addWaypoint(new Waypoint(90, 50, 0, 0));
+		 * path.generateProfile(Drivetrain.MAX_IN_SEC, Drivetrain.MAX_IN_SEC2 / 4.0);
+		 * System.out.println("Time to make path: " + t.get());
+		 * 
+		 * Iterator<TrajectoryPoint[]> iterator =
+		 * path.getIteratorZeroAtStart(TrajectoryDuration.Trajectory_Duration_20ms,
+		 * Robot.drivetrain.leftFFF, Robot.drivetrain.rightFFF, Drivetrain.EFFECTIVE_ROBOT_WIDTH_IN,
+		 * 1.0 / Drivetrain.ENCODER_INCHES_PER_PULSE);
+		 * 
+		 * new TestPathing(iterator).start();
+		 */
+		new DriveDistance(50).start();
 		// new DriveTrainCharacterizer(TestMode.STEP_VOLTAGE,
 		// Direction.Forward).start();
 	}

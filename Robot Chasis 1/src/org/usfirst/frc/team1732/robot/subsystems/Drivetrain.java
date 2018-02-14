@@ -1,5 +1,6 @@
 package org.usfirst.frc.team1732.robot.subsystems;
 
+import org.usfirst.frc.team1732.robot.Util;
 import org.usfirst.frc.team1732.robot.commands.DriveWithJoysticks;
 import org.usfirst.frc.team1732.robot.controlutils.ClosedLoopProfile;
 import org.usfirst.frc.team1732.robot.controlutils.Feedforward;
@@ -123,15 +124,33 @@ public class Drivetrain extends Subsystem {
 	}
 
 	public EncoderReader makeRightEncoderReader() {
-		return rightEncoder.makeReader();
+		return makeRightEncoderReader(false);
 	}
-
+	public EncoderReader makeRightEncoderReader(boolean zero) {
+		EncoderReader r = rightEncoder.makeReader();
+		if (zero) r.zero();
+		return r;
+	}
 	public EncoderReader makeLeftEncoderReader() {
-		return leftEncoder.makeReader();
+		return makeLeftEncoderReader(false);
+	}
+	public EncoderReader makeLeftEncoderReader(boolean zero) {
+		EncoderReader r = leftEncoder.makeReader();
+		if (zero) r.zero();
+		return r;
 	}
 
 	public void setStop() {
 		drive.tankDrive(0, 0);
+	}
+	public void setLeft(double d) {
+		leftTalon1.set(ControlMode.PercentOutput, limit(d));
+	}
+	public void setRight(double d) {
+		rightTalon1.set(ControlMode.PercentOutput, limit(d));
+	}
+	private double limit(double d) {
+		return Util.limit(d, -1, 1);
 	}
 
 }
