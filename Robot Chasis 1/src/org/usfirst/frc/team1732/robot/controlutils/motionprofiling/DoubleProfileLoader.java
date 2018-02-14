@@ -16,6 +16,8 @@ import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class DoubleProfileLoader extends Subsystem {
+	
+	public static final int MAX_POINTS_LOADED = 10000000;
 
 	private static final int minPointsInTalon = 40;
 	private static final double timeoutSec = 0.1;
@@ -105,8 +107,8 @@ public class DoubleProfileLoader extends Subsystem {
 	}
 
 	private void fillUntilFullOrDone() {
-		while (pointIterator.hasNext() && !leftTalon.isMotionProfileTopLevelBufferFull()
-				&& !rightTalon.isMotionProfileTopLevelBufferFull()) {
+		while (pointIterator.hasNext() && !(leftTalon.getMotionProfileTopLevelBufferCount() > MAX_POINTS_LOADED || rightTalon.getMotionProfileTopLevelBufferCount() > MAX_POINTS_LOADED) &&
+				!(leftTalon.isMotionProfileTopLevelBufferFull() || rightTalon.isMotionProfileTopLevelBufferFull())) {
 			TrajectoryPoint[] points = pointIterator.next();
 			TrajectoryPoint leftPoint = points[0];
 			TrajectoryPoint rightPoint = points[1];
