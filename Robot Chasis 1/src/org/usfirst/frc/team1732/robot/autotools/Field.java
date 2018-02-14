@@ -36,14 +36,10 @@ public class Field {
 	public class Switch {
 		public final Rectangle2D LEFT_PLATE = new Rectangle2D.Double(140, 85, 56, 44);
 		public final Rectangle2D RIGHT_PLATE = new Rectangle2D.Double(140, 195, 56, 44);
-		public Rectangle2D[] CUBES = {
-				new Rectangle2D.Double(195, 85, 13, 13),
-				new Rectangle2D.Double(195, 113, 13, 13),
-				new Rectangle2D.Double(195, 141, 13, 13),
-				new Rectangle2D.Double(195, 169, 13, 13),
-				new Rectangle2D.Double(195, 197, 13, 13),
-				new Rectangle2D.Double(195, 225, 13, 13),
-		};
+		public Rectangle2D[] CUBES = { new Rectangle2D.Double(195, 85, 13, 13),
+				new Rectangle2D.Double(195, 113, 13, 13), new Rectangle2D.Double(195, 141, 13, 13),
+				new Rectangle2D.Double(195, 169, 13, 13), new Rectangle2D.Double(195, 197, 13, 13),
+				new Rectangle2D.Double(195, 225, 13, 13), };
 	}
 
 	public class Zones {

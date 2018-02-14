@@ -72,15 +72,14 @@ public final class BezierCurve implements Curve {
 		return Util.gaussQuadIntegrate64(this::arcLengthDerivative, lower, upper);
 	}
 
-	public void startMakingTable() {
+	public void makeTable() {
 		if (tToArcLengthTable == null) {
 			tToArcLengthTable = new LookupTable(this::arcLengthIntegral, 0, 1);
 		}
 	}
 
 	public LookupTable getTable() {
-		startMakingTable();
-		tToArcLengthTable.waitToBeDone();
+		makeTable();
 		return tToArcLengthTable;
 	}
 

@@ -3,7 +3,6 @@ package org.usfirst.frc.team1732.robot.controlutils.motionprofiling.pathing;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.function.Supplier;
 
 import org.usfirst.frc.team1732.robot.Util;
 import org.usfirst.frc.team1732.robot.controlutils.Feedforward;
@@ -159,7 +158,7 @@ public final class Path {
 	public void generateProfile(double maxVelocity, double maxAcceleration) {
 		for (PathSegment seg : segments) {
 			if (seg.curve instanceof BezierCurve) {
-				((BezierCurve) seg.curve).startMakingTable();
+				((BezierCurve) seg.curve).makeTable();
 			}
 		}
 		MotionProfileConstraints constraints = new MotionProfileConstraints(maxVelocity, maxAcceleration);
@@ -332,21 +331,20 @@ public final class Path {
 	}
 
 	public Iterator<TrajectoryPoint[]> getIteratorWithOffset(TrajectoryDuration pointDuration, Feedforward leftFF,
-			Feedforward rightFF, Supplier<Integer> initialLeftSensorUnitsSupplier,
-			Supplier<Integer> initialRightSensorUnitsSupplier, double robotWidth, double sensorUnitsPerYourUnits) {
-		return getIterator(pointDuration, leftFF, rightFF, initialLeftSensorUnitsSupplier,
-				initialRightSensorUnitsSupplier, robotWidth, sensorUnitsPerYourUnits, false);
+			Feedforward rightFF, int initialLeftSensorUnits, int initialRightSensorUnits, double robotWidth,
+			double sensorUnitsPerYourUnits) {
+		return getIterator(pointDuration, leftFF, rightFF, initialLeftSensorUnits, initialRightSensorUnits, robotWidth,
+				sensorUnitsPerYourUnits, false);
 	}
 
 	public Iterator<TrajectoryPoint[]> getIteratorZeroAtStart(TrajectoryDuration pointDuration, Feedforward leftFF,
 			Feedforward rightFF, double robotWidth, double sensorUnitsPerYourUnits) {
-		return getIterator(pointDuration, leftFF, rightFF, () -> 0, () -> 0, robotWidth, sensorUnitsPerYourUnits, true);
+		return getIterator(pointDuration, leftFF, rightFF, 0, 0, robotWidth, sensorUnitsPerYourUnits, true);
 	}
 
 	private Iterator<TrajectoryPoint[]> getIterator(TrajectoryDuration pointDuration, Feedforward leftFF,
-			Feedforward rightFF, Supplier<Integer> initialLeftSensorUnitsSupplier,
-			Supplier<Integer> initialRightSensorUnitsSupplier, double robotWidth, double sensorUnitsPerYourUnits,
-			boolean zeroAtStart) {
+			Feedforward rightFF, int initialLeftSensorUnits, int initialRightSensorUnits, double robotWidth,
+			double sensorUnitsPerYourUnits, boolean zeroAtStart) {
 		return new Iterator<TrajectoryPoint[]>() {
 			int cs = 0;
 			PathSegment currentSegment = segments.get(0);
@@ -363,9 +361,6 @@ public final class Path {
 			double prevLeftVel = 0;
 			double prevRightVel = 0;
 			int i = 0;
-
-			int initialLeftSensorUnits;
-			int initialRightSensorUnits;
 
 			@Override
 			public boolean hasNext() {
@@ -388,8 +383,6 @@ public final class Path {
 				leftPoint.zeroPos = false;
 				rightPoint.zeroPos = false;
 				if (i == 0) {
-					initialLeftSensorUnits = initialLeftSensorUnitsSupplier.get();
-					initialRightSensorUnits = initialRightSensorUnitsSupplier.get();
 					leftPoint.zeroPos = zeroAtStart;
 					rightPoint.zeroPos = zeroAtStart;
 					leftPoint.position = previousState.pos() * sensorUnitsPerYourUnits + initialLeftSensorUnits;

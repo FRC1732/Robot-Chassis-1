@@ -10,19 +10,9 @@ import java.util.function.Function;
 
 import org.usfirst.frc.team1732.robot.Util;
 
-/*
- * Warning: although this class uses multithreading, setResolution SHOULD NOT
- * be called from a thread different than the one using it, because then it could
- * be in the middle of creating the table when trying to access it
- */
-
 public class LookupTable {
 
 	public static final int DEFAULT_SIZE = 150;
-	// private static final ExecutorService threadPool =
-	// Executors.newWorkStealingPool(); // Executors.newCachedThreadPool();
-	// private static final ExecutorService singleThread =
-	// Executors.newSingleThreadExecutor();
 
 	private final BiFunction<Double, Double, Double> deltaY;
 	private final double lowerInput;
@@ -31,7 +21,6 @@ public class LookupTable {
 
 	private int resolution;
 	private double increment;
-	// private Future<?> doneChecker;
 	private NavigableMap<Double, Double> inOut;
 	private NavigableMap<Double, Double> outIn;
 
@@ -60,16 +49,10 @@ public class LookupTable {
 	}
 
 	private void makeLUT() {
-		// inOut = new ConcurrentSkipListMap<>();
 		inOut = new TreeMap<>();
 		inOut.put(lowerInput, 0.0);
-		// outIn = new ConcurrentSkipListMap<>();
 		outIn = new TreeMap<>();
 		outIn.put(0.0, lowerInput);
-
-		// List<Future<Double>> puts = new ArrayList<>(resolution);
-		// puts.add(threadPool.submit(() -> 0.0));
-
 		List<Double> puts = new ArrayList<>(resolution);
 		puts.add(0.0);
 
@@ -77,40 +60,13 @@ public class LookupTable {
 			int index = i; // need to do this for lambda expression below
 			double prevIn = indexToInput(index - 1);
 			double currentIn = indexToInput(index);
-
-			// Future<Double> ds = threadPool.submit(() -> deltaY.apply(prevIn, currentIn));
-			double ds = deltaY.apply(prevIn, currentIn);
-			// Future<Double> putTask = singleThread.submit(() -> {
-			// double change = ds.get();
-			// double prevResult = puts.get(index - 1).get();
-			// double result = prevResult + change;
-			// inOut.put(currentIn, result);
-			// outIn.put(result, currentIn);
-			// return change + prevResult;
-			// });
-			double change = ds;
+			double change = deltaY.apply(prevIn, currentIn);
 			double prevResult = puts.get(index - 1);
 			double result = prevResult + change;
 			inOut.put(currentIn, result);
 			outIn.put(result, currentIn);
 			puts.add(result);
 		}
-		// doneChecker = puts.get(resolution - 1);
-	}
-
-	public void waitToBeDone() {
-		// try {
-		// doneChecker.get();
-		// } catch (InterruptedException e) {
-		// e.printStackTrace();
-		// } catch (ExecutionException e) {
-		// e.printStackTrace();
-		// }
-	}
-
-	public boolean checkIfDone() {
-		// return doneChecker.isDone();
-		return true;
 	}
 
 	// private int inputToIndex(double input) {
@@ -118,11 +74,6 @@ public class LookupTable {
 	// }
 
 	public double getOutput(double input) {
-		Double gotVal = inOut.get(input);
-		if (gotVal != null) {
-			return gotVal;
-		}
-
 		Entry<Double, Double> lower = inOut.floorEntry(input);
 		Entry<Double, Double> upper = inOut.ceilingEntry(input);
 
@@ -144,11 +95,6 @@ public class LookupTable {
 
 	// basically does an interpolation search on the tree
 	public double getInput(double output) {
-		Double gotVal = outIn.get(output);
-		if (gotVal != null) {
-			return gotVal;
-		}
-
 		Entry<Double, Double> lower = outIn.floorEntry(output);
 		Entry<Double, Double> upper = outIn.ceilingEntry(output);
 
@@ -166,11 +112,6 @@ public class LookupTable {
 				upper.getValue(), d);
 
 		return outIn.computeIfAbsent(output, f);
-	}
-
-	public static void closeThreadPools() {
-		// threadPool.shutdown();
-		// singleThread.shutdown();
 	}
 
 }
