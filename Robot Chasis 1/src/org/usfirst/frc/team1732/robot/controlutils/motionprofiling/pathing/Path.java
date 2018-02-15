@@ -596,10 +596,10 @@ public final class Path {
 						double rightA = (rightV - prevRightVel) / pointDurationSec;
 						leftPoint.position = (prevLeftPos + dArcLeft) * sensorUnitsPerYourUnits
 								+ initialLeftSensorUnits;
-						leftPoint.velocity = leftFF.getAppliedVoltage(leftV, leftA);
+						leftPoint.velocity = leftFF.getAppliedVoltage(leftV, leftA+diffrence*PERCENT_HEADING_CORRECTION);
 						rightPoint.position = (prevRightPos + dArcRight) * sensorUnitsPerYourUnits
 								+ initialRightSensorUnits;
-						rightPoint.velocity = rightFF.getAppliedVoltage(rightV, rightA);
+						rightPoint.velocity = rightFF.getAppliedVoltage(rightV, rightA-diffrence*PERCENT_HEADING_CORRECTION);
 						prevLeftPos = prevLeftPos + dArcLeft;
 						prevLeftVel = leftV;
 						prevRightPos = prevRightPos + dArcRight;

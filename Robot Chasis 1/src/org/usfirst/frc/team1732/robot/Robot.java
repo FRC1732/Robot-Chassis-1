@@ -62,27 +62,33 @@ public class Robot extends TimedRobot {
 	}
 
 	@Override
-	public void disabledInit() {}
+	public void disabledInit() {
+	}
 
 	@Override
 	public void autonomousInit() {
-		/*
-		 * Timer t = new Timer();
-		 * t.reset();
-		 * t.start();
-		 * Path path = new Path(new Waypoint(0, 0, Math.PI / 2, 0), true);
-		 * path.addWaypoint(new Waypoint(90, 50, 0, 0));
-		 * path.generateProfile(Drivetrain.MAX_IN_SEC, Drivetrain.MAX_IN_SEC2 / 4.0);
-		 * System.out.println("Time to make path: " + t.get());
-		 * 
-		 * Iterator<TrajectoryPoint[]> iterator =
-		 * path.getIteratorZeroAtStart(TrajectoryDuration.Trajectory_Duration_20ms,
-		 * Robot.drivetrain.leftFFF, Robot.drivetrain.rightFFF, Drivetrain.EFFECTIVE_ROBOT_WIDTH_IN,
-		 * 1.0 / Drivetrain.ENCODER_INCHES_PER_PULSE);
-		 * 
-		 * new TestPathing(iterator).start();
-		 */
-		new DriveDistance(50).start();
+//		Timer t = new Timer();
+//		t.reset();
+//		t.start();
+//		Path path = new Path(new Waypoint(0, 0, Math.PI / 2, 0), true);
+//		path.addWaypoint(new Waypoint(90, 50, 0, 0));
+//		path.generateProfile(Drivetrain.MAX_IN_SEC, Drivetrain.MAX_IN_SEC2 / 4.0);
+//		System.out.println("Time to make path: " + t.get());
+//		
+//		// With Correction
+//		Iterator<TrajectoryPoint[]> iterator = path.getIterator(TrajectoryDuration.Trajectory_Duration_20ms,
+//				Robot.drivetrain.leftFFF, Robot.drivetrain.rightFFF, 0, 0, Drivetrain.EFFECTIVE_ROBOT_WIDTH_IN,
+//				1.0 / Drivetrain.ENCODER_INCHES_PER_PULSE, true, sensors::getCurrentAngleCorrectedInRadian,
+//				drivetrain.rightTalon1::getActiveTrajectoryHeading, drivetrain.leftTalon1::getActiveTrajectoryHeading);
+//
+//		// Without Correction
+//		Iterator<TrajectoryPoint[]> iterator = path.getIteratorZeroAtStart(TrajectoryDuration.Trajectory_Duration_20ms,
+//				Robot.drivetrain.leftFFF, Robot.drivetrain.rightFFF, Drivetrain.EFFECTIVE_ROBOT_WIDTH_IN,
+//				1.0 / Drivetrain.ENCODER_INCHES_PER_PULSE);
+//
+//		new TestPathing(iterator).start();
+
+		 new DriveDistance(50).start();
 		// new DriveTrainCharacterizer(TestMode.STEP_VOLTAGE,
 		// Direction.Forward).start();
 	}
