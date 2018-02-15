@@ -15,5 +15,5 @@ public interface Curve {
 
 	public Vector getPointAtArcLength(double arcLength);
 
-	public Vector getHeadingAtArcLength(double arcLength);
+	public double getHeadingAtArcLength(double arcLength);
 }

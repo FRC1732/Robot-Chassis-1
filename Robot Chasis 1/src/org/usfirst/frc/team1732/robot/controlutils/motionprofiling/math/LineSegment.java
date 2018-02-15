@@ -80,8 +80,8 @@ public class LineSegment implements Curve {
 	}
 
 	@Override
-	public Vector getHeadingAtArcLength(double arcLength) {
-		return getDirection().normalized();
+	public double getHeadingAtArcLength(double arcLength) {
+		return getDirection().normalized().getAbsoluteAngle();
 	}
 
 }

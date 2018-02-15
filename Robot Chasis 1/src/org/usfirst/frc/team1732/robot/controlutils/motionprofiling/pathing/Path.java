@@ -464,9 +464,27 @@ public final class Path {
 		};
 	}
 	
+
+	public static final double MAX_HEADING_CORRECTION = Math.PI / 60;
+	public static final double PERCENT_HEADING_CORRECTION = 0.3;
+	/**
+	 * 
+	 * @param pointDuration
+	 * @param leftFF
+	 * @param rightFF
+	 * @param initialLeftSensorUnits
+	 * @param initialRightSensorUnits
+	 * @param robotWidth
+	 * @param sensorUnitsPerYourUnits
+	 * @param zeroAtStart
+	 * @param actualHeading Navx
+	 * @param theoryHeading the right side
+	 * @param theoryCorrectedHeading the left side
+	 * @return
+	 */
 	public Iterator<TrajectoryPoint[]> getIterator(TrajectoryDuration pointDuration, Feedforward leftFF,
 			Feedforward rightFF, int initialLeftSensorUnits, int initialRightSensorUnits, double robotWidth,
-			double sensorUnitsPerYourUnits, boolean zeroAtStart, Supplier<Double> actualHeading, Supplier<Double> theoryHeading) {
+			double sensorUnitsPerYourUnits, boolean zeroAtStart, Supplier<Double> actualHeading, Supplier<Double> theoryHeading, Supplier<Double> theoryCorrectedHeading) {
 		return new Iterator<TrajectoryPoint[]>() {
 			int cs = 0;
 			PathSegment currentSegment = segments.get(0);
@@ -483,9 +501,7 @@ public final class Path {
 			double prevLeftVel = 0;
 			double prevRightVel = 0;
 			int i = 0;
-
-			Supplier<Double> heading = actualHeading;
-			Supplier<Double> headingTheaory = theoryHeading;
+			
 			double headingCorrection = 0;
 
 			@Override
@@ -495,8 +511,12 @@ public final class Path {
 
 			@Override
 			public TrajectoryPoint[] next() {
+				double headingError = theoryHeading.get() - actualHeading.get();
+				headingCorrection-= theoryCorrectedHeading.get();
 				
-				double currentHeading = heading.get();
+				double diffrence = (headingError < MAX_HEADING_CORRECTION)? headingError : MAX_HEADING_CORRECTION;
+				
+				headingCorrection+= diffrence;
 				
 				TrajectoryPoint[] points = { new TrajectoryPoint(), new TrajectoryPoint() };
 				TrajectoryPoint leftPoint = points[0];
@@ -537,6 +557,10 @@ public final class Path {
 							currentSegment = segments.get(cs);
 						}
 					}
+
+					leftPoint.headingDeg = currentSegment.curve.getHeadingAtArcLength(state.pos() - segmentLengthSum);
+					rightPoint.headingDeg = diffrence;
+					
 					double curvature = currentSegment.curve.getCurvatureAtArcLength(state.pos() - segmentLengthSum);
 					double dCenterArc = state.pos() - previousState.pos();
 
@@ -544,10 +568,10 @@ public final class Path {
 					if (Math.abs(curvature) < 1.0E-25) {
 						leftPoint.position = (prevLeftPos + dCenterArc) * sensorUnitsPerYourUnits
 								+ initialLeftSensorUnits;
-						leftPoint.velocity = leftFF.getAppliedVoltage(state.vel(), state.acc());
+						leftPoint.velocity = leftFF.getAppliedVoltage(state.vel(), state.acc()+diffrence*PERCENT_HEADING_CORRECTION);
 						rightPoint.position = (prevRightPos + dCenterArc) * sensorUnitsPerYourUnits
 								+ initialRightSensorUnits;
-						rightPoint.velocity = rightFF.getAppliedVoltage(state.vel(), state.acc());
+						rightPoint.velocity = rightFF.getAppliedVoltage(state.vel(), state.acc()-diffrence*PERCENT_HEADING_CORRECTION);
 						prevLeftPos = prevLeftPos + dCenterArc;
 						prevLeftVel = state.vel();
 						prevRightPos = prevRightPos + dCenterArc;
