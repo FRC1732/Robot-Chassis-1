@@ -568,10 +568,10 @@ public final class Path {
 					if (Math.abs(curvature) < 1.0E-25) {
 						leftPoint.position = (prevLeftPos + dCenterArc) * sensorUnitsPerYourUnits
 								+ initialLeftSensorUnits;
-						leftPoint.velocity = leftFF.getAppliedVoltage(state.vel(), state.acc()+diffrence*PERCENT_HEADING_CORRECTION);
+						leftPoint.velocity = leftFF.getAppliedVoltage(state.vel()+diffrence*PERCENT_HEADING_CORRECTION, state.acc()+diffrence*PERCENT_HEADING_CORRECTION);
 						rightPoint.position = (prevRightPos + dCenterArc) * sensorUnitsPerYourUnits
 								+ initialRightSensorUnits;
-						rightPoint.velocity = rightFF.getAppliedVoltage(state.vel(), state.acc()-diffrence*PERCENT_HEADING_CORRECTION);
+						rightPoint.velocity = rightFF.getAppliedVoltage(state.vel()-diffrence*PERCENT_HEADING_CORRECTION, state.acc()-diffrence*PERCENT_HEADING_CORRECTION);
 						prevLeftPos = prevLeftPos + dCenterArc;
 						prevLeftVel = state.vel();
 						prevRightPos = prevRightPos + dCenterArc;
@@ -596,10 +596,10 @@ public final class Path {
 						double rightA = (rightV - prevRightVel) / pointDurationSec;
 						leftPoint.position = (prevLeftPos + dArcLeft) * sensorUnitsPerYourUnits
 								+ initialLeftSensorUnits;
-						leftPoint.velocity = leftFF.getAppliedVoltage(leftV, leftA+diffrence*PERCENT_HEADING_CORRECTION);
+						leftPoint.velocity = leftFF.getAppliedVoltage(leftV+diffrence*PERCENT_HEADING_CORRECTION, leftA+diffrence*PERCENT_HEADING_CORRECTION);
 						rightPoint.position = (prevRightPos + dArcRight) * sensorUnitsPerYourUnits
 								+ initialRightSensorUnits;
-						rightPoint.velocity = rightFF.getAppliedVoltage(rightV, rightA-diffrence*PERCENT_HEADING_CORRECTION);
+						rightPoint.velocity = rightFF.getAppliedVoltage(rightV-diffrence*PERCENT_HEADING_CORRECTION, rightA-diffrence*PERCENT_HEADING_CORRECTION);
 						prevLeftPos = prevLeftPos + dArcLeft;
 						prevLeftVel = leftV;
 						prevRightPos = prevRightPos + dArcRight;

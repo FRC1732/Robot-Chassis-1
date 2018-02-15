@@ -17,9 +17,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class DoubleProfileLoader extends Subsystem {
 	
-	public static final int MAX_POINTS_LOADED = 10000000;
+	public static final int MAX_POINTS_LOADED = 40;
 
-	private static final int minPointsInTalon = 40;
+	private static final int minPointsInTalon = 20;
 	private static final double timeoutSec = 0.1;
 
 	private final TalonSRX leftTalon;
