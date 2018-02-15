@@ -347,20 +347,23 @@ public final class Path {
 			Feedforward rightFF, int initialLeftSensorUnits, int initialRightSensorUnits, double robotWidth,
 			double sensorUnitsPerYourUnits, boolean zeroAtStart) {
 		return new Iterator<TrajectoryPoint[]>() {
+
 			int cs = 0;
 			PathSegment currentSegment = segments.get(0);
+			double currentLength = currentSegment.curve.getTotalArcLength();
 			double segmentLengthSum = 0;
 
 			double totalTime = profile.duration();
 			double pointDurationSec = pointDuration.value / 1000.0;
 			int pointCount = (int) (totalTime / (pointDurationSec));
 			double increment = totalTime / (pointCount - 1);
-			MotionState previousState = profile.stateByTimeClamped(0);
+			MotionState startState = profile.stateByTimeClamped(0);
 
-			double prevLeftPos = 0;
-			double prevRightPos = 0;
-			double prevLeftVel = 0;
-			double prevRightVel = 0;
+			double startLeftPos = 0;
+			double startRightPos = 0;
+			double startLeftVel = 0;
+			double startRightVel = 0;
+
 			int i = 0;
 
 			@Override
@@ -383,73 +386,58 @@ public final class Path {
 				rightPoint.profileSlotSelect1 = 0;
 				leftPoint.zeroPos = false;
 				rightPoint.zeroPos = false;
+
+				MotionState currentState = profile.stateByTimeClamped(i * increment);
+				if (Math.abs(currentState.pos()) >= currentLength + segmentLengthSum && cs + 1 < segments.size()) {
+					segmentLengthSum += currentLength;
+					cs++;
+					currentSegment = segments.get(cs);
+					currentLength = currentSegment.curve.getTotalArcLength();
+				}
+
+				double curvature = currentSegment.curve
+						.getCurvatureAtArcLength(Math.abs(currentState.pos()) - segmentLengthSum);
+				double dCenterArc = currentState.pos() - startState.pos();
+
+				double leftAcc;
+				double rightAcc;
+
+				if (Math.abs(curvature) < 1.0E-25) { // if straight
+					leftPoint.position = (startLeftPos + dCenterArc) * sensorUnitsPerYourUnits + initialLeftSensorUnits;
+					rightPoint.position = (startRightPos + dCenterArc) * sensorUnitsPerYourUnits
+							+ initialRightSensorUnits;
+					startLeftPos = startLeftPos + dCenterArc;
+					startRightPos = startRightPos + dCenterArc;
+					leftAcc = leftFF.getInitialAcceleration(dCenterArc, pointDurationSec, startLeftVel);
+					rightAcc = rightFF.getInitialAcceleration(dCenterArc, pointDurationSec, startLeftVel);
+				} else { // if curving
+					double prevArcLength = startState.pos() - segmentLengthSum;
+					double arcLength = currentState.pos() - segmentLengthSum;
+					double dLeftArc = Util.gaussQuadIntegrate64(
+							(d) -> getLeftAdjust(currentSegment.curve, robotWidth, d), prevArcLength, arcLength);
+					double dRightArc = Util.gaussQuadIntegrate64(
+							(d) -> getRightAdjust(currentSegment.curve, robotWidth, d), prevArcLength, arcLength);
+					leftPoint.position = (startLeftPos + dLeftArc) * sensorUnitsPerYourUnits + initialLeftSensorUnits;
+					rightPoint.position = (startRightPos + dRightArc) * sensorUnitsPerYourUnits
+							+ initialRightSensorUnits;
+					startLeftPos = startLeftPos + dLeftArc;
+					startRightPos = startRightPos + dRightArc;
+					leftAcc = leftFF.getInitialAcceleration(dLeftArc, pointDurationSec, startLeftVel);
+					rightAcc = rightFF.getInitialAcceleration(dRightArc, pointDurationSec, startLeftVel);
+				}
+				leftPoint.velocity = leftFF.getAppliedVoltage(startLeftVel, leftAcc);
+				rightPoint.velocity = rightFF.getAppliedVoltage(startLeftVel, rightAcc);
+				startLeftVel = leftFF.getVelocityAtTime(startLeftVel, leftAcc, pointDurationSec);
+				startRightVel = rightFF.getVelocityAtTime(startRightVel, rightAcc, pointDurationSec);
 				if (i == 0) {
 					leftPoint.zeroPos = zeroAtStart;
 					rightPoint.zeroPos = zeroAtStart;
-					leftPoint.position = previousState.pos() * sensorUnitsPerYourUnits + initialLeftSensorUnits;
-					leftPoint.velocity = leftFF.getAppliedVoltage(previousState.vel(), previousState.acc());
-					rightPoint.position = previousState.pos() * sensorUnitsPerYourUnits + initialRightSensorUnits;
-					rightPoint.velocity = rightFF.getAppliedVoltage(previousState.vel(), previousState.acc());
-					prevLeftPos = previousState.pos();
-					prevLeftVel = previousState.vel();
-					prevRightPos = previousState.pos();
-					prevRightVel = previousState.vel();
-				} else {
-					MotionState state = profile.stateByTimeClamped(i * increment);
-					double currentLength = currentSegment.curve.getTotalArcLength();
-					if (state.pos() >= currentLength + segmentLengthSum) {
-						if (cs + 1 < segments.size()) {
-							cs++;
-							segmentLengthSum += currentLength;
-							currentSegment = segments.get(cs);
-						}
-					}
-					double curvature = currentSegment.curve.getCurvatureAtArcLength(state.pos() - segmentLengthSum);
-					double dCenterArc = state.pos() - previousState.pos();
-
-					// System.out.println(coord);
-					if (Math.abs(curvature) < 1.0E-25) {
-						leftPoint.position = (prevLeftPos + dCenterArc) * sensorUnitsPerYourUnits
-								+ initialLeftSensorUnits;
-						leftPoint.velocity = leftFF.getAppliedVoltage(state.vel(), state.acc());
-						rightPoint.position = (prevRightPos + dCenterArc) * sensorUnitsPerYourUnits
-								+ initialRightSensorUnits;
-						rightPoint.velocity = rightFF.getAppliedVoltage(state.vel(), state.acc());
-						prevLeftPos = prevLeftPos + dCenterArc;
-						prevLeftVel = state.vel();
-						prevRightPos = prevRightPos + dCenterArc;
-						prevRightVel = state.vel();
-					} else {
-						double prevArcLength = previousState.pos() - segmentLengthSum;
-						double arcLength = state.pos() - segmentLengthSum;
-						double dArcLeft = Util.gaussQuadIntegrate64(
-								(d) -> getLeftAdjust(currentSegment.curve, robotWidth, d), prevArcLength, arcLength);
-						double dArcRight = Util.gaussQuadIntegrate64(
-								(d) -> getRightAdjust(currentSegment.curve, robotWidth, d), prevArcLength, arcLength);
-
-						
-						double leftV = ;
-						double rightV = ;
-						double leftA = ;
-						double rightA =;
-						leftPoint.position = (prevLeftPos + dArcLeft) * sensorUnitsPerYourUnits
-								+ initialLeftSensorUnits;
-						leftPoint.velocity = leftFF.getAppliedVoltage(leftV, leftA);
-						rightPoint.position = (prevRightPos + dArcRight) * sensorUnitsPerYourUnits
-								+ initialRightSensorUnits;
-						rightPoint.velocity = rightFF.getAppliedVoltage(rightV, rightA);
-						prevLeftPos = prevLeftPos + dArcLeft;
-						prevLeftVel = leftV;
-						prevRightPos = prevRightPos + dArcRight;
-						prevRightVel = rightV;
-					}
-					previousState = state;
 				}
 				if (i == pointCount - 1) {
 					leftPoint.isLastPoint = true;
 					rightPoint.isLastPoint = true;
 				}
-
+				startState = currentState;
 				i++;
 				return points;
 			}

@@ -29,17 +29,23 @@ public class Feedforward {
 		}
 	}
 
+	// following two methods are derived from the first order linear differential
+	// equation of the feed forward
+
 	public double getInitialAcceleration(double x, double t, double v0) {
-		double numerator = x - t * v0;
-		double denominator;
+		double av;
+		double va;
 		if (v0 >= 0) {
-			double av = fkA / fkV;
-			denominator = t * av + av * av * (Math.exp(-fkV / fkA * t)));
+			av = fkA / fkV;
+			va = fkV / fkA;
 		} else {
-			double av = bkA / bkV;
-			denominator = t * av + av * av * (Math.exp(-bkV / bkA * t)));
+			av = bkA / bkV;
+			va = bkV / bkA;
 		}
-		return numerator/denominator;
+		double numerator = x - t * v0;
+		double denominator = t * av + av * av * (Math.exp(-va * t));
+
+		return numerator / denominator;
 	}
 
 	public double getVelocityAtTime(double v0, double a0, double t) {
