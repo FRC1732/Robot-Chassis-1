@@ -31,19 +31,19 @@ public class Drivetrain extends Subsystem {
 	public static final double MAX_OUTPUT = 1.0;
 	public static final double ENCODER_INCHES_PER_PULSE = 0.002099;
 
-	// Forward feedforward
-	public final Feedforward leftFFF = new Feedforward(0.0574657, 0.0089855, 1.6010019);
-	public final Feedforward rightFFF = new Feedforward(0.0560625, 0.0071341, 1.7711541);
-	// Backward feedforward
-	public final Feedforward leftBFF = new Feedforward(0, 0, 0);
-	public final Feedforward rightBFF = new Feedforward(0, 0, 0);
+	// Feedforward
+	public final Feedforward leftFF = new Feedforward(0.0574657, 0.0089855, 1.6010019, 0.0574657, 0.0089855,
+			-1.6010019);
+	public final Feedforward rightFF = new Feedforward(0.0560625, 0.0071341, 1.7711541, 0.0560625, 0.0071341,
+			-1.7711541);
 
 	// keep in mind for these
 	private final ClosedLoopProfile mpGains = new ClosedLoopProfile("MP PID", 0.01 * Math.pow(2, 7), 0.0008, 0.01,
 			Feedforward.TALON_SRX_FF_GAIN, 800, 0, 5000, 0);
 	public final ClosedLoopProfile leftMPGains = mpGains;
 	public final ClosedLoopProfile rightMPGains = mpGains;
-
+	public final ClosedLoopProfile velGains = new ClosedLoopProfile("Closed Loop Profile", 0, 0, 0,
+			Feedforward.TALON_SRX_FF_GAIN, 0, 0, 0, 0);
 	/*
 	 * The following 2 values are determined from the feedforward constants.
 	 * 
@@ -126,29 +126,37 @@ public class Drivetrain extends Subsystem {
 	public EncoderReader makeRightEncoderReader() {
 		return makeRightEncoderReader(false);
 	}
+
 	public EncoderReader makeRightEncoderReader(boolean zero) {
 		EncoderReader r = rightEncoder.makeReader();
-		if (zero) r.zero();
+		if (zero)
+			r.zero();
 		return r;
 	}
+
 	public EncoderReader makeLeftEncoderReader() {
 		return makeLeftEncoderReader(false);
 	}
+
 	public EncoderReader makeLeftEncoderReader(boolean zero) {
 		EncoderReader r = leftEncoder.makeReader();
-		if (zero) r.zero();
+		if (zero)
+			r.zero();
 		return r;
 	}
 
 	public void setStop() {
 		drive.tankDrive(0, 0);
 	}
+
 	public void setLeft(double d) {
 		leftTalon1.set(ControlMode.PercentOutput, limit(d));
 	}
+
 	public void setRight(double d) {
 		rightTalon1.set(ControlMode.PercentOutput, limit(d));
 	}
+
 	private double limit(double d) {
 		return Util.limit(d, -1, 1);
 	}

@@ -1,5 +1,7 @@
 package org.usfirst.frc.team1732.robot.commands.autotest;
 
+import org.usfirst.frc.team1732.robot.subsystems.Drivetrain;
+
 import edu.wpi.first.wpilibj.command.CommandGroup;
 
 /**
@@ -7,22 +9,9 @@ import edu.wpi.first.wpilibj.command.CommandGroup;
  */
 public class TurnToAngle extends CommandGroup {
 
-    public TurnToAngle() {
-        // Add Commands here:
-        // e.g. addSequential(new Command1());
-        //      addSequential(new Command2());
-        // these will run in order.
-
-        // To run multiple commands at the same time,
-        // use addParallel()
-        // e.g. addParallel(new Command1());
-        //      addSequential(new Command2());
-        // Command1 and Command2 will run in parallel.
-
-        // A command group will require all of the subsystems that each member
-        // would require.
-        // e.g. if Command1 requires chassis, and Command2 requires arm,
-        // a CommandGroup containing them would require both the chassis and the
-        // arm.
-    }
+	public TurnToAngle(double angle) {
+		addSequential(new TurnAngleWithNavXHelp(Drivetrain.MAX_IN_SEC, Drivetrain.MAX_IN_SEC2, angle / 2));
+		addSequential(new TurnAngleWithNavXHelp(0, -Drivetrain.MAX_IN_SEC2, angle / 2));
+		addSequential(new SetVelocity(0, 0));
+	}
 }
