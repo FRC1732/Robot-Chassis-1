@@ -15,4 +15,22 @@ public class Sensors {
 		}
 		return angle;
 	}
+	
+	public double getCurrentAngle() {
+		double angle = navX.getAngle() % 360;
+		if(angle < 0) {
+			angle+= 360;
+		}
+		return angle;
+	}
+
+	public static final double DIFFRENCE = -90;
+	public static final double MULTIPLIER = -1;
+	public double getCurrentAngleCorrectedInRadian() {
+		double angle = (navX.getAngle()*MULTIPLIER + DIFFRENCE) % 360;
+		if(angle < 0) {
+			angle+= 360;
+		}
+		return Math.toRadians(angle);
+	}
 }
