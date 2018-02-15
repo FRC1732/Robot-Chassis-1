@@ -42,8 +42,9 @@ public class Drivetrain extends Subsystem {
 			Feedforward.TALON_SRX_FF_GAIN, 800, 0, 5000, 0);
 	public final ClosedLoopProfile leftMPGains = mpGains;
 	public final ClosedLoopProfile rightMPGains = mpGains;
-	public final ClosedLoopProfile velGains = new ClosedLoopProfile("Closed Loop Profile", 0, 0, 0,
-			Feedforward.TALON_SRX_FF_GAIN, 0, 0, 0, 0);
+	public final ClosedLoopProfile velGains = new ClosedLoopProfile("Closed Loop Profile", 0, 0, 0, 1023 / 7500.0, 0, 0,
+			0, 0);
+
 	/*
 	 * The following 2 values are determined from the feedforward constants.
 	 * 
@@ -112,6 +113,8 @@ public class Drivetrain extends Subsystem {
 
 	@Override
 	public void periodic() {
+		SmartDashboard.putNumber("Left Rate", leftTalon1.getSelectedSensorVelocity(0));
+		SmartDashboard.putNumber("Right Rate", rightTalon1.getSelectedSensorVelocity(0));
 		SmartDashboard.putNumber("Left Velocity", leftEncoder.getRate());
 		SmartDashboard.putNumber("Right Velocity", rightEncoder.getRate());
 		SmartDashboard.putNumber("Left Position", leftEncoder.getPosition());

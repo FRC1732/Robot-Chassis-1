@@ -1,5 +1,7 @@
 package org.usfirst.frc.team1732.robot.sensors.navx;
 
+import org.usfirst.frc.team1732.robot.sensors.Sensors;
+
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -28,6 +30,7 @@ public class NavXData {
 		/* path for upgrading from the Kit-of-Parts gyro to the navx-MXP */
 
 		SmartDashboard.putNumber(imu + "IMU_TotalYaw", ahrs.getAngle());
+		SmartDashboard.putNumber(imu + "IMU_Angle", Sensors.convertTotalAngle(ahrs.getAngle()));
 		SmartDashboard.putNumber(imu + "IMU_YawRateDPS", ahrs.getRate());
 
 		/* Display Processed Acceleration Data (Linear Acceleration, Motion Detect) */
