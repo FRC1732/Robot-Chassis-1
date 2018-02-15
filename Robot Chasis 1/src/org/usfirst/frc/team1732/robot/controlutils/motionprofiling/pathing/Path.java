@@ -355,7 +355,7 @@ public final class Path {
 			double pointDurationSec = pointDuration.value / 1000.0;
 			int pointCount = (int) (totalTime / (pointDurationSec));
 			double increment = totalTime / (pointCount - 1);
-			MotionState previousState = profile.stateByTime(0).get();
+			MotionState previousState = profile.stateByTimeClamped(0);
 
 			double prevLeftPos = 0;
 			double prevRightPos = 0;
@@ -397,10 +397,8 @@ public final class Path {
 				} else {
 					MotionState state = profile.stateByTimeClamped(i * increment);
 					double currentLength = currentSegment.curve.getTotalArcLength();
-					if (state.pos() > currentLength + segmentLengthSum) {
-						if (cs + 1 >= segments.size()) {
-
-						} else {
+					if (state.pos() >= currentLength + segmentLengthSum) {
+						if (cs + 1 < segments.size()) {
 							cs++;
 							segmentLengthSum += currentLength;
 							currentSegment = segments.get(cs);
@@ -429,16 +427,11 @@ public final class Path {
 						double dArcRight = Util.gaussQuadIntegrate64(
 								(d) -> getRightAdjust(currentSegment.curve, robotWidth, d), prevArcLength, arcLength);
 
-						double r = 1 / curvature;
-						double lR = Math.abs(r - robotWidth / 2);
-						double rR = Math.abs(r + robotWidth / 2);
-						r = Math.max(lR, rR);
-						double lK = lR / r;
-						double rK = rR / r;
-						double leftV = state.vel() * lK;
-						double rightV = state.vel() * rK;
-						double leftA = (leftV - prevLeftVel) / pointDurationSec;
-						double rightA = (rightV - prevRightVel) / pointDurationSec;
+						
+						double leftV = ;
+						double rightV = ;
+						double leftA = ;
+						double rightA =;
 						leftPoint.position = (prevLeftPos + dArcLeft) * sensorUnitsPerYourUnits
 								+ initialLeftSensorUnits;
 						leftPoint.velocity = leftFF.getAppliedVoltage(leftV, leftA);
@@ -463,10 +456,10 @@ public final class Path {
 
 		};
 	}
-	
 
 	public static final double MAX_HEADING_CORRECTION = Math.PI / 60;
 	public static final double PERCENT_HEADING_CORRECTION = 0.3;
+
 	/**
 	 * 
 	 * @param pointDuration
@@ -477,14 +470,18 @@ public final class Path {
 	 * @param robotWidth
 	 * @param sensorUnitsPerYourUnits
 	 * @param zeroAtStart
-	 * @param actualHeading Navx
-	 * @param theoryHeading the right side
-	 * @param theoryCorrectedHeading the left side
+	 * @param actualHeading
+	 *            Navx
+	 * @param theoryHeading
+	 *            the right side
+	 * @param theoryCorrectedHeading
+	 *            the left side
 	 * @return
 	 */
 	public Iterator<TrajectoryPoint[]> getIterator(TrajectoryDuration pointDuration, Feedforward leftFF,
 			Feedforward rightFF, int initialLeftSensorUnits, int initialRightSensorUnits, double robotWidth,
-			double sensorUnitsPerYourUnits, boolean zeroAtStart, Supplier<Double> actualHeading, Supplier<Double> theoryHeading, Supplier<Double> theoryCorrectedHeading) {
+			double sensorUnitsPerYourUnits, boolean zeroAtStart, Supplier<Double> actualHeading,
+			Supplier<Double> theoryHeading, Supplier<Double> theoryCorrectedHeading) {
 		return new Iterator<TrajectoryPoint[]>() {
 			int cs = 0;
 			PathSegment currentSegment = segments.get(0);
@@ -501,7 +498,7 @@ public final class Path {
 			double prevLeftVel = 0;
 			double prevRightVel = 0;
 			int i = 0;
-			
+
 			double headingCorrection = 0;
 
 			@Override
@@ -512,16 +509,16 @@ public final class Path {
 			@Override
 			public TrajectoryPoint[] next() {
 				double headingError = theoryHeading.get() - actualHeading.get();
-				headingCorrection-= theoryCorrectedHeading.get();
-				
-				double diffrence = (headingError < MAX_HEADING_CORRECTION)? headingError : MAX_HEADING_CORRECTION;
-				
-				headingCorrection+= diffrence;
-				
+				headingCorrection -= theoryCorrectedHeading.get();
+
+				double diffrence = (headingError < MAX_HEADING_CORRECTION) ? headingError : MAX_HEADING_CORRECTION;
+
+				headingCorrection += diffrence;
+
 				TrajectoryPoint[] points = { new TrajectoryPoint(), new TrajectoryPoint() };
 				TrajectoryPoint leftPoint = points[0];
 				TrajectoryPoint rightPoint = points[1];
-				
+
 				leftPoint.timeDur = pointDuration;
 				rightPoint.timeDur = pointDuration;
 				leftPoint.headingDeg = 0;
@@ -543,8 +540,7 @@ public final class Path {
 					prevLeftVel = previousState.vel();
 					prevRightPos = previousState.pos();
 					prevRightVel = previousState.vel();
-					
-					
+
 				} else {
 					MotionState state = profile.stateByTimeClamped(i * increment);
 					double currentLength = currentSegment.curve.getTotalArcLength();
@@ -560,7 +556,7 @@ public final class Path {
 
 					leftPoint.headingDeg = currentSegment.curve.getHeadingAtArcLength(state.pos() - segmentLengthSum);
 					rightPoint.headingDeg = diffrence;
-					
+
 					double curvature = currentSegment.curve.getCurvatureAtArcLength(state.pos() - segmentLengthSum);
 					double dCenterArc = state.pos() - previousState.pos();
 
@@ -568,10 +564,12 @@ public final class Path {
 					if (Math.abs(curvature) < 1.0E-25) {
 						leftPoint.position = (prevLeftPos + dCenterArc) * sensorUnitsPerYourUnits
 								+ initialLeftSensorUnits;
-						leftPoint.velocity = leftFF.getAppliedVoltage(state.vel(), state.acc()+diffrence*PERCENT_HEADING_CORRECTION);
+						leftPoint.velocity = leftFF.getAppliedVoltage(state.vel(),
+								state.acc() + diffrence * PERCENT_HEADING_CORRECTION);
 						rightPoint.position = (prevRightPos + dCenterArc) * sensorUnitsPerYourUnits
 								+ initialRightSensorUnits;
-						rightPoint.velocity = rightFF.getAppliedVoltage(state.vel(), state.acc()-diffrence*PERCENT_HEADING_CORRECTION);
+						rightPoint.velocity = rightFF.getAppliedVoltage(state.vel(),
+								state.acc() - diffrence * PERCENT_HEADING_CORRECTION);
 						prevLeftPos = prevLeftPos + dCenterArc;
 						prevLeftVel = state.vel();
 						prevRightPos = prevRightPos + dCenterArc;
@@ -596,10 +594,12 @@ public final class Path {
 						double rightA = (rightV - prevRightVel) / pointDurationSec;
 						leftPoint.position = (prevLeftPos + dArcLeft) * sensorUnitsPerYourUnits
 								+ initialLeftSensorUnits;
-						leftPoint.velocity = leftFF.getAppliedVoltage(leftV, leftA+diffrence*PERCENT_HEADING_CORRECTION);
+						leftPoint.velocity = leftFF.getAppliedVoltage(leftV,
+								leftA + diffrence * PERCENT_HEADING_CORRECTION);
 						rightPoint.position = (prevRightPos + dArcRight) * sensorUnitsPerYourUnits
 								+ initialRightSensorUnits;
-						rightPoint.velocity = rightFF.getAppliedVoltage(rightV, rightA-diffrence*PERCENT_HEADING_CORRECTION);
+						rightPoint.velocity = rightFF.getAppliedVoltage(rightV,
+								rightA - diffrence * PERCENT_HEADING_CORRECTION);
 						prevLeftPos = prevLeftPos + dArcLeft;
 						prevLeftVel = leftV;
 						prevRightPos = prevRightPos + dArcRight;

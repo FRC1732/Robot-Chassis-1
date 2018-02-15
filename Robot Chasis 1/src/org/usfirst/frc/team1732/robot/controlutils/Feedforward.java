@@ -29,4 +29,24 @@ public class Feedforward {
 		}
 	}
 
+	public double getInitialAcceleration(double x, double t, double v0) {
+		double numerator = x - t * v0;
+		double denominator;
+		if (v0 >= 0) {
+			double av = fkA / fkV;
+			denominator = t * av + av * av * (Math.exp(-fkV / fkA * t)));
+		} else {
+			double av = bkA / bkV;
+			denominator = t * av + av * av * (Math.exp(-bkV / bkA * t)));
+		}
+		return numerator/denominator;
+	}
+
+	public double getVelocityAtTime(double v0, double a0, double t) {
+		if (v0 >= 0) {
+			return v0 + fkA / fkV * a0 - fkA * a0 / (fkV * Math.exp(fkV / fkA * t));
+		} else {
+			return v0 + bkA / bkV * a0 - bkA * a0 / (bkV * Math.exp(bkV / bkA * t));
+		}
+	}
 }
