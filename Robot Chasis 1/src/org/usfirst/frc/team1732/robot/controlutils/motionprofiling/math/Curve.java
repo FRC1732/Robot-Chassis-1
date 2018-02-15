@@ -14,4 +14,6 @@ public interface Curve {
 	public double getCurvatureAtArcLength(double arcLength);
 
 	public Vector getPointAtArcLength(double arcLength);
+
+	public Vector getHeadingAtArcLength(double arcLength);
 }

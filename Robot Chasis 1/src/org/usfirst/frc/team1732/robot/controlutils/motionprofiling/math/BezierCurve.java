@@ -121,4 +121,13 @@ public final class BezierCurve implements Curve {
 		return result;
 	}
 
+	private Vector tangent(double t) {
+		return derivative.deCasteljau(t);
+	}
+
+	@Override
+	public Vector getHeadingAtArcLength(double arcLength) {
+		return tangent(tFromArcLength(arcLength));
+	}
+
 }
