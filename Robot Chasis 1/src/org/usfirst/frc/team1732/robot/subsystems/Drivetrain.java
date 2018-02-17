@@ -149,7 +149,8 @@ public class Drivetrain extends Subsystem {
 	}
 
 	public void setStop() {
-		drive.tankDrive(0, 0);
+		leftTalon1.neutralOutput();
+		rightTalon1.neutralOutput();
 	}
 
 	public void setLeft(double d) {
@@ -164,8 +165,7 @@ public class Drivetrain extends Subsystem {
 		return Util.limit(d, -1, 1);
 	}
 
-	public void setBrakeMode(boolean enabled) {
-		NeutralMode mode = enabled ? NeutralMode.Brake : NeutralMode.Coast;
+	public void setNeutralMode(NeutralMode mode) {
 		leftTalon1.setNeutralMode(mode);
 		l2.setNeutralMode(mode);
 		l3.setNeutralMode(mode);

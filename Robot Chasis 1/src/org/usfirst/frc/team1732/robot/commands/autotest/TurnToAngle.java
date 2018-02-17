@@ -3,9 +3,8 @@ package org.usfirst.frc.team1732.robot.commands.autotest;
 import org.usfirst.frc.team1732.robot.Robot;
 import org.usfirst.frc.team1732.robot.subsystems.Drivetrain;
 
-import edu.wpi.first.wpilibj.PIDController;
-import edu.wpi.first.wpilibj.PIDSource;
-import edu.wpi.first.wpilibj.PIDSourceType;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Command;
 
@@ -15,7 +14,6 @@ import edu.wpi.first.wpilibj.command.Command;
 public class TurnToAngle extends Command {
 
 	private static final double ANGLE_DEADBAND = 2;
-	private static final double angleP = 0.05;
 
 	private final Timer timer;
 	private final double sign;
@@ -23,26 +21,27 @@ public class TurnToAngle extends Command {
 	private final double maxVel;
 	private final double k;
 	private final double radius;
-	private final double endTime;
+	// private final double endTime;
 
-	private final PIDController pid = new PIDController(0.1, 0, 0, new PIDSource() {
-
-		@Override
-		public void setPIDSourceType(PIDSourceType pidSource) {
-		}
-
-		@Override
-		public PIDSourceType getPIDSourceType() {
-			return PIDSourceType.kDisplacement;
-		}
-
-		@Override
-		public double pidGet() {
-			return Robot.sensors.navX.getAngle();
-		}
-
-	}, d -> {
-	});
+	// private final PIDController pid = new PIDController(0.1, 0, 0, new
+	// PIDSource() {
+	//
+	// @Override
+	// public void setPIDSourceType(PIDSourceType pidSource) {
+	// }
+	//
+	// @Override
+	// public PIDSourceType getPIDSourceType() {
+	// return PIDSourceType.kDisplacement;
+	// }
+	//
+	// @Override
+	// public double pidGet() {
+	// return Robot.sensors.navX.getAngle();
+	// }
+	//
+	// }, d -> {
+	// });
 
 	public TurnToAngle(double angle, double maxVel) {
 		timer = new Timer();
@@ -52,7 +51,7 @@ public class TurnToAngle extends Command {
 		radius = Drivetrain.EFFECTIVE_ROBOT_WIDTH_IN / 2.0;
 		double distance = radius * Math.toRadians(Math.abs(angle));
 		k = 2 * maxVel / distance;
-		endTime = Math.PI / k;
+		// endTime = Math.PI / k;
 	}
 
 	// private double getPosition(double t) {
@@ -76,7 +75,7 @@ public class TurnToAngle extends Command {
 		timer.reset();
 		timer.start();
 		Robot.sensors.navX.zeroYaw();
-		pid.setSetpoint(goalAngle);
+		// pid.setSetpoint(goalAngle);
 	}
 
 	@Override
@@ -89,25 +88,19 @@ public class TurnToAngle extends Command {
 		// double desiredAngleError = currentAngle - getAngle(time);
 		// double voltAdjust = desiredAngleError * angleP;
 
-		if (time < endTime) {
-			double leftVel = getVelocity(time) * sign;
-			double leftAcc = (getAcceleration(time)) * sign;
-			double rightVel = -getVelocity(time) * sign;
-			double rightAcc = -(getAcceleration(time)) * sign;
+		double leftVel = getVelocity(time) * sign;
+		double leftAcc = (getAcceleration(time)) * sign;
+		double rightVel = -getVelocity(time) * sign;
+		double rightAcc = -(getAcceleration(time)) * sign;
 
-			double leftVolt = Robot.drivetrain.leftFF.getAppliedVoltage(leftVel, leftAcc);
-			double rightVolt = Robot.drivetrain.rightFF.getAppliedVoltage(rightVel, rightAcc);
+		double leftVolt = Robot.drivetrain.leftFF.getAppliedVoltage(leftVel, leftAcc);
+		double rightVolt = Robot.drivetrain.rightFF.getAppliedVoltage(rightVel, rightAcc);
 
-			// leftVolt = leftVolt - voltAdjust;
-			// rightVolt = rightVolt + voltAdjust;
+		// leftVolt = leftVolt - voltAdjust;
+		// rightVolt = rightVolt + voltAdjust;
 
-			Robot.drivetrain.setLeft(leftVolt / 12.0);
-			Robot.drivetrain.setRight(rightVolt / 12.0);
-		} else {
-			double out = pid.get();
-			Robot.drivetrain.setLeft(out);
-			Robot.drivetrain.setRight(out);
-		}
+		Robot.drivetrain.setLeft(leftVolt / 12.0);
+		Robot.drivetrain.setRight(rightVolt / 12.0);
 
 		System.out.println("ANGLE ERROR: " + (goalAngle - currentAngle));
 	}
@@ -120,6 +113,7 @@ public class TurnToAngle extends Command {
 	@Override
 	protected void end() {
 		System.out.println("Finished");
+		Robot.drivetrain.setNeutralMode(NeutralMode.Brake);
 		Robot.drivetrain.setStop();
 	}
 }

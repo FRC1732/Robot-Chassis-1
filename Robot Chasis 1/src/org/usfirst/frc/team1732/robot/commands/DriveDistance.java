@@ -7,6 +7,8 @@ import org.usfirst.frc.team1732.robot.Robot;
 import org.usfirst.frc.team1732.robot.controlutils.DisplacementPIDSource;
 import org.usfirst.frc.team1732.robot.sensors.encoders.EncoderReader;
 
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+
 import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.command.Command;
 
@@ -21,34 +23,46 @@ public class DriveDistance extends Command {
 		requires(drivetrain);
 		// need to tune PIDs
 		trans = new PIDController(0.1, 0, 0.7, new DisplacementPIDSource() {
+			@Override
 			public double pidGet() {
 				return (l.getPosition() + r.getPosition()) / 2;
 			}
-		}, d -> {}, PERIOD_S);
+		}, d -> {
+		}, PERIOD_S);
 		trans.setSetpoint(dist);
 		trans.setAbsoluteTolerance(1);
 		rot = new PIDController(0.05, 0, 0, new DisplacementPIDSource() {
+			@Override
 			public double pidGet() {
 				return Robot.sensors.navX.getAngle();
 			}
-		}, d -> {}, PERIOD_S);
+		}, d -> {
+		}, PERIOD_S);
 		rot.setSetpoint(0);
 		rot.setAbsoluteTolerance(1);
 	}
+
+	@Override
 	protected void initialize() {
 		l.zero();
 		r.zero();
 		trans.enable();
 		Robot.sensors.navX.zeroYaw();
 		rot.enable();
-		drivetrain.setBrakeMode(true);
+		drivetrain.setNeutralMode(NeutralMode.Brake);
 	}
+
+	@Override
 	protected void execute() {
 		drivetrain.drive.arcadeDrive(trans.get(), rot.get(), false);
 	}
+
+	@Override
 	protected boolean isFinished() {
 		return trans.onTarget() && rot.onTarget();
 	}
+
+	@Override
 	protected void end() {
 		trans.disable();
 		rot.disable();
