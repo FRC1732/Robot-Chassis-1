@@ -5,19 +5,20 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 public class DriverStationData {
 
-	public static TeeterTotter closeSwitch;
-	public static TeeterTotter scale;
-	public static TeeterTotter farSwitch;
-
+	public static boolean closeSwitchIsLeft;
+	public static boolean scaleIsLeft;
+	public static boolean farSwitchIsLeft;
 	private static String platePosition = "";
 
-	public static void pollPlatePosition() {
+	public static boolean gotPlatePositions() {
 		platePosition = DriverStation.getInstance().getGameSpecificMessage();
-		if (platePosition.length() >= 3) {
-			Alliance a = getAlliance();
-			closeSwitch = new TeeterTotter(a, platePosition.charAt(0));
-			scale = new TeeterTotter(a, platePosition.charAt(1));
-			farSwitch = new TeeterTotter(a, platePosition.charAt(2));
+		if (platePosition == null || platePosition == "") {
+			return false;
+		} else {
+			closeSwitchIsLeft = platePosition.charAt(0) == 'L';
+			scaleIsLeft = platePosition.charAt(1) == 'L';
+			farSwitchIsLeft = platePosition.charAt(2) == 'L';
+			return true;
 		}
 	}
 
@@ -25,23 +26,4 @@ public class DriverStationData {
 		return DriverStation.getInstance().getAlliance();
 	}
 
-	public static class TeeterTotter {
-
-		public final Alliance leftPlateAlliance;
-		public final Alliance rightPlateAlliance;
-
-		public TeeterTotter(Alliance ourAlliance, char side) {
-			if (side == 'L') {
-				leftPlateAlliance = ourAlliance;
-				rightPlateAlliance = getOpposite(ourAlliance);
-			} else {
-				leftPlateAlliance = getOpposite(ourAlliance);
-				rightPlateAlliance = ourAlliance;
-			}
-		}
-
-		private static Alliance getOpposite(Alliance a) {
-			return a.equals(Alliance.Red) ? Alliance.Blue : Alliance.Red;
-		}
-	}
 }

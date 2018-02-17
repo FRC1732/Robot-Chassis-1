@@ -50,6 +50,7 @@ public class DriveDistance extends Command {
 		Robot.sensors.navX.zeroYaw();
 		rot.enable();
 		drivetrain.setNeutralMode(NeutralMode.Brake);
+		System.out.println("Drive distance started");
 	}
 
 	@Override
@@ -67,5 +68,6 @@ public class DriveDistance extends Command {
 		trans.disable();
 		rot.disable();
 		drivetrain.setStop();
+		System.out.println("Drive distance ended");
 	}
 }

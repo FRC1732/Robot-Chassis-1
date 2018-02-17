@@ -7,8 +7,8 @@ import java.awt.geom.Rectangle2D;
  * Where everything SHOULD be
  * 
  * Origin is close left corner when standing at driverstation
- * positive X direction is going outwards
- * positive Y direction is towards right side
+ * positive Y direction is going outwards
+ * positive X direction is towards right side
  * Put in default coordinates
  * 
  * All units in inches
@@ -21,30 +21,27 @@ public class Field {
 
 	// private static final double DriverWallToSideWall = 29.69;
 
-	public final Scale SCALE = new Scale();
-	public final Switch SWITCH = new Switch();
-	public final Zones ZONES = new Zones();
-
-	public class Scale {
-		public final Rectangle2D LEFT_PLATE = new Rectangle2D.Double(299.65, 72, 48, 36);
-		public final Rectangle2D RIGHT_PLATE = new Rectangle2D.Double(299.65, 216, 48, 36);
-		public final Rectangle2D PLATFORM = new Rectangle2D.Double(261.47, 97, 54, 130);
-		public final Rectangle2D LEFT_NULL_ZONE = new Rectangle2D.Double(288, 0, 72, 95);
-		public final Rectangle2D RIGHT_NULL_ZONE = new Rectangle2D.Double(288, 229, 72, 95);
+	public static final class Scale {
+		public static final Rectangle2D LEFT_PLATE = new Rectangle2D.Double(72, 299.65, 36, 48);
+		public static final Rectangle2D RIGHT_PLATE = new Rectangle2D.Double(216, 299.65, 36, 48);
+		public static final Rectangle2D PLATFORM = new Rectangle2D.Double(97, 261.47, 130, 54);
+		public static final Rectangle2D LEFT_NULL_ZONE = new Rectangle2D.Double(0, 288, 95, 72);
+		public static final Rectangle2D RIGHT_NULL_ZONE = new Rectangle2D.Double(229, 288, 95, 72);
 	}
 
-	public class Switch {
-		public final Rectangle2D LEFT_PLATE = new Rectangle2D.Double(140, 85, 56, 44);
-		public final Rectangle2D RIGHT_PLATE = new Rectangle2D.Double(140, 195, 56, 44);
-		public Rectangle2D[] CUBES = { new Rectangle2D.Double(195, 85, 13, 13),
-				new Rectangle2D.Double(195, 113, 13, 13), new Rectangle2D.Double(195, 141, 13, 13),
-				new Rectangle2D.Double(195, 169, 13, 13), new Rectangle2D.Double(195, 197, 13, 13),
-				new Rectangle2D.Double(195, 225, 13, 13), };
+	public static final class Switch {
+		public static final Rectangle2D BOUNDARY = new Rectangle2D.Double(85.25, 140, 153.5, 56);
+		public static final Rectangle2D LEFT_PLATE = new Rectangle2D.Double(85, 140, 44, 56);
+		public static final Rectangle2D RIGHT_PLATE = new Rectangle2D.Double(195, 140, 44, 56);
+		public static Rectangle2D[] CUBES = { new Rectangle2D.Double(85, 195, 13, 13),
+				new Rectangle2D.Double(113, 195, 13, 13), new Rectangle2D.Double(141, 195, 13, 13),
+				new Rectangle2D.Double(169, 195, 13, 13), new Rectangle2D.Double(197, 195, 13, 13),
+				new Rectangle2D.Double(225, 195, 13, 13), };
 	}
 
-	public class Zones {
-		public final Rectangle2D POWER_CUBE_ZONE = new Rectangle2D.Double(98, 140, 42, 45);
-		public final Rectangle2D EXCHANGE_ZONE = new Rectangle2D.Double(0, 102, 36, 48);
-		public final Rectangle2D EXCHANGE_OPENING = new Rectangle2D.Double(0, 122.125, 0, 21);
+	public static final class Zones {
+		public static final Rectangle2D POWER_CUBE_ZONE = new Rectangle2D.Double(140, 98, 45, 42);
+		public static final Rectangle2D EXCHANGE_ZONE = new Rectangle2D.Double(102, 0, 48, 36);
+		public static final Rectangle2D EXCHANGE_OPENING = new Rectangle2D.Double(122.125, 0, 21, 0);
 	}
 }

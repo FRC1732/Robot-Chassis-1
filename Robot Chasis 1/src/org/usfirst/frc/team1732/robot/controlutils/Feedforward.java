@@ -29,6 +29,14 @@ public class Feedforward {
 		}
 	}
 
+	public double getAppliedVoltage(double velocity, double acceleration, double intercept) {
+		if (velocity >= 0) {
+			return fkV * velocity + fkA * acceleration + intercept;
+		} else {
+			return bkV * velocity + bkA * acceleration - intercept;
+		}
+	}
+
 	// following two methods are derived from the first order linear differential
 	// equation of the feed forward
 
