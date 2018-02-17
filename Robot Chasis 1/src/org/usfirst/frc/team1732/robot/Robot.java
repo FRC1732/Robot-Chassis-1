@@ -8,7 +8,7 @@
 package org.usfirst.frc.team1732.robot;
 
 import org.usfirst.frc.team1732.robot.autotools.DriverStationData;
-import org.usfirst.frc.team1732.robot.commands.auto.SwitchCenterFront;
+import org.usfirst.frc.team1732.robot.commands.autotest.ScaleLeftSingle;
 import org.usfirst.frc.team1732.robot.input.Joysticks;
 import org.usfirst.frc.team1732.robot.odomotry.PositionEstimator;
 import org.usfirst.frc.team1732.robot.sensors.Sensors;
@@ -101,7 +101,7 @@ public class Robot extends TimedRobot {
 		}
 
 		// new TurnToAngle(-90, 80).start();
-		new SwitchCenterFront(!DriverStationData.closeSwitchIsLeft).start();
+		new ScaleLeftSingle(DriverStationData.closeSwitchIsLeft).start();
 		// new TestMotors(-0.3, 0.3).start();
 		;
 		// new Test().start();
