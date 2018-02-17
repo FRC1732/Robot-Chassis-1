@@ -1,7 +1,12 @@
 package org.usfirst.frc.team1732.robot.commands.autotest;
 
 import org.usfirst.frc.team1732.robot.Robot;
+import org.usfirst.frc.team1732.robot.subsystems.Drivetrain;
 
+import edu.wpi.first.wpilibj.PIDController;
+import edu.wpi.first.wpilibj.PIDSource;
+import edu.wpi.first.wpilibj.PIDSourceType;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Command;
 
 /**
@@ -9,64 +14,112 @@ import edu.wpi.first.wpilibj.command.Command;
  */
 public class TurnToAngle extends Command {
 
-	private double angle;
-	private double initialAngle;
-	private double leftVolt;
-	private double rightVolt;
+	private static final double ANGLE_DEADBAND = 2;
+	private static final double angleP = 0.05;
 
-	public TurnToAngle(double angle) {
-		this.angle = angle;
-		double volt = 0.4;
-		leftVolt = volt * Math.signum(angle);
-		rightVolt = -volt * Math.signum(angle);
+	private final Timer timer;
+	private final double sign;
+	private final double goalAngle;
+	private final double maxVel;
+	private final double k;
+	private final double radius;
+	private final double endTime;
+
+	private final PIDController pid = new PIDController(0.1, 0, 0, new PIDSource() {
+
+		@Override
+		public void setPIDSourceType(PIDSourceType pidSource) {
+		}
+
+		@Override
+		public PIDSourceType getPIDSourceType() {
+			return PIDSourceType.kDisplacement;
+		}
+
+		@Override
+		public double pidGet() {
+			return Robot.sensors.navX.getAngle();
+		}
+
+	}, d -> {
+	});
+
+	public TurnToAngle(double angle, double maxVel) {
+		timer = new Timer();
+		this.goalAngle = angle;
+		this.sign = Math.signum(angle);
+		this.maxVel = maxVel;
+		radius = Drivetrain.EFFECTIVE_ROBOT_WIDTH_IN / 2.0;
+		double distance = radius * Math.toRadians(Math.abs(angle));
+		k = 2 * maxVel / distance;
+		endTime = Math.PI / k;
 	}
+
+	// private double getPosition(double t) {
+	// return -maxVel / k * Math.cos(k * t) + maxVel / k;
+	// }
+
+	private double getVelocity(double t) {
+		return maxVel * Math.sin(k * t);
+	}
+
+	private double getAcceleration(double t) {
+		return maxVel * k * Math.cos(k * t);
+	}
+
+	// private double getAngle(double t) {
+	// return getPosition(t) / (Math.PI * 2) * Math.signum(goalAngle);
+	// }
 
 	@Override
 	protected void initialize() {
-		this.initialAngle = Robot.sensors.navX.getAngle();
-		Robot.drivetrain.drive.tankDrive(leftVolt, rightVolt);
+		timer.reset();
+		timer.start();
+		Robot.sensors.navX.zeroYaw();
+		pid.setSetpoint(goalAngle);
 	}
-
-	private double lookAheadTime = 25;
-	private boolean stopperDetected = false;
-	private double stopRange;
-	double rateP = 0.1;
-	private double velocityP = 0;
 
 	@Override
 	protected void execute() {
-		double rate = Robot.sensors.navX.getRate();
-		double predictedAngleChange = lookAheadTime * rate;
-		double currentAngle = Robot.sensors.navX.getAngle() - initialAngle;
-		double error = Robot.sensors.navX.getAngle() - initialAngle - angle;
+		double time = timer.get();
 
-		System.out.println("Rate: " + rate);
-		System.out.println("Current Angle: " + currentAngle);
-		System.out.println("Predicted angle: " + currentAngle + predictedAngleChange);
+		double currentAngle = Robot.sensors.navX.getAngle();
 
-		if (Math.abs(currentAngle + predictedAngleChange) > Math.abs(angle) && !stopperDetected) {
-			stopperDetected = true;
-			stopRange = Math.abs(currentAngle - angle);
+		// getAngle() is where we should be
+		// double desiredAngleError = currentAngle - getAngle(time);
+		// double voltAdjust = desiredAngleError * angleP;
+
+		if (time < endTime) {
+			double leftVel = getVelocity(time) * sign;
+			double leftAcc = (getAcceleration(time)) * sign;
+			double rightVel = -getVelocity(time) * sign;
+			double rightAcc = -(getAcceleration(time)) * sign;
+
+			double leftVolt = Robot.drivetrain.leftFF.getAppliedVoltage(leftVel, leftAcc);
+			double rightVolt = Robot.drivetrain.rightFF.getAppliedVoltage(rightVel, rightAcc);
+
+			// leftVolt = leftVolt - voltAdjust;
+			// rightVolt = rightVolt + voltAdjust;
+
+			Robot.drivetrain.setLeft(leftVolt / 12.0);
+			Robot.drivetrain.setRight(rightVolt / 12.0);
+		} else {
+			double out = pid.get();
+			Robot.drivetrain.setLeft(out);
+			Robot.drivetrain.setRight(out);
 		}
 
-		if (stopperDetected) {
-			double percent = Math.abs((currentAngle - angle)) / stopRange;
-			System.out.println("Percent: " + percent);
-			leftVolt = leftVolt - rate * rateP;
-			rightVolt = rightVolt + rate * rateP;
-		}
-		System.out.println("Volt: " + leftVolt + ", " + rightVolt);
-		Robot.drivetrain.drive.tankDrive(leftVolt, rightVolt);
+		System.out.println("ANGLE ERROR: " + (goalAngle - currentAngle));
 	}
 
 	@Override
 	protected boolean isFinished() {
-		return Math.abs(Robot.sensors.navX.getAngle() - initialAngle) > Math.abs(angle);
+		return Math.abs(goalAngle - Robot.sensors.navX.getAngle()) < ANGLE_DEADBAND;
 	}
 
 	@Override
 	protected void end() {
 		System.out.println("Finished");
-		Robot.drivetrain.drive.tankDrive(0, 0);
+		Robot.drivetrain.setStop();
 	}
 }

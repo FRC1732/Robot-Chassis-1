@@ -63,7 +63,7 @@ public class Drivetrain extends Subsystem {
 	public static final double MAX_IN_SEC2 = 500; // max acc
 
 	public static final double ROBOT_WIDTH_IN = 29;
-	public static final double EFFECTIVE_ROBOT_WIDTH_IN = ROBOT_WIDTH_IN * 1.0;
+	public static final double EFFECTIVE_ROBOT_WIDTH_IN = ROBOT_WIDTH_IN * 1.1;
 
 	public final DoubleProfileLoader profileManager;
 
