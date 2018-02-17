@@ -51,6 +51,7 @@ public class TurnToAngle extends Command {
 		radius = Drivetrain.EFFECTIVE_ROBOT_WIDTH_IN / 2.0;
 		double distance = radius * Math.toRadians(Math.abs(angle));
 		k = 2 * maxVel / distance;
+		Robot.drivetrain.setNeutralMode(NeutralMode.Brake);
 		// endTime = Math.PI / k;
 	}
 
@@ -113,7 +114,6 @@ public class TurnToAngle extends Command {
 	@Override
 	protected void end() {
 		System.out.println("Finished");
-		Robot.drivetrain.setNeutralMode(NeutralMode.Brake);
 		Robot.drivetrain.setStop();
 	}
 }
