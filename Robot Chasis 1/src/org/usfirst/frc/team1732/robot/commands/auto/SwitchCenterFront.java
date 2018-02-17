@@ -2,7 +2,7 @@ package org.usfirst.frc.team1732.robot.commands.auto;
 
 import org.usfirst.frc.team1732.robot.autotools.Field;
 import org.usfirst.frc.team1732.robot.commands.DriveDistance;
-import org.usfirst.frc.team1732.robot.commands.autotest.TurnToAngle;
+import org.usfirst.frc.team1732.robot.commands.autotest.TurnAngle;
 import org.usfirst.frc.team1732.robot.commands.autotest.ZeroNavXAndWaitToStopMoving;
 import org.usfirst.frc.team1732.robot.subsystems.Drivetrain;
 
@@ -21,12 +21,12 @@ public class SwitchCenterFront extends CommandGroup {
 			System.out.println("ForwardDistance: " + forwardDistance);
 			addSequential(new DriveDistance(forwardDistance));
 			addSequential(new ZeroNavXAndWaitToStopMoving());
-			addSequential(new TurnToAngle(-90, 80));
+			addSequential(new TurnAngle(-90, 80));
 			double sideDistance = startingX - Field.Zones.POWER_CUBE_ZONE.getX() + Drivetrain.ROBOT_LENGTH_IN / 2.0
 					+ 15.0;
 			addSequential(new DriveDistance(sideDistance));
 			addSequential(new ZeroNavXAndWaitToStopMoving());
-			addSequential(new TurnToAngle(90, 80));
+			addSequential(new TurnAngle(90, 80));
 			double secondForward = Field.Switch.BOUNDARY.getY() - forwardDistance + 2.0 - Drivetrain.ROBOT_LENGTH_IN;
 			System.out.println("seconds forward distance: " + secondForward);
 			addSequential(new DriveDistance(secondForward));
