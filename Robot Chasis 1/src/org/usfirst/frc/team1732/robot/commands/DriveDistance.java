@@ -20,7 +20,7 @@ public class DriveDistance extends Command {
 	public DriveDistance(double dist) {
 		requires(drivetrain);
 		// need to tune PIDs
-		trans = new PIDController(0.1, 0, 0.8, new DisplacementPIDSource() {
+		trans = new PIDController(0.1, 0, 0.7, new DisplacementPIDSource() {
 			public double pidGet() {
 				return (l.getPosition() + r.getPosition()) / 2;
 			}
