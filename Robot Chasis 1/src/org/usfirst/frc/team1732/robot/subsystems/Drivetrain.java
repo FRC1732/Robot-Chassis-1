@@ -11,6 +11,7 @@ import org.usfirst.frc.team1732.robot.sensors.encoders.TalonEncoder;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.wpilibj.command.Subsystem;
@@ -18,8 +19,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Drivetrain extends Subsystem {
 
-	public final TalonSRX leftTalon1;
-	public final TalonSRX rightTalon1;
+	public final TalonSRX leftTalon1, l2, l3;
+	public final TalonSRX rightTalon1, r2, r3;
 
 	public DifferentialDrive drive;
 
@@ -72,14 +73,13 @@ public class Drivetrain extends Subsystem {
 		TalonConfiguration config = TalonConfiguration.getDefaultConfig();
 		config.enableVoltageCompensation = true;
 		leftTalon1 = MotorUtils.configTalon(leftMaster, false, config);
-		MotorUtils.configFollowerTalon(MotorUtils.configTalon(9, false, config), leftTalon1);
-		MotorUtils.configFollowerTalon(MotorUtils.configTalon(3, false, config), leftTalon1);
+		l2 = MotorUtils.configFollowerTalon(MotorUtils.configTalon(9, false, config), leftTalon1);
+		l3 = MotorUtils.configFollowerTalon(MotorUtils.configTalon(3, false, config), leftTalon1);
 
 		int rightMaster = 5;
 		rightTalon1 = MotorUtils.configTalon(rightMaster, true, config);
-
-		MotorUtils.configFollowerTalon(MotorUtils.configTalon(6, true, config), rightTalon1);
-		MotorUtils.configFollowerTalon(MotorUtils.configTalon(7, true, config), rightTalon1);
+		r2 = MotorUtils.configFollowerTalon(MotorUtils.configTalon(6, true, config), rightTalon1);
+		r3 = MotorUtils.configFollowerTalon(MotorUtils.configTalon(7, true, config), rightTalon1);
 
 		drive = new DifferentialDrive(leftTalon1, rightTalon1, ControlMode.PercentOutput, MIN_OUTPUT, MAX_OUTPUT,
 				INPUT_DEADBAND);
@@ -162,6 +162,16 @@ public class Drivetrain extends Subsystem {
 
 	private double limit(double d) {
 		return Util.limit(d, -1, 1);
+	}
+
+	public void setBrakeMode(boolean enabled) {
+		NeutralMode mode = enabled ? NeutralMode.Brake : NeutralMode.Coast;
+		leftTalon1.setNeutralMode(mode);
+		l2.setNeutralMode(mode);
+		l3.setNeutralMode(mode);
+		rightTalon1.setNeutralMode(mode);
+		r2.setNeutralMode(mode);
+		r3.setNeutralMode(mode);
 	}
 
 }
