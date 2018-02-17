@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.command.Command;
 /**
  *
  */
-public class TurnToAngle extends Command {
+public class TurnAngle extends Command {
 
 	private static final double OUTER_DEADBAND = 20;
 	private static final double DEADBAND_TIME = 0.25;
@@ -49,7 +49,7 @@ public class TurnToAngle extends Command {
 	// }, d -> {
 	// });
 
-	public TurnToAngle(double angle, double maxVel) {
+	public TurnAngle(double angle, double maxVel) {
 		timer = new Timer();
 		deadbandTimer = new Timer();
 		timer.reset();
