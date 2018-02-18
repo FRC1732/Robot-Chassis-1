@@ -9,6 +9,11 @@
 	<classpathentry kind="var" path="USERLIBS_DIR/CTRE_Phoenix-sources.jar"/>
 	<classpathentry kind="var" path="USERLIBS_DIR/CTRE_Phoenix.jar" sourcepath="/USERLIBS_DIR/CTRE_Phoenix-sources.jar"/>
 	<classpathentry kind="src" path="src"/>
+<<<<<<< HEAD
 	<classpathentry kind="var" path="USERLIBS_DIR/navx_frc.jar" sourcepath="/NAVX_FRC_LIB"/>
+=======
+	<classpathentry kind="var" path="USERLIBS_DIR/navx_frc.jar"/>
+	<classpathentry kind="var" path="USERLIBS_DIR/json-simple-1.1.1.jar"/>
+>>>>>>> branch 'master' of https://github.com/ProgrammingSubteamFRCTeam1732/Robot-Chassis-1.git
 	<classpathentry kind="output" path="bin"/>
 </classpath>

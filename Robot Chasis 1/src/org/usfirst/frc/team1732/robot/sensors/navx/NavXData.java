@@ -59,9 +59,9 @@ public class NavXData {
 		/* for advanced users. Before using this data, please consider whether */
 		/* the processed data (see above) will suit your needs. */
 
-		// SmartDashboard.putNumber(imu + "RawGyro_X", ahrs.getRawGyroX());
-		// SmartDashboard.putNumber(imu + "RawGyro_Y", ahrs.getRawGyroY());
-		// SmartDashboard.putNumber(imu + "RawGyro_Z", ahrs.getRawGyroZ());
+		SmartDashboard.putNumber(imu + "RawGyro_X", ahrs.getRawGyroX());
+		SmartDashboard.putNumber(imu + "RawGyro_Y", ahrs.getRawGyroY());
+		SmartDashboard.putNumber(imu + "RawGyro_Z", ahrs.getRawGyroZ());
 		// SmartDashboard.putNumber(imu + "RawAccel_X", ahrs.getRawAccelX());
 		// SmartDashboard.putNumber(imu + "RawAccel_Y", ahrs.getRawAccelY());
 		// SmartDashboard.putNumber(imu + "RawAccel_Z", ahrs.getRawAccelZ());

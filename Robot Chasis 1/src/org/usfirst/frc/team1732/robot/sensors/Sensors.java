@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.SPI;
 
 public class Sensors {
 
-	public final AHRS navX = new AHRS(SPI.Port.kMXP);
+	public final AHRS navX = new AHRS(SPI.Port.kMXP, (byte) 200);
 
 	public static double convertTotalAngle(double angle) {
 		angle = angle % 360;

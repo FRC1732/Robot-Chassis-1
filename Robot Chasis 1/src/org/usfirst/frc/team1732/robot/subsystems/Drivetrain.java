@@ -63,8 +63,9 @@ public class Drivetrain extends Subsystem {
 	public static final double MAX_IN_SEC = 90; // max vel
 	public static final double MAX_IN_SEC2 = 500; // max acc
 
-	public static final double ROBOT_WIDTH_IN = 29;
-	public static final double EFFECTIVE_ROBOT_WIDTH_IN = ROBOT_WIDTH_IN * 1.1;
+	public static final double ROBOT_LENGTH_IN = 34.5;
+	public static final double ROBOT_WIDTH_IN = 35;
+	public static final double EFFECTIVE_ROBOT_WIDTH_IN = 27.8947584116;
 
 	public final DoubleProfileLoader profileManager;
 
@@ -154,10 +155,14 @@ public class Drivetrain extends Subsystem {
 	}
 
 	public void setLeft(double d) {
-		leftTalon1.set(ControlMode.PercentOutput, limit(d));
+		d = limit(d);
+		System.out.println("left:" + d);
+		leftTalon1.set(ControlMode.PercentOutput, d);
 	}
 
 	public void setRight(double d) {
+		d = limit(d);
+		System.out.println("right: " + d);
 		rightTalon1.set(ControlMode.PercentOutput, limit(d));
 	}
 

@@ -7,10 +7,12 @@
 
 package org.usfirst.frc.team1732.robot;
 
-import org.usfirst.frc.team1732.robot.commands.Test;
+import org.usfirst.frc.team1732.robot.autotools.DriverStationData;
+import org.usfirst.frc.team1732.robot.commands.autotest.ScaleLeftSingle;
 import org.usfirst.frc.team1732.robot.input.Joysticks;
 import org.usfirst.frc.team1732.robot.odomotry.PositionEstimator;
 import org.usfirst.frc.team1732.robot.sensors.Sensors;
+import org.usfirst.frc.team1732.robot.sensors.navx.NavXData;
 import org.usfirst.frc.team1732.robot.subsystems.Arm;
 import org.usfirst.frc.team1732.robot.subsystems.Claw;
 import org.usfirst.frc.team1732.robot.subsystems.Drivetrain;
@@ -46,7 +48,7 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void robotInit() {
-		setPeriod(PERIOD_S); // periodic methods will loop every 10 ms (1/100 sec)
+		setPeriod(PERIOD_S);
 		drivetrain = new Drivetrain();
 		sensors = new Sensors();
 		arm = new Arm();
@@ -57,12 +59,14 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void robotPeriodic() {
+		DriverStationData.gotPlatePositions();
 		Scheduler.getInstance().run();
-		// NavXData.sendNavXData(sensors.navX);
+		NavXData.sendNavXData(sensors.navX);
 	}
 
 	@Override
-	public void disabledInit() {}
+	public void disabledInit() {
+	}
 
 	@Override
 	public void autonomousInit() {
@@ -75,20 +79,32 @@ public class Robot extends TimedRobot {
 		// System.out.println("Time to make path: " + t.get());
 		//
 		// // With Correction
-		// Iterator<TrajectoryPoint[]> iterator = path.getIterator(TrajectoryDuration.Trajectory_Duration_20ms,
-		// Robot.drivetrain.leftFFF, Robot.drivetrain.rightFFF, 0, 0, Drivetrain.EFFECTIVE_ROBOT_WIDTH_IN,
-		// 1.0 / Drivetrain.ENCODER_INCHES_PER_PULSE, true, sensors::getCurrentAngleCorrectedInRadian,
-		// drivetrain.rightTalon1::getActiveTrajectoryHeading, drivetrain.leftTalon1::getActiveTrajectoryHeading);
+		// Iterator<TrajectoryPoint[]> iterator =
+		// path.getIterator(TrajectoryDuration.Trajectory_Duration_20ms,
+		// Robot.drivetrain.leftFFF, Robot.drivetrain.rightFFF, 0, 0,
+		// Drivetrain.EFFECTIVE_ROBOT_WIDTH_IN,
+		// 1.0 / Drivetrain.ENCODER_INCHES_PER_PULSE, true,
+		// sensors::getCurrentAngleCorrectedInRadian,
+		// drivetrain.rightTalon1::getActiveTrajectoryHeading,
+		// drivetrain.leftTalon1::getActiveTrajectoryHeading);
 		//
 		// // Without Correction
 		// Iterator<TrajectoryPoint[]> iterator =
 		// path.getIteratorZeroAtStart(TrajectoryDuration.Trajectory_Duration_20ms,
-		// Robot.drivetrain.leftFFF, Robot.drivetrain.rightFFF, Drivetrain.EFFECTIVE_ROBOT_WIDTH_IN,
+		// Robot.drivetrain.leftFFF, Robot.drivetrain.rightFFF,
+		// Drivetrain.EFFECTIVE_ROBOT_WIDTH_IN,
 		// 1.0 / Drivetrain.ENCODER_INCHES_PER_PULSE);
 		//
 		// new TestPathing(iterator).start();
 
-		new Test().start();
+		while (!DriverStationData.gotPlatePositions()) {
+		}
+
+		// new TurnToAngle(-90, 80).start();
+		new ScaleLeftSingle(DriverStationData.closeSwitchIsLeft).start();
+		// new TestMotors(-0.3, 0.3).start();
+		;
+		// new Test().start();
 		// new DriveTrainCharacterizer(TestMode.STEP_VOLTAGE,
 		// Direction.Forward).start();
 	}
