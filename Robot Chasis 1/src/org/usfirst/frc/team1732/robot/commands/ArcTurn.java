@@ -2,7 +2,6 @@ package org.usfirst.frc.team1732.robot.commands;
 
 import static java.lang.Math.abs;
 import static java.lang.Math.atan2;
-import static java.lang.Math.max;
 import static java.lang.Math.sin;
 import static java.lang.Math.toDegrees;
 import static java.lang.Math.toRadians;
@@ -24,13 +23,13 @@ import edu.wpi.first.wpilibj.command.Command;
  *
  */
 public class ArcTurn extends Command {
-	final double R, T, outerArcLength, innerArcLength, innerRatio, k = .1;
+	final double R, T, outerArcLength, innerArcLength, innerRatio, k = 0.1;
 	final int sign;
-	final boolean left, SAE;
+	final boolean left;
 	EncoderReader l = drivetrain.makeLeftEncoderReader(), r = drivetrain.makeRightEncoderReader();
 	GyroReader g = sensors.navX.makeReader();
 
-	public ArcTurn(double a, double b, ArcTurnCalculation calc, boolean left, boolean stopAtEnd) {
+	public ArcTurn(double a, double b, ArcTurnCalculation calc, boolean left) {
 		requires(drivetrain);
 		R = calc.getR.apply(a, b);
 		T = calc.getT.apply(a, b);
@@ -38,7 +37,6 @@ public class ArcTurn extends Command {
 		outerArcLength = (R + Drivetrain.ROBOT_WIDTH_IN) * T;
 		innerRatio = innerArcLength / outerArcLength;
 		this.left = left;
-		SAE = stopAtEnd;
 		sign = left ? -1 : 1;
 	}
 
@@ -54,7 +52,6 @@ public class ArcTurn extends Command {
 		}
 	}
 
-	// Called just before this Command runs the first time
 	protected void initialize() {
 		System.out.println("ArcTurn starting R = " + R + ", T = " + T);
 		g.zero();
@@ -62,33 +59,24 @@ public class ArcTurn extends Command {
 		r.zero();
 		drivetrain.setNeutralMode(NeutralMode.Brake);
 	}
-
-	// Called repeatedly when this Command is scheduled to run
 	protected void execute() {
 		double innerDist = left ? l.getPosition() : r.getPosition();
 		double outerDist = left ? r.getPosition() : l.getPosition();
 		double percentDone = ((innerDist / innerArcLength) + (outerDist / outerArcLength)) / 2;
 		double expectedAngle = percentDone * T;
 		double angleError = g.getTotalAngle() - sign * toDegrees(expectedAngle);
-		double max = 0.7;
+		double max = 0.6;
 		double speed = Util.limit(2 * (1 - percentDone), -1, 1);
-		if (!SAE) {
-			speed = max(speed, 0.5);
-		}
 		double inner = max * (innerRatio * speed + sign * k * angleError), outer = max * speed;
 		if (left)
 			drivetrain.drive.tankDrive(inner, outer);
 		else
 			drivetrain.drive.tankDrive(outer, inner);
 	}
-
-	// Make this return true when this Command no longer needs to run execute()
 	protected boolean isFinished() {
 		return abs(g.getTotalAngle() - sign * toDegrees(T)) <= 2;
 	}
-	// Called once after isFinished returns true
 	protected void end() {
-		if (SAE) drivetrain.setStop();
-		else drivetrain.drive.arcadeDrive(0.7, 0);
+		drivetrain.setStop();
 	}
 }
