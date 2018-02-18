@@ -1,7 +1,10 @@
 package org.usfirst.frc.team1732.robot.commands.autotest;
 
-import org.usfirst.frc.team1732.robot.Robot;
+import static org.usfirst.frc.team1732.robot.Robot.drivetrain;
+import static org.usfirst.frc.team1732.robot.Robot.sensors;
+
 import org.usfirst.frc.team1732.robot.Util;
+import org.usfirst.frc.team1732.robot.sensors.navx.GyroReader;
 import org.usfirst.frc.team1732.robot.subsystems.Drivetrain;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
@@ -28,6 +31,8 @@ public class TurnAngle extends Command {
 	private final double k;
 	private final double radius;
 	private final double endTime;
+
+	private GyroReader g = sensors.navX.makeReader();
 
 	// private final PIDController pid = new PIDController(0.1, 0, 0, new
 	// PIDSource() {
@@ -62,7 +67,7 @@ public class TurnAngle extends Command {
 		radius = Drivetrain.EFFECTIVE_ROBOT_WIDTH_IN / 2.0 * 1.2;
 		double distance = radius * Math.toRadians(Math.abs(angle));
 		k = 2 * maxVel / distance;
-		Robot.drivetrain.setNeutralMode(NeutralMode.Brake);
+		drivetrain.setNeutralMode(NeutralMode.Brake);
 		endTime = Math.PI / k;
 	}
 
@@ -84,6 +89,7 @@ public class TurnAngle extends Command {
 
 	@Override
 	protected void initialize() {
+		g.zero();
 		timer.start();
 		System.out.println("Turn to angle started");
 		// pid.setSetpoint(goalAngle);
@@ -93,15 +99,14 @@ public class TurnAngle extends Command {
 	protected void execute() {
 		double time = timer.get();
 
-		double currentAngle = Robot.sensors.navX.getYaw();
+		double currentAngle = g.getTotalAngle();
 		double error = goalAngle - currentAngle;
 
 		if (time >= endTime) {
 			System.out.println("Passed max time");
 			double errorSign = Math.signum(error);
-			Robot.drivetrain.setLeft(Util.limit(error * ERROR_P, 0.1 * errorSign, 0.2 * errorSign));
-			Robot.drivetrain
-					.setRight(Util.limit(error * ERROR_P * -1.0, 0.1 * errorSign * -1.0, 0.2 * errorSign * -1.0));
+			drivetrain.setLeft(Util.limit(error * ERROR_P, 0.1 * errorSign, 0.2 * errorSign));
+			drivetrain.setRight(Util.limit(error * ERROR_P * -1.0, 0.1 * errorSign * -1.0, 0.2 * errorSign * -1.0));
 		} else {
 			double leftVel = getVelocity(time) * sign;
 			double leftAcc = (getAcceleration(time)) * sign;
@@ -109,22 +114,22 @@ public class TurnAngle extends Command {
 			double rightAcc = -(getAcceleration(time)) * sign;
 
 			double adjust = 1.0;
-			double leftVolt = Robot.drivetrain.leftFF.getAppliedVoltage(leftVel, leftAcc * adjust, 1.1);
-			double rightVolt = Robot.drivetrain.rightFF.getAppliedVoltage(rightVel, rightAcc * adjust, 1.1);
+			double leftVolt = drivetrain.leftFF.getAppliedVoltage(leftVel, leftAcc * adjust, 1.1);
+			double rightVolt = drivetrain.rightFF.getAppliedVoltage(rightVel, rightAcc * adjust, 1.1);
 
 			if (Math.abs(error) < OUTER_DEADBAND) {
-				Robot.drivetrain.setLeft(leftVolt / 12.0 * 0.75);
-				Robot.drivetrain.setRight(rightVolt / 12 * 0.75);
+				drivetrain.setLeft(leftVolt / 12.0 * 0.75);
+				drivetrain.setRight(rightVolt / 12 * 0.75);
 				System.out.println("inside outer deadband");
 			} else {
-				Robot.drivetrain.setLeft(leftVolt / 12.0);
-				Robot.drivetrain.setRight(rightVolt / 12.0);
+				drivetrain.setLeft(leftVolt / 12.0);
+				drivetrain.setRight(rightVolt / 12.0);
 			}
 		}
-		if (!inDeadband && Math.abs(goalAngle - Robot.sensors.navX.getYaw()) < ANGLE_DEADBAND) {
+		if (!inDeadband && Math.abs(goalAngle - g.getTotalAngle()) < ANGLE_DEADBAND) {
 			deadbandTimer.start();
 			inDeadband = true;
-		} else if (inDeadband && !(Math.abs(goalAngle - Robot.sensors.navX.getYaw()) < ANGLE_DEADBAND)) {
+		} else if (inDeadband && !(Math.abs(goalAngle - g.getTotalAngle()) < ANGLE_DEADBAND)) {
 			inDeadband = false;
 			deadbandTimer.reset();
 			deadbandTimer.stop();
@@ -134,13 +139,13 @@ public class TurnAngle extends Command {
 
 	@Override
 	protected boolean isFinished() {
-		return Math.abs(goalAngle - Robot.sensors.navX.getYaw()) < ANGLE_DEADBAND
+		return Math.abs(goalAngle - g.getTotalAngle()) < ANGLE_DEADBAND
 				&& deadbandTimer.get() > DEADBAND_TIME;
 	}
 
 	@Override
 	protected void end() {
 		System.out.println("Turn to angle finsished");
-		Robot.drivetrain.setStop();
+		drivetrain.setStop();
 	}
 }

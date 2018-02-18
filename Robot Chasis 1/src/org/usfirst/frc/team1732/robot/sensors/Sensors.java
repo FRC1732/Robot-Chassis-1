@@ -1,12 +1,18 @@
 package org.usfirst.frc.team1732.robot.sensors;
 
+import org.usfirst.frc.team1732.robot.sensors.navx.NavX;
+
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.SPI;
 
 public class Sensors {
 
-	public final AHRS navX = new AHRS(SPI.Port.kMXP, (byte) 200);
+	public final NavX navX;
+
+	public Sensors() {
+		navX = new NavX(true, new AHRS(SPI.Port.kMXP, (byte) 200));
+	}
 
 	public static double convertTotalAngle(double angle) {
 		angle = angle % 360;
