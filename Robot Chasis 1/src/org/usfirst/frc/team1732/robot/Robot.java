@@ -18,6 +18,7 @@ import org.usfirst.frc.team1732.robot.sensors.Sensors;
 import org.usfirst.frc.team1732.robot.subsystems.Arm;
 import org.usfirst.frc.team1732.robot.subsystems.Claw;
 import org.usfirst.frc.team1732.robot.subsystems.Drivetrain;
+import org.usfirst.frc.team1732.robot.util.SRXMomentRecorder;
 
 import com.ctre.phoenix.motion.TrajectoryPoint;
 import com.ctre.phoenix.motion.TrajectoryPoint.TrajectoryDuration;
@@ -42,6 +43,12 @@ public class Robot extends TimedRobot {
 	public static Sensors sensors;
 	public static Joysticks joysticks;
 	public static PositionEstimator positionEstimator;
+	
+	// Voltage recording (Should move)
+	public static final SRXMomentRecorder leftRecorder = new SRXMomentRecorder(
+			drivetrain.leftTalon1, drivetrain.leftEncoder);
+	public static final SRXMomentRecorder rightRecorder = new SRXMomentRecorder(
+			drivetrain.rightTalon1, drivetrain.rightEncoder);
 
 	// config
 	public static final int PERIOD_MS = 20;
