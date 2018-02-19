@@ -15,8 +15,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class DoubleProfileLoader {
 
-	public static final int MAX_POINTS_LOADED = 10000000;
-
 	private static final int minPointsInTalon = 100;
 	private static final double timeoutSec = 0.1;
 
@@ -105,10 +103,8 @@ public class DoubleProfileLoader {
 
 	private void fillUntilFullOrDone() {
 		MyIterator iterator = pointIterator;
-		while (iterator.hasNext()
-				&& !(leftTalon.getMotionProfileTopLevelBufferCount() > MAX_POINTS_LOADED
-						|| rightTalon.getMotionProfileTopLevelBufferCount() > MAX_POINTS_LOADED)
-				&& !(leftTalon.isMotionProfileTopLevelBufferFull() || rightTalon.isMotionProfileTopLevelBufferFull())) {
+		while (iterator.hasNext() && !leftTalon.isMotionProfileTopLevelBufferFull()
+				&& !rightTalon.isMotionProfileTopLevelBufferFull()) {
 			TrajectoryPointPair pair = iterator.next();
 			leftTalon.pushMotionProfileTrajectory(pair.left);
 			rightTalon.pushMotionProfileTrajectory(pair.right);
