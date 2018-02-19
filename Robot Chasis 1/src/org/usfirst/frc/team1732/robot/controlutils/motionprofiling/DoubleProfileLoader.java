@@ -22,7 +22,7 @@ public class DoubleProfileLoader {
 	private final TalonSRX rightTalon;
 
 	private volatile MyIterator pointIterator;
-	private volatile Mode mode = new Mode();
+	private volatile Mode mode = new Mode(false, STATE.WAITING, SetValueMotionProfile.Disable);
 	private volatile boolean printData = false;
 
 	private MotionProfileStatus leftStatus = new MotionProfileStatus();
@@ -126,10 +126,6 @@ public class DoubleProfileLoader {
 		private final STATE state;
 		private final SetValueMotionProfile setValue;
 
-		private Mode() {
-			this(false, STATE.WAITING, SetValueMotionProfile.Disable);
-		}
-
 		private Mode(boolean start, STATE state, SetValueMotionProfile setValue) {
 			this.start = start;
 			this.state = state;
@@ -155,6 +151,7 @@ public class DoubleProfileLoader {
 			switch (currentMode.state) {
 			case WAITING:
 				if (currentMode.start) {
+					System.out.println("MP Started");
 					mode = new Mode(false, STATE.LOADING, SetValueMotionProfile.Disable);
 					timer.reset();
 					timer.start();
@@ -171,6 +168,7 @@ public class DoubleProfileLoader {
 			case LOADING:
 				fillUntilFullOrIter(minPointsInTalon * 2);
 				if (leftStatus.btmBufferCnt >= minPointsInTalon && rightStatus.btmBufferCnt >= minPointsInTalon) {
+					System.out.println("MP Finished Loading");
 					mode = new Mode(false, STATE.EXECUTING, SetValueMotionProfile.Enable);
 				}
 				break;
@@ -222,14 +220,17 @@ public class DoubleProfileLoader {
 
 			if (printData) {
 				if (header % 8 == 0) {
-					printHeader();
+					printDoubleHeader();
 					header = 0;
 				}
 				header++;
-				printStatus("Left", leftStatus, leftTalon.getActiveTrajectoryPosition(),
-						leftTalon.getClosedLoopError(0), leftTalon.getActiveTrajectoryVelocity());
-				printStatus("Right", rightStatus, rightTalon.getActiveTrajectoryPosition(),
-						rightTalon.getClosedLoopError(0), rightTalon.getActiveTrajectoryVelocity());
+				int lP = leftTalon.getActiveTrajectoryPosition();
+				int lE = leftTalon.getClosedLoopError(0);
+				int lV = leftTalon.getActiveTrajectoryVelocity();
+				int rP = rightTalon.getActiveTrajectoryPosition();
+				int rE = rightTalon.getClosedLoopError(0);
+				int rV = rightTalon.getActiveTrajectoryVelocity();
+				printDoubleStatus(leftStatus, rightStatus, lP, rP, lE, rE, lV, rV);
 			}
 		}
 
@@ -243,20 +244,53 @@ public class DoubleProfileLoader {
 		printData = false;
 	}
 
-	private static void printHeader() {
-		System.out.printf("%6s%10s%10s%10s%10s%10s%10s%10s%10s%10s%10s%10s%10s%10s%10s%n", "Side", "Mode", "Is Valid",
-				"Is Last", "Btm Cnt", "Top Cnt", "Top Rem", "Has Undrn", "Is Undrn", "Profile0", "Profile1", "Duration",
-				"Pos", "Pos Err", "Vel");
+	private static void printDoubleHeader() {
+		System.out.printf("%4s%4s%8s%8s%8s%6s%5s%5s%6s%5s%14s%12s%10s%8s%n", "P0", "P1", "TopCnt", "TopRem", "BtmCnt",
+				"HasUn", "Mode", "IsUn", "IsVal", "Last", "Pos", "Pos Err", "Vel", "Duration");
 	}
 
-	private static void printStatus(String name, MotionProfileStatus status, double pos, double error, double vel) {
-		System.out.printf("%6s%10s%10s%10s%10s%10s%10s%10s%10s%10s%10s%10s%10s%10s%10s%n", name,
-				status.outputEnable.name(), Boolean.toString(status.activePointValid), Boolean.toString(status.isLast),
-				Integer.toString(status.btmBufferCnt), Integer.toString(status.topBufferCnt),
-				Integer.toString(status.topBufferRem), Boolean.toString(status.hasUnderrun),
-				Boolean.toString(status.isUnderrun), Integer.toString(status.profileSlotSelect),
-				Integer.toString(status.profileSlotSelect1), Integer.toString(status.timeDurMs), Double.toString(pos),
-				Double.toString(error), Double.toString(vel));
+	private static void printDoubleStatus(MotionProfileStatus lS, MotionProfileStatus rS, int lP, int rP, int lE,
+			int rE, int lV, int rV) {
+		String formats = "%10s%10s%10s%10s%10s%10s%10s%10s%10s%10s%10s%10s%10s%10s%n";
+		String profile0 = String.format("%d,%d", lS.profileSlotSelect, rS.profileSlotSelect);
+		String profile1 = String.format("%d,%d", lS.profileSlotSelect1, rS.profileSlotSelect1);
+		String topCount = String.format("%d,%d", lS.topBufferCnt, rS.topBufferCnt);
+		String topRem = String.format("%d,%d", lS.topBufferRem, rS.topBufferRem);
+		String bottomCount = String.format("%d,%d", lS.btmBufferCnt, rS.btmBufferCnt);
+		String hasUnderrun = String.format("%d,%d", lS.hasUnderrun ? 1 : 0, rS.hasUnderrun ? 1 : 0);
+		String mode = String.format("%d,%d", lS.outputEnable.value, rS.outputEnable.value);
+		String isUnderrun = String.format("%d,%d", lS.isUnderrun ? 1 : 0, rS.isUnderrun ? 1 : 0);
+		String isValid = String.format("%d,%d", lS.activePointValid ? 1 : 0, rS.activePointValid ? 1 : 0);
+		String isLast = String.format("%d,%d", lS.isLast ? 1 : 0, rS.isLast ? 1 : 0);
+		String pos = String.format("%d,%d", lP, rP);
+		String err = String.format("%d,%d", lE, rE);
+		String vel = String.format("%d,%d", lV, rV);
+		String dur = String.format("%d,%d", lS.timeDurMs, rS.timeDurMs);
+		System.out.printf(formats, profile0, profile1, topCount, topRem, bottomCount, hasUnderrun, mode, isUnderrun,
+				isValid, isLast, pos, err, vel, dur);
 	}
+
+	// private static void printHeader() {
+	// System.out.printf("%6s%10s%10s%10s%10s%10s%10s%10s%10s%10s%10s%10s%10s%10s%10s%n",
+	// "Side", "Mode", "Is Valid",
+	// "Is Last", "Btm Cnt", "Top Cnt", "Top Rem", "Has Undrn", "Is Undrn",
+	// "Profile0", "Profile1", "Duration",
+	// "Pos", "Pos Err", "Vel");
+	// }
+	//
+	// private static void printStatus(String name, MotionProfileStatus status,
+	// double pos, double error, double vel) {
+	// System.out.printf("%6s%10s%10s%10s%10s%10s%10s%10s%10s%10s%10s%10s%10s%10s%10s%n",
+	// name,
+	// status.outputEnable.name(), Boolean.toString(status.activePointValid),
+	// Boolean.toString(status.isLast),
+	// Integer.toString(status.btmBufferCnt), Integer.toString(status.topBufferCnt),
+	// Integer.toString(status.topBufferRem), Boolean.toString(status.hasUnderrun),
+	// Boolean.toString(status.isUnderrun),
+	// Integer.toString(status.profileSlotSelect),
+	// Integer.toString(status.profileSlotSelect1),
+	// Integer.toString(status.timeDurMs), Double.toString(pos),
+	// Double.toString(error), Double.toString(vel));
+	// }
 
 }
