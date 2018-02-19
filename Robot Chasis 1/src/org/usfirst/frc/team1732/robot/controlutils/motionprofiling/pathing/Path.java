@@ -496,10 +496,12 @@ public final class Path {
 				leftPoint.velocity = 1023 / 12.0 * leftFF.getAppliedVoltage(prevLeftEndVel, leftStartAcc);
 				rightPoint.velocity = 1023 / 12.0 * rightFF.getAppliedVoltage(prevRightEndVel, rightStartAcc);
 
-				System.out.println("Left:  " + prevLeftEndPos + ", " + prevLeftEndVel + ", " + leftStartAcc + ", "
-						+ leftPoint.velocity);
-				System.out.println("Right: " + prevRightEndPos + ", " + prevRightEndVel + ", " + rightStartAcc + ", "
-						+ rightPoint.velocity);
+				// System.out.println("Left: " + prevLeftEndPos + ", " + prevLeftEndVel + ", " +
+				// leftStartAcc + ", "
+				// + leftPoint.velocity);
+				// System.out.println("Right: " + prevRightEndPos + ", " + prevRightEndVel + ",
+				// " + rightStartAcc + ", "
+				// + rightPoint.velocity);
 
 				// prevLeftEndVel = leftEndVel;
 				// prevRightEndVel = rightEndVel;

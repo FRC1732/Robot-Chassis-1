@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class DoubleProfileLoader {
 
-	private static final int minPointsInTalon = 100;
+	private static final int minPointsInTalon = 127;
 	private static final double timeoutSec = 0.1;
 
 	private final TalonSRX leftTalon;
@@ -38,19 +38,18 @@ public class DoubleProfileLoader {
 	public DoubleProfileLoader(TalonSRX leftTalon, TalonSRX rightTalon) {
 		this.leftTalon = leftTalon;
 		this.rightTalon = rightTalon;
-		int period = 5;
+		int period = 1;
 		leftTalon.changeMotionControlFramePeriod(period);
 		rightTalon.changeMotionControlFramePeriod(period);
-		double periodSec = 5 / 1000.0;
 		Notifier bufferLoader = new Notifier(() -> {
 			leftTalon.processMotionProfileBuffer();
 			rightTalon.processMotionProfileBuffer();
 		});
-		bufferLoader.startPeriodic(periodSec);
+		bufferLoader.startPeriodic(period / 1000.0);
 		Notifier controller = new Notifier(() -> {
 			control();
 		});
-		controller.startPeriodic(periodSec);
+		controller.startPeriodic(5 / 1000.0);
 	}
 
 	/**
@@ -143,7 +142,8 @@ public class DoubleProfileLoader {
 		rightTalon.getMotionProfileStatus(rightStatus);
 
 		if (leftTalon.getControlMode() != ControlMode.MotionProfile
-				|| rightTalon.getControlMode() != ControlMode.MotionProfile) {
+				|| rightTalon.getControlMode() != ControlMode.MotionProfile
+				|| DriverStation.getInstance().isDisabled()) {
 			return;
 			// not using robot in motion profile mode
 		} else {
@@ -245,13 +245,13 @@ public class DoubleProfileLoader {
 	}
 
 	private static void printDoubleHeader() {
-		System.out.printf("%4s%4s%8s%8s%8s%6s%5s%5s%6s%5s%14s%12s%10s%8s%n", "P0", "P1", "TopCnt", "TopRem", "BtmCnt",
+		System.out.printf("%4s%4s%8s%8s%8s%6s%5s%5s%6s%5s%16s%15s%12s%9s%n", "P0", "P1", "TopCnt", "TopRem", "BtmCnt",
 				"HasUn", "Mode", "IsUn", "IsVal", "Last", "Pos", "Pos Err", "Vel", "Duration");
 	}
 
 	private static void printDoubleStatus(MotionProfileStatus lS, MotionProfileStatus rS, int lP, int rP, int lE,
 			int rE, int lV, int rV) {
-		String formats = "%10s%10s%10s%10s%10s%10s%10s%10s%10s%10s%10s%10s%10s%10s%n";
+		String formats = "%4s%4s%8s%8s%8s%6s%5s%5s%6s%5s%16s%15s%12s%9s%n";
 		String profile0 = String.format("%d,%d", lS.profileSlotSelect, rS.profileSlotSelect);
 		String profile1 = String.format("%d,%d", lS.profileSlotSelect1, rS.profileSlotSelect1);
 		String topCount = String.format("%d,%d", lS.topBufferCnt, rS.topBufferCnt);
