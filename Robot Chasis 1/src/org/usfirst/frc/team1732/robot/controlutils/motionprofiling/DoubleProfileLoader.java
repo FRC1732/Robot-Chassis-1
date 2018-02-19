@@ -41,11 +41,14 @@ public class DoubleProfileLoader {
 		int period = 1;
 		leftTalon.changeMotionControlFramePeriod(period);
 		rightTalon.changeMotionControlFramePeriod(period);
-		Notifier bufferLoader = new Notifier(() -> {
-			leftTalon.processMotionProfileBuffer();
-			rightTalon.processMotionProfileBuffer();
+		Thread bufferLoader = new Thread(() -> {
+			while (!Thread.interrupted()) {
+				leftTalon.processMotionProfileBuffer();
+				rightTalon.processMotionProfileBuffer();
+			}
 		});
-		bufferLoader.startPeriodic(period / 1000.0);
+		bufferLoader.setDaemon(true);
+		bufferLoader.start();
 		Notifier controller = new Notifier(() -> {
 			control();
 		});
