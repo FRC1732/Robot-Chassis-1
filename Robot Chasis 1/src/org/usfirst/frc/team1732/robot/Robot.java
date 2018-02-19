@@ -8,6 +8,7 @@
 package org.usfirst.frc.team1732.robot;
 
 import org.usfirst.frc.team1732.robot.autotools.DriverStationData;
+import org.usfirst.frc.team1732.robot.commands.ReverseDrivetrainMovements;
 import org.usfirst.frc.team1732.robot.commands.TestPathing;
 import org.usfirst.frc.team1732.robot.controlutils.motionprofiling.pathing.Path;
 import org.usfirst.frc.team1732.robot.controlutils.motionprofiling.pathing.Path.MyIterator;
@@ -41,10 +42,8 @@ public class Robot extends TimedRobot {
 	public static Joysticks joysticks;
 	public static PositionEstimator positionEstimator;
 
-	public static final SRXMomentRecorder leftRecorder = new SRXMomentRecorder(drivetrain.leftTalon1,
-			drivetrain.leftEncoder);
-	public static final SRXMomentRecorder rightRecorder = new SRXMomentRecorder(drivetrain.rightTalon1,
-			drivetrain.rightEncoder);
+	public static SRXMomentRecorder leftRecorder;
+	public static SRXMomentRecorder rightRecorder;
 	
 	// config
 	public static final int PERIOD_MS = 20;
@@ -64,6 +63,10 @@ public class Robot extends TimedRobot {
 		claw = new Claw();
 
 		joysticks = new Joysticks();
+		leftRecorder = new SRXMomentRecorder(drivetrain.leftTalon1,
+				drivetrain.leftEncoder);
+		rightRecorder = new SRXMomentRecorder(drivetrain.rightTalon1,
+				drivetrain.rightEncoder);
 	}
 
 	@Override
@@ -109,7 +112,10 @@ public class Robot extends TimedRobot {
 		// iterator = Path.getPreloadedIterator(iterator);
 		System.out.println("Time to make path: " + t.get());
 
-		new TestPathing(iterator).start();
+//		new TestPathing(iterator).start();
+		
+		new ReverseDrivetrainMovements().start();
+		
 		// new TurnToAngle(-90, 80).start();
 		// new ScaleLeftSingle(DriverStationData.closeSwitchIsLeft).start();
 		// new TestMotors(-0.3, 0.3).start();

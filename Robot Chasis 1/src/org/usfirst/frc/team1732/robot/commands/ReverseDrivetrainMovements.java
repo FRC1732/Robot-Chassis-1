@@ -27,8 +27,10 @@ public class ReverseDrivetrainMovements extends Command {
 	protected void execute() {
 		Moment left = leftRecorder.getLast(), right = rightRecorder.getLast();
 		// System.out.printf("Left: %.5f, Right: %.5f%n", left, right);
-		drivetrain.setLeft(drivetrain.leftFF.getAppliedVoltage(left.velocity, left.acceleration));
-		drivetrain.setRight(drivetrain.rightFF.getAppliedVoltage(right.velocity, right.acceleration));
+		drivetrain.setLeft(drivetrain.leftFF.getAppliedVoltage(-left.velocity, -left.acceleration)/12);
+		drivetrain.setRight(drivetrain.rightFF.getAppliedVoltage(-right.velocity, -right.acceleration)/12);
+//		drivetrain.setLeft(-left.voltage);
+//		drivetrain.setRight(-right.voltage);
 	}
 
 	// Make this return true when this Command no longer needs to run execute()
