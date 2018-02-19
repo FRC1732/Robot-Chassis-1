@@ -75,6 +75,8 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void disabledInit() {
+		rightRecorder.stopRecording();
+		leftRecorder.stopRecording();
 	}
 
 	@Override
@@ -118,7 +120,8 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void teleopInit() {
-
+		leftRecorder.startRecording();
+		rightRecorder.startRecording();
 	}
 
 	@Override
