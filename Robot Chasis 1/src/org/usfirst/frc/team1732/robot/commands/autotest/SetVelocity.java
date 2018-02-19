@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.command.Command;
  */
 public class SetVelocity extends Command {
 
+	@SuppressWarnings("unused")
 	private static final ClosedLoopProfile pid = new ClosedLoopProfile("Closed Loop Profile", 0, 0, 0, 0, 0, 0, 0, 0);
 
 	private double velocity;

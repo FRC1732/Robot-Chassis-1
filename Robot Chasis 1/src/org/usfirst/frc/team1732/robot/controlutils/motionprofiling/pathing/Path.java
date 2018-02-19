@@ -502,6 +502,7 @@ public final class Path {
 			double prevRightVel = 0;
 			int i = 0;
 			
+			@SuppressWarnings("unused")
 			double headingCorrection = 0;
 
 			@Override

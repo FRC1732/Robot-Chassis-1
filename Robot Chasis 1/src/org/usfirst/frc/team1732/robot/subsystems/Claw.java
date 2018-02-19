@@ -14,6 +14,7 @@ public class Claw extends Subsystem {
 	public final Supplier<Double> leftSparkCurrent;
 	public final Supplier<Double> rightSparkCurrent;
 
+	@SuppressWarnings("unused")
 	private final PowerDistributionPanel panel = new PowerDistributionPanel();
 	public static final double rightCurrentLimit = 17;
 	public static final double leftCurrentLimit = 17;
