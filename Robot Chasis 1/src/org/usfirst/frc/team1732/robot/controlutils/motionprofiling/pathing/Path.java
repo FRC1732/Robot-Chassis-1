@@ -313,6 +313,45 @@ public final class Path {
 
 	}
 
+	public static class TrajectoryPointPair {
+		public final TrajectoryPoint left;
+		public final TrajectoryPoint right;
+
+		public TrajectoryPointPair() {
+			this(new TrajectoryPoint(), new TrajectoryPoint());
+		}
+
+		public TrajectoryPointPair(TrajectoryPoint left, TrajectoryPoint right) {
+			this.left = left;
+			this.right = right;
+		}
+
+	}
+
+	public static class MyIterator implements Iterator<TrajectoryPointPair> {
+
+		private final Iterator<TrajectoryPointPair> iterator;
+		public final int baseDurationMs;
+		public final double baseDurationSec;
+
+		public MyIterator(Iterator<TrajectoryPointPair> iterator, int baseDurationMs) {
+			this.iterator = iterator;
+			this.baseDurationMs = baseDurationMs;
+			this.baseDurationSec = baseDurationMs / 1000.0;
+		}
+
+		@Override
+		public boolean hasNext() {
+			return iterator.hasNext();
+		}
+
+		@Override
+		public TrajectoryPointPair next() {
+			return iterator.next();
+		}
+
+	}
+
 	private static double getLeftAdjust(Curve currentCurve, double robotWidth, double arcLength) {
 		double curvature = currentCurve.getCurvatureAtArcLength(arcLength);
 		double r = 1 / curvature;
@@ -331,30 +370,30 @@ public final class Path {
 		return rR / r;
 	}
 
-	public Iterator<TrajectoryPoint[]> getPreloadedIterator(Iterator<TrajectoryPoint[]> input) {
-		ArrayList<TrajectoryPoint[]> array = new ArrayList<>();
+	public static MyIterator getPreloadedIterator(MyIterator input) {
+		ArrayList<TrajectoryPointPair> array = new ArrayList<>();
 		while (input.hasNext()) {
 			array.add(input.next());
 		}
-		return array.iterator();
+		return new MyIterator(array.iterator(), input.baseDurationMs);
 	}
 
-	public Iterator<TrajectoryPoint[]> getIteratorWithOffset(TrajectoryDuration pointDuration, Feedforward leftFF,
-			Feedforward rightFF, int initialLeftSensorUnits, int initialRightSensorUnits, double robotWidth,
+	public MyIterator getIteratorWithOffset(int baseDurationMs, Feedforward leftFF, Feedforward rightFF,
+			int initialLeftSensorUnits, int initialRightSensorUnits, double robotWidth,
 			double sensorUnitsPerYourUnits) {
-		return getIterator(pointDuration, leftFF, rightFF, initialLeftSensorUnits, initialRightSensorUnits, robotWidth,
+		return getIterator(baseDurationMs, leftFF, rightFF, initialLeftSensorUnits, initialRightSensorUnits, robotWidth,
 				sensorUnitsPerYourUnits, false);
 	}
 
-	public Iterator<TrajectoryPoint[]> getIteratorZeroAtStart(TrajectoryDuration pointDuration, Feedforward leftFF,
-			Feedforward rightFF, double robotWidth, double sensorUnitsPerYourUnits) {
-		return getIterator(pointDuration, leftFF, rightFF, 0, 0, robotWidth, sensorUnitsPerYourUnits, true);
+	public MyIterator getIteratorZeroAtStart(int baseDurationMs, Feedforward leftFF, Feedforward rightFF,
+			double robotWidth, double sensorUnitsPerYourUnits) {
+		return getIterator(baseDurationMs, leftFF, rightFF, 0, 0, robotWidth, sensorUnitsPerYourUnits, true);
 	}
 
-	public Iterator<TrajectoryPoint[]> getIterator(TrajectoryDuration pointDuration, Feedforward leftFF,
-			Feedforward rightFF, int initialLeftSensorUnits, int initialRightSensorUnits, double robotWidth,
-			double sensorUnitsPerYourUnits, boolean zeroAtStart) {
-		return new Iterator<TrajectoryPoint[]>() {
+	public MyIterator getIterator(int baseDurationMs, Feedforward leftFF, Feedforward rightFF,
+			int initialLeftSensorUnits, int initialRightSensorUnits, double robotWidth, double sensorUnitsPerYourUnits,
+			boolean zeroAtStart) {
+		Iterator<TrajectoryPointPair> iterator = new Iterator<TrajectoryPointPair>() {
 
 			int cs = 0;
 			PathSegment currentSegment = segments.get(0);
@@ -362,10 +401,12 @@ public final class Path {
 			double segmentLengthSum = 0;
 
 			double totalTime = profile.duration();
-			double pointDurationSec = pointDuration.value / 1000.0;
+			double pointDurationSec = baseDurationMs / 1000.0;
 			int pointCount = (int) (totalTime / (pointDurationSec));
 			double timeIncrement = totalTime / (pointCount - 1);
 			MotionState currentStartState = profile.stateByTimeClamped(0);
+
+			TrajectoryDuration additionalDuration = TrajectoryDuration.Trajectory_Duration_0ms;
 
 			double prevLeftEndPos = 0;
 			double prevRightEndPos = 0;
@@ -380,12 +421,12 @@ public final class Path {
 			}
 
 			@Override
-			public TrajectoryPoint[] next() {
-				TrajectoryPoint[] points = { new TrajectoryPoint(), new TrajectoryPoint() };
-				TrajectoryPoint leftPoint = points[0];
-				TrajectoryPoint rightPoint = points[1];
-				leftPoint.timeDur = pointDuration;
-				rightPoint.timeDur = pointDuration;
+			public TrajectoryPointPair next() {
+				TrajectoryPointPair pair = new TrajectoryPointPair();
+				TrajectoryPoint leftPoint = pair.left;
+				TrajectoryPoint rightPoint = pair.right;
+				leftPoint.timeDur = additionalDuration;
+				rightPoint.timeDur = additionalDuration;
 				leftPoint.headingDeg = 0;
 				rightPoint.headingDeg = 0;
 				leftPoint.isLastPoint = false;
@@ -477,10 +518,10 @@ public final class Path {
 				}
 				currentStartState = currentEndState;
 				i++;
-				return points;
+				return pair;
 			}
-
 		};
+		return new MyIterator(iterator, baseDurationMs);
 	}
 
 	public static final double MAX_HEADING_CORRECTION = Math.PI / 60;

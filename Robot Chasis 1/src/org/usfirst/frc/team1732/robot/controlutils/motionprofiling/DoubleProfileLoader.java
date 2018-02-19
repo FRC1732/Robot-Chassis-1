@@ -1,37 +1,31 @@
 package org.usfirst.frc.team1732.robot.controlutils.motionprofiling;
 
-import java.util.Iterator;
+import org.usfirst.frc.team1732.robot.controlutils.motionprofiling.pathing.Path.MyIterator;
+import org.usfirst.frc.team1732.robot.controlutils.motionprofiling.pathing.Path.TrajectoryPointPair;
 
 import com.ctre.phoenix.motion.MotionProfileStatus;
 import com.ctre.phoenix.motion.SetValueMotionProfile;
-import com.ctre.phoenix.motion.TrajectoryPoint;
-import com.ctre.phoenix.motion.TrajectoryPoint.TrajectoryDuration;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class DoubleProfileLoader extends Subsystem {
+public class DoubleProfileLoader {
 
 	public static final int MAX_POINTS_LOADED = 10000000;
 
-	private static final int minPointsInTalon = 20;
+	private static final int minPointsInTalon = 100;
 	private static final double timeoutSec = 0.1;
 
 	private final TalonSRX leftTalon;
 	private final TalonSRX rightTalon;
 
-	private Iterator<TrajectoryPoint[]> pointIterator;
-
-	private boolean start;
-
-	private SetValueMotionProfile leftSetValue = SetValueMotionProfile.Disable;
-	private SetValueMotionProfile rightSetValue = SetValueMotionProfile.Disable;
-	private STATE currentState = STATE.WAITING;
+	private volatile MyIterator pointIterator;
+	private volatile Mode mode = new Mode();
+	private volatile boolean printData = false;
 
 	private MotionProfileStatus leftStatus = new MotionProfileStatus();
 	private MotionProfileStatus rightStatus = new MotionProfileStatus();
@@ -41,20 +35,24 @@ public class DoubleProfileLoader extends Subsystem {
 	private int leftUnderruns = 0;
 	private int rightUnderruns = 0;
 
-	private boolean printData = false;
 	private int header = 0;
 
 	public DoubleProfileLoader(TalonSRX leftTalon, TalonSRX rightTalon) {
 		this.leftTalon = leftTalon;
 		this.rightTalon = rightTalon;
 		int period = 5;
-		Notifier notifier = new Notifier(() -> {
+		leftTalon.changeMotionControlFramePeriod(period);
+		rightTalon.changeMotionControlFramePeriod(period);
+		double periodSec = 5 / 1000.0;
+		Notifier bufferLoader = new Notifier(() -> {
 			leftTalon.processMotionProfileBuffer();
 			rightTalon.processMotionProfileBuffer();
 		});
-		notifier.startPeriodic(period / 1000.0);
-		leftTalon.changeMotionControlFramePeriod(period);
-		rightTalon.changeMotionControlFramePeriod(period);
+		bufferLoader.startPeriodic(periodSec);
+		Notifier controller = new Notifier(() -> {
+			control();
+		});
+		controller.startPeriodic(periodSec);
 	}
 
 	/**
@@ -63,36 +61,37 @@ public class DoubleProfileLoader extends Subsystem {
 	 * 
 	 * @param pointIterator
 	 */
-	public void setTrajectory(Iterator<TrajectoryPoint[]> pointIterator) {
+	public void setTrajectory(MyIterator pointIterator) {
 		this.pointIterator = pointIterator;
+		leftTalon.configMotionProfileTrajectoryPeriod(pointIterator.baseDurationMs, 0);
+		rightTalon.configMotionProfileTrajectoryPeriod(pointIterator.baseDurationMs, 0);
 	}
 
 	/**
 	 * Call this once to start the profile and erase currently stored trajectories
 	 */
-	public void startProfile(Iterator<TrajectoryPoint[]> pointIterator) {
-		start = true;
+	public void startProfile(MyIterator pointIterator) {
 		setTrajectory(pointIterator);
-		leftSetValue = SetValueMotionProfile.Disable;
-		rightSetValue = SetValueMotionProfile.Disable;
-		currentState = STATE.WAITING;
+		mode = new Mode(true, STATE.WAITING, SetValueMotionProfile.Disable);
 	}
 
 	/**
 	 * Call this while you want to follow the profile
 	 */
 	public void run() {
-		leftTalon.set(ControlMode.MotionProfile, leftSetValue.value);
-		rightTalon.set(ControlMode.MotionProfile, rightSetValue.value);
+		Mode currentMode = mode;
+		leftTalon.set(ControlMode.MotionProfile, currentMode.setValue.value);
+		rightTalon.set(ControlMode.MotionProfile, currentMode.setValue.value);
 	}
 
 	// use the following method to check if we need to move on
 	public boolean isWaitingAndNotStarting() {
-		return currentState == STATE.WAITING && start == false;
+		Mode currentMode = mode;
+		return currentMode.state == STATE.WAITING && currentMode.start == false;
 	}
 
 	public boolean isHolding() {
-		return leftSetValue.equals(SetValueMotionProfile.Hold) && rightSetValue.equals(SetValueMotionProfile.Hold);
+		return mode.setValue == SetValueMotionProfile.Hold;
 	}
 
 	public boolean isTimedOut() {
@@ -100,60 +99,54 @@ public class DoubleProfileLoader extends Subsystem {
 	}
 
 	public void disable() {
-		leftSetValue = SetValueMotionProfile.Disable;
-		rightSetValue = SetValueMotionProfile.Disable;
-		currentState = STATE.WAITING;
+		mode = new Mode(false, STATE.WAITING, SetValueMotionProfile.Disable);
 		run();
 	}
 
 	private void fillUntilFullOrDone() {
-		while (pointIterator.hasNext()
+		MyIterator iterator = pointIterator;
+		while (iterator.hasNext()
 				&& !(leftTalon.getMotionProfileTopLevelBufferCount() > MAX_POINTS_LOADED
 						|| rightTalon.getMotionProfileTopLevelBufferCount() > MAX_POINTS_LOADED)
 				&& !(leftTalon.isMotionProfileTopLevelBufferFull() || rightTalon.isMotionProfileTopLevelBufferFull())) {
-			TrajectoryPoint[] points = pointIterator.next();
-			TrajectoryPoint leftPoint = points[0];
-			TrajectoryPoint rightPoint = points[1];
-			leftTalon.pushMotionProfileTrajectory(leftPoint);
-			rightTalon.pushMotionProfileTrajectory(rightPoint);
+			TrajectoryPointPair pair = iterator.next();
+			leftTalon.pushMotionProfileTrajectory(pair.left);
+			rightTalon.pushMotionProfileTrajectory(pair.right);
 		}
 	}
 
 	private void fillUntilFullOrIter(int iterations) {
-		for (int i = 0; i < iterations && pointIterator.hasNext() && !leftTalon.isMotionProfileTopLevelBufferFull()
+		MyIterator iterator = pointIterator;
+		for (int i = 0; i < iterations && iterator.hasNext() && !leftTalon.isMotionProfileTopLevelBufferFull()
 				&& !rightTalon.isMotionProfileTopLevelBufferFull(); i++) {
-			TrajectoryPoint[] points = pointIterator.next();
-			TrajectoryPoint leftPoint = points[0];
-			TrajectoryPoint rightPoint = points[1];
-			leftTalon.pushMotionProfileTrajectory(leftPoint);
-			rightTalon.pushMotionProfileTrajectory(rightPoint);
+			TrajectoryPointPair pair = iterator.next();
+			leftTalon.pushMotionProfileTrajectory(pair.left);
+			rightTalon.pushMotionProfileTrajectory(pair.right);
 		}
 	}
 
-	public static TrajectoryDuration getTrajectoryDuration(int durationMs) {
-		/* create return value */
-		TrajectoryDuration retval = TrajectoryDuration.Trajectory_Duration_0ms;
-		/* convert duration to supported type */
-		retval = retval.valueOf(durationMs);
-		/* check that it is valid */
-		if (retval.value != durationMs) {
-			DriverStation.reportError(
-					"Trajectory Duration not supported - use configMotionProfileTrajectoryPeriod instead", false);
-		}
-		/* pass to caller */
-		return retval;
-	}
+	private static class Mode {
+		private final boolean start;
+		private final STATE state;
+		private final SetValueMotionProfile setValue;
 
-	@Override
-	protected void initDefaultCommand() {
+		private Mode() {
+			this(false, STATE.WAITING, SetValueMotionProfile.Disable);
+		}
+
+		private Mode(boolean start, STATE state, SetValueMotionProfile setValue) {
+			this.start = start;
+			this.state = state;
+			this.setValue = setValue;
+		}
+
 	}
 
 	private static enum STATE {
 		WAITING, LOADING, EXECUTING;
 	}
 
-	@Override
-	public void periodic() {
+	private void control() {
 		leftTalon.getMotionProfileStatus(leftStatus);
 		rightTalon.getMotionProfileStatus(rightStatus);
 
@@ -162,11 +155,11 @@ public class DoubleProfileLoader extends Subsystem {
 			return;
 			// not using robot in motion profile mode
 		} else {
-			switch (currentState) {
+			Mode currentMode = mode;
+			switch (currentMode.state) {
 			case WAITING:
-				if (start) {
-					start = false;
-
+				if (currentMode.start) {
+					mode = new Mode(false, STATE.LOADING, SetValueMotionProfile.Disable);
 					timer.reset();
 					timer.start();
 					timedOut = false;
@@ -174,25 +167,15 @@ public class DoubleProfileLoader extends Subsystem {
 					rightUnderruns = 0;
 					header = 0;
 
-					leftSetValue = SetValueMotionProfile.Disable;
-					rightSetValue = SetValueMotionProfile.Disable;
 					// clear old trajectory in bottom and top
 					leftTalon.clearMotionProfileTrajectories();
 					rightTalon.clearMotionProfileTrajectories();
-					// we will use the period from the TrajectoryPoint
-					leftTalon.configMotionProfileTrajectoryPeriod(0, 0);
-					rightTalon.configMotionProfileTrajectoryPeriod(0, 0);
-
-					currentState = STATE.LOADING;
 				}
 				break;
 			case LOADING:
 				fillUntilFullOrIter(minPointsInTalon * 2);
 				if (leftStatus.btmBufferCnt >= minPointsInTalon && rightStatus.btmBufferCnt >= minPointsInTalon) {
-					leftSetValue = SetValueMotionProfile.Enable;
-					rightSetValue = SetValueMotionProfile.Enable;
-
-					currentState = STATE.EXECUTING;
+					mode = new Mode(false, STATE.EXECUTING, SetValueMotionProfile.Enable);
 				}
 				break;
 			case EXECUTING:
@@ -218,10 +201,8 @@ public class DoubleProfileLoader extends Subsystem {
 				// one way to be done: reach last point if user set it for both
 				if (leftStatus.activePointValid && leftStatus.isLast && rightStatus.activePointValid
 						&& rightStatus.isLast) {
-					leftSetValue = SetValueMotionProfile.Hold;
-					rightSetValue = SetValueMotionProfile.Hold;
 					System.out.println("Both profile executors have reached the last point. Holding.");
-					currentState = STATE.WAITING;
+					mode = new Mode(false, STATE.WAITING, SetValueMotionProfile.Hold);
 				}
 				// other way to be done: executor tried to get a point, but bottom buffer is
 				// empty (underrun), top buffer is empty, and iterator is empty. This will
@@ -231,9 +212,7 @@ public class DoubleProfileLoader extends Subsystem {
 						&& rightStatus.btmBufferCnt == 0 && leftStatus.topBufferCnt == 0
 						&& rightStatus.topBufferCnt == 0 && !pointIterator.hasNext()) {
 					System.out.println("Profile executor has run out of points, and no more are available. Waiting.");
-					leftSetValue = SetValueMotionProfile.Disable;
-					rightSetValue = SetValueMotionProfile.Disable;
-					currentState = STATE.WAITING;
+					mode = new Mode(false, STATE.WAITING, SetValueMotionProfile.Disable);
 				}
 				break;
 			}
@@ -257,6 +236,7 @@ public class DoubleProfileLoader extends Subsystem {
 						rightTalon.getClosedLoopError(0), rightTalon.getActiveTrajectoryVelocity());
 			}
 		}
+
 	}
 
 	public void enablePrintingData() {

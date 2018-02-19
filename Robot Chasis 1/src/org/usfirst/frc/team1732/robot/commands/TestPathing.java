@@ -1,10 +1,7 @@
 package org.usfirst.frc.team1732.robot.commands;
 
-import java.util.Iterator;
-
 import org.usfirst.frc.team1732.robot.Robot;
-
-import com.ctre.phoenix.motion.TrajectoryPoint;
+import org.usfirst.frc.team1732.robot.controlutils.motionprofiling.pathing.Path.MyIterator;
 
 import edu.wpi.first.wpilibj.command.Command;
 
@@ -16,9 +13,9 @@ import edu.wpi.first.wpilibj.command.Command;
  */
 public class TestPathing extends Command {
 
-	private final Iterator<TrajectoryPoint[]> iterator;
+	private final MyIterator iterator;
 
-	public TestPathing(Iterator<TrajectoryPoint[]> iterator) {
+	public TestPathing(MyIterator iterator) {
 		requires(Robot.drivetrain);
 		this.iterator = iterator;
 	}
