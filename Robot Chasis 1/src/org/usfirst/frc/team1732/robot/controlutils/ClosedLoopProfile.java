@@ -43,7 +43,7 @@ public class ClosedLoopProfile {
 		talon.config_kP(profile, kP, Robot.CONFIG_TIMEOUT);
 		talon.config_kI(profile, kI, Robot.CONFIG_TIMEOUT);
 		talon.config_kD(profile, kD, Robot.CONFIG_TIMEOUT);
-		talon.config_kF(profile, Feedforward.TALON_SRX_FF_GAIN, Robot.CONFIG_TIMEOUT);
+		talon.config_kF(profile, kF, Robot.CONFIG_TIMEOUT);
 		talon.configAllowableClosedloopError(profile, allowableError, Robot.CONFIG_TIMEOUT);
 		talon.configMaxIntegralAccumulator(profile, maxIntegralAccumulated, Robot.CONFIG_TIMEOUT);
 		talon.configClosedloopRamp(secondsFromNeutralToFull, Robot.CONFIG_TIMEOUT);

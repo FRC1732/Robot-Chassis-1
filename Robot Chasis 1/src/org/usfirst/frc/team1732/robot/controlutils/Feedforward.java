@@ -2,7 +2,8 @@ package org.usfirst.frc.team1732.robot.controlutils;
 
 public class Feedforward {
 
-	public static final double TALON_SRX_FF_GAIN = 1023 / 12;
+	// public static final double TALON_SRX_FF_GAIN = 1023.0 / 12.0;
+	public static final double TALON_SRX_FF_GAIN = 1.0;
 
 	public final double fkV;
 	public final double fkA;
@@ -22,45 +23,101 @@ public class Feedforward {
 	}
 
 	public double getAppliedVoltage(double velocity, double acceleration) {
+		double kV;
+		double kA;
+		double kS;
 		if (velocity >= 0) {
-			return fkV * velocity + fkA * acceleration + fVintercept;
+			kV = fkV;
+			kA = fkA;
+			kS = fVintercept;
 		} else {
-			return bkV * velocity + bkA * acceleration + bVintercept;
+			kV = bkV;
+			kA = bkA;
+			kS = bVintercept;
 		}
+		return kV * velocity + kA * acceleration + kS;
+
 	}
 
 	public double getAppliedVoltage(double velocity, double acceleration, double intercept) {
+		double kV;
+		double kA;
 		if (velocity >= 0) {
-			return fkV * velocity + fkA * acceleration + intercept;
+			kV = fkV;
+			kA = fkA;
 		} else {
-			return bkV * velocity + bkA * acceleration - intercept;
+			kV = bkV;
+			kA = bkA;
 		}
+		return kV * velocity + kA * acceleration + intercept;
 	}
 
 	// following two methods are derived from the first order linear differential
 	// equation of the feed forward
 
-	public double getInitialAcceleration(double x, double t, double v0) {
-		double av;
-		double va;
-		if (v0 >= 0) {
-			av = fkA / fkV;
-			va = fkV / fkA;
+	// this method comes from solving the position equation for a0
+	public double getInitialAcceleration(double dx, double dt, double v0) {
+		double kV;
+		double kA;
+		if (v0 == 0) {
+			if (dx > 0) {
+				kV = fkV;
+				kA = fkA;
+			} else {
+				kV = bkV;
+				kA = bkA;
+			}
+		} else if (v0 > 0) {
+			kV = fkV;
+			kA = fkA;
+		} else if (v0 < 0) {
+			kV = bkV;
+			kA = bkA;
 		} else {
-			av = bkA / bkV;
-			va = bkV / bkA;
+			throw new RuntimeException("ERROR CALCUTING INITIAL ACCELERATION");
 		}
-		double numerator = x - t * v0;
-		double denominator = t * av + av * av * (Math.exp(-va * t));
-
+		double numerator = -kV * kV * (v0 * dt - dx) * Math.exp(kV / kA * dt);
+		double denominator = kA * ((kV * dt - kA) * Math.exp(kV / kA * dt) + kA);
 		return numerator / denominator;
 	}
 
-	public double getVelocityAtTime(double v0, double a0, double t) {
+	public double getPositionAtTime(double v0, double a0, double t) {
+		double kV;
+		double kA;
 		if (v0 >= 0) {
-			return v0 + fkA / fkV * a0 - fkA * a0 / (fkV * Math.exp(fkV / fkA * t));
+			kV = fkV;
+			kA = fkA;
 		} else {
-			return v0 + bkA / bkV * a0 - bkA * a0 / (bkV * Math.exp(bkV / bkA * t));
+			kV = bkV;
+			kA = bkA;
 		}
+		return v0 * t + (kA / kV) * (kA / kV) * a0 / Math.exp(kV / kA * t) + kA / kV * a0 * t
+				- (kA / kV) * (kA / kV) * a0;
+	}
+
+	public double getVelocityAtTime(double v0, double a0, double t) {
+		double kV;
+		double kA;
+		if (v0 >= 0) {
+			kV = fkV;
+			kA = fkA;
+		} else {
+			kV = bkV;
+			kA = bkA;
+		}
+		return v0 + (kA / kV) * a0 - (kA / kV) * a0 / Math.exp(kV / kA * t);
+	}
+
+	public double getAccelerationAtTime(double v0, double a0, double t) {
+		double kV;
+		double kA;
+		if (v0 >= 0) {
+			kV = fkV;
+			kA = fkA;
+		} else {
+			kV = bkV;
+			kA = bkA;
+		}
+		return a0 * Math.exp(-kV / kA * t);
 	}
 }

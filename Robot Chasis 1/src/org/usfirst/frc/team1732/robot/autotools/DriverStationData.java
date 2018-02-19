@@ -12,7 +12,7 @@ public class DriverStationData {
 
 	public static boolean gotPlatePositions() {
 		platePosition = DriverStation.getInstance().getGameSpecificMessage();
-		if (platePosition == null || platePosition == "") {
+		if (platePosition == null || platePosition.equals("")) {
 			return false;
 		} else {
 			closeSwitchIsLeft = platePosition.charAt(0) == 'L';

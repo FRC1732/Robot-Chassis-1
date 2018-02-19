@@ -38,13 +38,10 @@ public class Drivetrain extends Subsystem {
 	public final Feedforward rightFF = new Feedforward(0.0560625, 0.0071341, 1.7711541, 0.0560625, 0.0071341,
 			-1.7711541);
 
-	// keep in mind for these
-	private final ClosedLoopProfile mpGains = new ClosedLoopProfile("MP PID", 0.01 * Math.pow(2, 7), 0.0008, 0.01,
-			Feedforward.TALON_SRX_FF_GAIN, 800, 0, 5000, 0);
+	private final ClosedLoopProfile mpGains = new ClosedLoopProfile("MP PID", 0.01 * Math.pow(2, 6), 0.05, 0.0,
+			Feedforward.TALON_SRX_FF_GAIN, 2000, 0, 2000, 0);
 	public final ClosedLoopProfile leftMPGains = mpGains;
 	public final ClosedLoopProfile rightMPGains = mpGains;
-	public final ClosedLoopProfile velGains = new ClosedLoopProfile("Closed Loop Profile", 0, 0, 0, 1023 / 7500.0, 0, 0,
-			0, 0);
 
 	/*
 	 * The following 2 values are determined from the feedforward constants.
