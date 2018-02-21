@@ -8,6 +8,7 @@
 package org.usfirst.frc.team1732.robot;
 
 import org.usfirst.frc.team1732.robot.autotools.DriverStationData;
+import org.usfirst.frc.team1732.robot.commands.ReverseDrivetrainMovements;
 import org.usfirst.frc.team1732.robot.commands.TestPathing;
 import org.usfirst.frc.team1732.robot.controlutils.motionprofiling.pathing.Path;
 import org.usfirst.frc.team1732.robot.controlutils.motionprofiling.pathing.Path.MyIterator;
@@ -18,6 +19,7 @@ import org.usfirst.frc.team1732.robot.sensors.Sensors;
 import org.usfirst.frc.team1732.robot.subsystems.Arm;
 import org.usfirst.frc.team1732.robot.subsystems.Claw;
 import org.usfirst.frc.team1732.robot.subsystems.Drivetrain;
+import org.usfirst.frc.team1732.robot.util.SRXMomentRecorder;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
@@ -40,6 +42,9 @@ public class Robot extends TimedRobot {
 	public static Joysticks joysticks;
 	public static PositionEstimator positionEstimator;
 
+	public static SRXMomentRecorder leftRecorder;
+	public static SRXMomentRecorder rightRecorder;
+	
 	// config
 	public static final int PERIOD_MS = 20;
 	public static final double PERIOD_S = PERIOD_MS / 1000.0;
@@ -58,6 +63,10 @@ public class Robot extends TimedRobot {
 		claw = new Claw();
 
 		joysticks = new Joysticks();
+		leftRecorder = new SRXMomentRecorder(drivetrain.leftTalon1,
+				drivetrain.leftEncoder);
+		rightRecorder = new SRXMomentRecorder(drivetrain.rightTalon1,
+				drivetrain.rightEncoder);
 	}
 
 	@Override
@@ -69,6 +78,8 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void disabledInit() {
+		rightRecorder.stopRecording();
+		leftRecorder.stopRecording();
 	}
 
 	@Override
@@ -101,7 +112,10 @@ public class Robot extends TimedRobot {
 		// iterator = Path.getPreloadedIterator(iterator);
 		System.out.println("Time to make path: " + t.get());
 
-		new TestPathing(iterator).start();
+//		new TestPathing(iterator).start();
+		
+		new ReverseDrivetrainMovements().start();
+		
 		// new TurnToAngle(-90, 80).start();
 		// new ScaleLeftSingle(DriverStationData.closeSwitchIsLeft).start();
 		// new TestMotors(-0.3, 0.3).start();
@@ -112,7 +126,8 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void teleopInit() {
-
+		leftRecorder.startRecording();
+		rightRecorder.startRecording();
 	}
 
 	@Override
