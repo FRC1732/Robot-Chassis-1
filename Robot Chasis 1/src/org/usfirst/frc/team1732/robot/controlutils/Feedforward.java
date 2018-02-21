@@ -56,35 +56,25 @@ public class Feedforward {
 	// equation of the feed forward
 
 	// this method comes from solving the position equation for a0
-	public double getInitialAcceleration(double dx, double dt, double v0) {
+	public double getInitialAcceleration(double dx, double dt, double v0, boolean forward) {
 		double kV;
 		double kA;
-		if (v0 == 0) {
-			if (dx > 0) {
-				kV = fkV;
-				kA = fkA;
-			} else {
-				kV = bkV;
-				kA = bkA;
-			}
-		} else if (v0 > 0) {
+		if (forward) {
 			kV = fkV;
 			kA = fkA;
-		} else if (v0 < 0) {
+		} else {
 			kV = bkV;
 			kA = bkA;
-		} else {
-			throw new RuntimeException("ERROR CALCUTING INITIAL ACCELERATION");
 		}
 		double numerator = -kV * kV * (v0 * dt - dx) * Math.exp(kV / kA * dt);
 		double denominator = kA * ((kV * dt - kA) * Math.exp(kV / kA * dt) + kA);
 		return numerator / denominator;
 	}
 
-	public double getPositionAtTime(double v0, double a0, double t) {
+	public double getPositionAtTime(double v0, double a0, double t, boolean forward) {
 		double kV;
 		double kA;
-		if (v0 >= 0) {
+		if (forward) {
 			kV = fkV;
 			kA = fkA;
 		} else {
@@ -95,10 +85,10 @@ public class Feedforward {
 				- (kA / kV) * (kA / kV) * a0;
 	}
 
-	public double getVelocityAtTime(double v0, double a0, double t) {
+	public double getVelocityAtTime(double v0, double a0, double t, boolean forward) {
 		double kV;
 		double kA;
-		if (v0 >= 0) {
+		if (forward) {
 			kV = fkV;
 			kA = fkA;
 		} else {
@@ -108,10 +98,10 @@ public class Feedforward {
 		return v0 + (kA / kV) * a0 - (kA / kV) * a0 / Math.exp(kV / kA * t);
 	}
 
-	public double getAccelerationAtTime(double v0, double a0, double t) {
+	public double getAccelerationAtTime(double v0, double a0, double t, boolean forward) {
 		double kV;
 		double kA;
-		if (v0 >= 0) {
+		if (forward) {
 			kV = fkV;
 			kA = fkA;
 		} else {

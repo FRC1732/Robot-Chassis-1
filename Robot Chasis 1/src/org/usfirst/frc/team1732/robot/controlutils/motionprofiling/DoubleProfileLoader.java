@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class DoubleProfileLoader {
 
-	private static final int minPointsInTalon = 127;
+	private static final int minPointsInTalon = 80;
 	private static final double timeoutSec = 0.1;
 
 	private final TalonSRX leftTalon;
@@ -38,17 +38,27 @@ public class DoubleProfileLoader {
 	public DoubleProfileLoader(TalonSRX leftTalon, TalonSRX rightTalon) {
 		this.leftTalon = leftTalon;
 		this.rightTalon = rightTalon;
-		int period = 1;
+		int period = 5;
 		leftTalon.changeMotionControlFramePeriod(period);
 		rightTalon.changeMotionControlFramePeriod(period);
-		Thread bufferLoader = new Thread(() -> {
+		Thread leftLoader = new Thread(() -> {
 			while (!Thread.interrupted()) {
+				// if (leftStatus.topBufferRem < 512) {
 				leftTalon.processMotionProfileBuffer();
-				rightTalon.processMotionProfileBuffer();
+				// }
 			}
 		});
-		bufferLoader.setDaemon(true);
-		bufferLoader.start();
+		leftLoader.setDaemon(true);
+		leftLoader.start();
+		Thread rightLoader = new Thread(() -> {
+			while (!Thread.interrupted()) {
+				// if (rightStatus.topBufferRem < 512) {
+				rightTalon.processMotionProfileBuffer();
+				// }
+			}
+		});
+		rightLoader.setDaemon(true);
+		rightLoader.start();
 		Notifier controller = new Notifier(() -> {
 			control();
 		});

@@ -37,6 +37,7 @@ public final class Path {
 	private final ArrayList<PathSegment> segments = new ArrayList<>();
 	private Waypoint prev;
 	private MotionProfile profile;
+	private static final double curvatureAdjust = 1.05;
 
 	/**
 	 * 
@@ -365,6 +366,11 @@ public final class Path {
 		double r = 1 / curvature;
 		double lR = Math.abs(r - robotWidth / 2);
 		double rR = Math.abs(r + robotWidth / 2);
+		if (curvature <= 0) {
+			lR = lR * curvatureAdjust;
+		} else {
+			rR = rR * curvatureAdjust;
+		}
 		r = Math.max(lR, rR);
 		return rR / r;
 	}
@@ -436,13 +442,15 @@ public final class Path {
 				rightPoint.zeroPos = false;
 
 				MotionState currentEndState = profile.stateByTimeClamped((i) * timeIncrement);
-				if (Math.abs(currentEndState.pos()) >= currentSegmentLength + segmentLengthSum
-						&& cs + 1 < segments.size()) {
-					System.out.println("currentState pos is greater than current curve length");
-					segmentLengthSum += currentSegmentLength;
-					cs++;
-					currentSegment = segments.get(cs);
-					currentSegmentLength = currentSegment.curve.getTotalArcLength();
+				// System.out.println("End Pos: " + currentEndState.pos());
+				if (Math.abs(currentEndState.pos()) >= currentSegmentLength + segmentLengthSum) {
+					if (cs < segments.size() - 1) {
+						System.out.println("currentState pos is greater than current curve length");
+						segmentLengthSum += currentSegmentLength;
+						cs++;
+						currentSegment = segments.get(cs);
+						currentSegmentLength = currentSegment.curve.getTotalArcLength();
+					}
 				}
 
 				double endCurvature = currentSegment.curve
@@ -455,7 +463,7 @@ public final class Path {
 				double leftStartAcc;
 				double rightStartAcc;
 
-				if (Math.abs(endCurvature) < 1.0E-25) { // if straight
+				if (Math.abs(endCurvature) < 1.0E-35) { // if straight
 					leftPoint.position = (prevLeftEndPos + dCenterArc) * sensorUnitsPerYourUnits
 							+ initialLeftSensorUnits;
 					rightPoint.position = (prevRightEndPos + dCenterArc) * sensorUnitsPerYourUnits
@@ -467,8 +475,10 @@ public final class Path {
 					// leftStartAcc = (leftEndVel - prevLeftEndVel) / pointDurationSec;
 					// rightStartAcc = (rightEndVel - prevRightEndVel) / pointDurationSec;
 
-					leftStartAcc = leftFF.getInitialAcceleration(dCenterArc, pointDurationSec, prevLeftEndVel);
-					rightStartAcc = rightFF.getInitialAcceleration(dCenterArc, pointDurationSec, prevRightEndVel);
+					leftStartAcc = leftFF.getInitialAcceleration(dCenterArc, pointDurationSec, prevLeftEndVel,
+							driveForwards);
+					rightStartAcc = rightFF.getInitialAcceleration(dCenterArc, pointDurationSec, prevRightEndVel,
+							driveForwards);
 				} else { // if curving
 					double startArcLength = Math.abs(currentStartState.pos()) - segmentLengthSum;
 					double endArcLength = Math.abs(currentEndState.pos()) - segmentLengthSum;
@@ -490,8 +500,10 @@ public final class Path {
 					// leftStartAcc = (leftEndVel - prevLeftEndVel) / pointDurationSec;
 					// rightStartAcc = (rightEndVel - prevRightEndVel) / pointDurationSec;
 
-					leftStartAcc = leftFF.getInitialAcceleration(dLeftArc, pointDurationSec, prevLeftEndVel);
-					rightStartAcc = rightFF.getInitialAcceleration(dRightArc, pointDurationSec, prevRightEndVel);
+					leftStartAcc = leftFF.getInitialAcceleration(dLeftArc, pointDurationSec, prevLeftEndVel,
+							driveForwards);
+					rightStartAcc = rightFF.getInitialAcceleration(dRightArc, pointDurationSec, prevRightEndVel,
+							driveForwards);
 				}
 				leftPoint.velocity = 1023 / 12.0 * leftFF.getAppliedVoltage(prevLeftEndVel, leftStartAcc);
 				rightPoint.velocity = 1023 / 12.0 * rightFF.getAppliedVoltage(prevRightEndVel, rightStartAcc);
@@ -506,8 +518,10 @@ public final class Path {
 				// prevLeftEndVel = leftEndVel;
 				// prevRightEndVel = rightEndVel;
 
-				prevLeftEndVel = leftFF.getVelocityAtTime(prevLeftEndVel, leftStartAcc, pointDurationSec);
-				prevRightEndVel = rightFF.getVelocityAtTime(prevRightEndVel, rightStartAcc, pointDurationSec);
+				prevLeftEndVel = leftFF.getVelocityAtTime(prevLeftEndVel, leftStartAcc, pointDurationSec,
+						driveForwards);
+				prevRightEndVel = rightFF.getVelocityAtTime(prevRightEndVel, rightStartAcc, pointDurationSec,
+						driveForwards);
 
 				if (i == 0) {
 					leftPoint.zeroPos = zeroAtStart;

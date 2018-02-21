@@ -38,8 +38,8 @@ public class Drivetrain extends Subsystem {
 	public final Feedforward rightFF = new Feedforward(0.0560625, 0.0071341, 1.7711541, 0.0560625, 0.0071341,
 			-1.7711541);
 
-	private final ClosedLoopProfile mpGains = new ClosedLoopProfile("MP PID", 0, 0, 0, Feedforward.TALON_SRX_FF_GAIN, 0,
-			0, 0, 0);
+	private final ClosedLoopProfile mpGains = new ClosedLoopProfile("MP PID", 0.4, 0, 0, Feedforward.TALON_SRX_FF_GAIN,
+			0, 0, 0, 0);
 	public final ClosedLoopProfile leftMPGains = mpGains;
 	public final ClosedLoopProfile rightMPGains = mpGains;
 
@@ -62,7 +62,7 @@ public class Drivetrain extends Subsystem {
 
 	public static final double ROBOT_LENGTH_IN = 34.5;
 	public static final double ROBOT_WIDTH_IN = 35;
-	public static final double EFFECTIVE_ROBOT_WIDTH_IN = 27.8947584116;
+	public static final double EFFECTIVE_ROBOT_WIDTH_IN = 27;
 
 	public final DoubleProfileLoader profileManager;
 
