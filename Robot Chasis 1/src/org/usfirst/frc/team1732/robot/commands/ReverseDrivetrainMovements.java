@@ -4,6 +4,7 @@ import static org.usfirst.frc.team1732.robot.Robot.drivetrain;
 import static org.usfirst.frc.team1732.robot.Robot.leftRecorder;
 import static org.usfirst.frc.team1732.robot.Robot.rightRecorder;
 
+import org.usfirst.frc.team1732.robot.Robot;
 import org.usfirst.frc.team1732.robot.util.SRXMomentRecorder.Moment;
 
 import edu.wpi.first.wpilibj.command.Command;
@@ -27,10 +28,14 @@ public class ReverseDrivetrainMovements extends Command {
 	protected void execute() {
 		Moment left = leftRecorder.getLast(), right = rightRecorder.getLast();
 		// System.out.printf("Left: %.5f, Right: %.5f%n", left, right);
-		drivetrain.setLeft(drivetrain.leftFF.getAppliedVoltage(-left.velocity, -left.acceleration)/12);
-		drivetrain.setRight(drivetrain.rightFF.getAppliedVoltage(-right.velocity, -right.acceleration)/12);
-//		drivetrain.setLeft(-left.voltage);
-//		drivetrain.setRight(-right.voltage);
+		// Almost works, but is off by some amount. I think that this is becuase the
+		// robot has a variable battery output
+		drivetrain.setLeft(drivetrain.leftFF.getAppliedVoltage(-left.velocity,
+				-left.acceleration) / Robot.actualVoltage.getAverage());
+		drivetrain.setRight(drivetrain.rightFF.getAppliedVoltage(-right.velocity,
+				-right.acceleration) / Robot.actualVoltage.getAverage());
+		// drivetrain.setLeft(-left.voltage);
+		// drivetrain.setRight(-right.voltage);
 	}
 
 	// Make this return true when this Command no longer needs to run execute()
