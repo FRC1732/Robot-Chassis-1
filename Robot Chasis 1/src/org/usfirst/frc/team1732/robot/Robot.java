@@ -8,10 +8,7 @@
 package org.usfirst.frc.team1732.robot;
 
 import org.usfirst.frc.team1732.robot.autotools.DriverStationData;
-import org.usfirst.frc.team1732.robot.commands.TestPathing;
-import org.usfirst.frc.team1732.robot.controlutils.motionprofiling.pathing.Path;
-import org.usfirst.frc.team1732.robot.controlutils.motionprofiling.pathing.Path.MyIterator;
-import org.usfirst.frc.team1732.robot.controlutils.motionprofiling.pathing.Waypoint;
+import org.usfirst.frc.team1732.robot.commands.Test;
 import org.usfirst.frc.team1732.robot.input.Joysticks;
 import org.usfirst.frc.team1732.robot.odomotry.PositionEstimator;
 import org.usfirst.frc.team1732.robot.sensors.Sensors;
@@ -20,7 +17,6 @@ import org.usfirst.frc.team1732.robot.subsystems.Claw;
 import org.usfirst.frc.team1732.robot.subsystems.Drivetrain;
 
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Scheduler;
 
 /**
@@ -68,21 +64,20 @@ public class Robot extends TimedRobot {
 	}
 
 	@Override
-	public void disabledInit() {
-	}
+	public void disabledInit() {}
 
 	@Override
 	public void autonomousInit() {
-		Timer t = new Timer();
-		t.reset();
-		t.start();
-		Path path;
+		// Timer t = new Timer();
+		// t.reset();
+		// t.start();
+		// Path path;
 		// path = new Path(new Waypoint(0, 0, Math.PI / 2, 0), true);
 		// path.addWaypoint(new Waypoint(90, 50, 0, 0));
-		path = new Path(new Waypoint(0, 0, Math.PI / 2, 0), true);
-		path.addWaypoint(new Waypoint(0, 100, Math.PI / 2, 0));
-		path.generateProfile(Drivetrain.MAX_IN_SEC, Drivetrain.MAX_IN_SEC2 / 4.0);
-		System.out.println("Time to make path: " + t.get());
+		// path = new Path(new Waypoint(0, 0, Math.PI / 2, 0), true);
+		// path.addWaypoint(new Waypoint(0, 100, Math.PI / 2, 0));
+		// path.generateProfile(Drivetrain.MAX_IN_SEC, Drivetrain.MAX_IN_SEC2 / 4.0);
+		// System.out.println("Time to make path: " + t.get());
 
 		//
 		// // With Correction
@@ -96,16 +91,16 @@ public class Robot extends TimedRobot {
 		// drivetrain.leftTalon1::getActiveTrajectoryHeading);
 		//
 		// // Without Correction
-		MyIterator iterator = path.getIteratorZeroAtStart(2, Robot.drivetrain.leftFF, Robot.drivetrain.rightFF,
-				Drivetrain.EFFECTIVE_ROBOT_WIDTH_IN, 1.0 / Drivetrain.ENCODER_INCHES_PER_PULSE);
+		// MyIterator iterator = path.getIteratorZeroAtStart(2, Robot.drivetrain.leftFF, Robot.drivetrain.rightFF,
+		// Drivetrain.EFFECTIVE_ROBOT_WIDTH_IN, 1.0 / Drivetrain.ENCODER_INCHES_PER_PULSE);
 		// iterator = Path.getPreloadedIterator(iterator);
-		System.out.println("Time to make path: " + t.get());
+		// System.out.println("Time to make path: " + t.get());
 
-		new TestPathing(iterator).start();
+		// new TestPathing(iterator).start();
 		// new TurnToAngle(-90, 80).start();
 		// new ScaleLeftSingle(DriverStationData.closeSwitchIsLeft).start();
 		// new TestMotors(-0.3, 0.3).start();
-		// new Test().start();
+		new Test().start();
 		// new DriveTrainCharacterizer(TestMode.STEP_VOLTAGE,
 		// Direction.Forward).start();
 	}

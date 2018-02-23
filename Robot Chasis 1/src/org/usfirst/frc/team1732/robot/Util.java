@@ -126,11 +126,11 @@ public class Util {
 		double modifiedPD = (1 - Math.cos(percentDone * Math.PI)) / 2;
 		return startOut * (1 - modifiedPD) + endOut * modifiedPD;
 	}
-	public static double lerp(double y1, double y2, double x) {
-		return (y1 * (1 - x)) + (y2 * x);
+	public static double lerp(double y1, double y2, double mu) {
+		return (y1 * (1 - mu)) + (y2 * mu);
 	}
-	public static double cerp(double y1, double y2, double x) {
-		double mu2 = (1 - Math.cos(x * Math.PI)) / 2;
+	public static double cerp(double y1, double y2, double mu) {
+		double mu2 = (1 - Math.cos(mu * Math.PI)) / 2;
 		return (y1 * (1 - mu2)) + (y2 * mu2);
 	}
 	public static double map(double x, double iMin, double iMax, double fMin, double fMax) {

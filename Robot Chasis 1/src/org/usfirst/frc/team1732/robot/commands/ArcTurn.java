@@ -53,7 +53,7 @@ public class ArcTurn extends Command {
 	}
 
 	protected void initialize() {
-		System.out.println("ArcTurn starting R = " + R + ", T = " + T);
+		System.out.println("ArcTurn: Starting R = " + R + ", T = " + T);
 		g.zero();
 		l.zero();
 		r.zero();
@@ -78,5 +78,6 @@ public class ArcTurn extends Command {
 	}
 	protected void end() {
 		drivetrain.setStop();
+		System.out.println("ArcTurn: Ended");
 	}
 }
