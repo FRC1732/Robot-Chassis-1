@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.command.CommandGroup;
 
 public class ScaleRight extends CommandGroup {
 
+	@SuppressWarnings("unused")
 	public ScaleRight(boolean scaleIsRight) {
 		double startingX = Field.Switch.BOUNDARY.getMaxX() - 3 - Drivetrain.ROBOT_WIDTH_IN / 2.0;
 		if (scaleIsRight) {

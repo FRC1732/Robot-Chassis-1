@@ -49,8 +49,6 @@ public class MotionProfile implements Iterable<TrajectoryPoint>, Iterator<Trajec
 	
 	TrajectoryPoint prev = null;
 	private double psum1 = 0;
-	private double psum2 = 0;
-	
 	private double[] sum1;
 	
 	@Override

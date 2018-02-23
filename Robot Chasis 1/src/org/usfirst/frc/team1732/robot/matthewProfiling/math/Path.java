@@ -5,6 +5,14 @@ public class Path {
 	private Bezier[] beziers;
 	
 	public Path(Bezier... beziers) {
+		this.setBeziers(beziers);
+	}
+
+	public Bezier[] getBeziers() {
+		return beziers;
+	}
+
+	public void setBeziers(Bezier[] beziers) {
 		this.beziers = beziers;
 	}
 	

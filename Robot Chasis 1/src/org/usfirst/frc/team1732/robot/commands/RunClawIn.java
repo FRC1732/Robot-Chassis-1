@@ -18,7 +18,9 @@ public class RunClawIn extends Command {
 		Robot.claw.setIn();
 	}
 
+	@SuppressWarnings("unused")
 	private long timeFirstOver;
+	@SuppressWarnings("unused")
 	private boolean goneOver = false;
 	public static final double currentOverTime = 500;
 
