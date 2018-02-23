@@ -44,7 +44,7 @@ public class Robot extends TimedRobot {
 	public static SampleAveraging actualVoltage;
 
 	// config
-	public static final int PERIOD_MS = 20;
+	public static final int PERIOD_MS = 10;
 	public static final double PERIOD_S = PERIOD_MS / 1000.0;
 	public static final int CONFIG_TIMEOUT = 10; // recommended timeout by CTRE
 
@@ -66,7 +66,7 @@ public class Robot extends TimedRobot {
 		rightRecorder = new SRXMomentRecorder(drivetrain.rightTalon1,
 				drivetrain.rightEncoder);
 
-		actualVoltage = new SampleAveraging(100, Claw.panel::getVoltage);
+		// actualVoltage = new SampleAveraging(100, Claw.panel::getVoltage);
 	}
 
 	@Override
@@ -126,15 +126,14 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void teleopInit() {
-		actualVoltage.stop();
-		leftRecorder.startRecording();
-		rightRecorder.startRecording();
+		// actualVoltage.stop();
+		// leftRecorder.startRecording();
+		// rightRecorder.startRecording();
 	}
 
 	@Override
 	public void testInit() {
-		actualVoltage.stop();
-
+		// actualVoltage.stop();
 	}
 
 }
