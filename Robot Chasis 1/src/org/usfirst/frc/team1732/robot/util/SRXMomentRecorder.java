@@ -1,7 +1,6 @@
 package org.usfirst.frc.team1732.robot.util;
 
 import java.util.Deque;
-import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.LinkedBlockingDeque;
 
 import org.usfirst.frc.team1732.robot.Robot;
@@ -21,7 +20,6 @@ public class SRXMomentRecorder {
 	public SRXMomentRecorder(TalonSRX device, TalonEncoder reader) {
 		talon = device;
 		encoder = reader;
-		moments.push(new Moment(0, 0, 0, 0, 0));
 	}
 
 	private double vel;
@@ -49,10 +47,8 @@ public class SRXMomentRecorder {
 
 	public void record() {
 		if (recording) {
-			moments.push(new Moment(talon.getMotorOutputVoltage(),
-					talon.getMotorOutputPercent(), encoder.getRate(),
-					(encoder.getRate() - vel) / (Timer.getFPGATimestamp() - time),
-					Timer.getFPGATimestamp() - time));
+			moments.push(new Moment(talon.getMotorOutputVoltage(), talon.getMotorOutputPercent(), encoder.getRate(),
+					(encoder.getRate() - vel) / (Timer.getFPGATimestamp() - time), Timer.getFPGATimestamp() - time));
 			totalTime += Timer.getFPGATimestamp() - time;
 			i++;
 			vel = encoder.getRate();
@@ -62,8 +58,7 @@ public class SRXMomentRecorder {
 
 	public void stopRecording() {
 		recording = false;
-		System.out.println("Average Time: " + totalTime / i +
-				" vs theory: " + Robot.PERIOD_S);
+		System.out.println("Average Time: " + totalTime / i + " vs theory: " + Robot.PERIOD_S);
 	}
 
 	public double getLastVoltage() {
@@ -83,7 +78,7 @@ public class SRXMomentRecorder {
 	private Moment current;
 
 	public Moment getNext(double deltaTime) {
-		if(isFinished()) {
+		if (isFinished()) {
 			return null;
 		}
 		if (current == null) {
@@ -93,10 +88,10 @@ public class SRXMomentRecorder {
 		}
 
 		if (current.deltaTime > deltaTime) {
-			current.deltaTime-= deltaTime;
+			current.deltaTime -= deltaTime;
 			return current;
-		}else {
-			deltaTime-= current.deltaTime;
+		} else {
+			deltaTime -= current.deltaTime;
 			current = getLast();
 			return getNext(deltaTime);
 		}
@@ -136,6 +131,7 @@ public class SRXMomentRecorder {
 			deltaTime = t;
 		}
 
+		@Override
 		public String toString() {
 			return String.format("Voltage: %.3f, EncoderPos: %.3f", voltage, velocity);
 		}

@@ -3,6 +3,7 @@ package org.usfirst.frc.team1732.robot.commands.autotest;
 import static org.usfirst.frc.team1732.robot.Robot.drivetrain;
 import static org.usfirst.frc.team1732.robot.Robot.sensors;
 
+import org.usfirst.frc.team1732.robot.Robot;
 import org.usfirst.frc.team1732.robot.sensors.navx.GyroReader;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
@@ -77,6 +78,8 @@ public class TurnAngle extends Command {
 		g.zero();
 		System.out.println("Turn to angle started");
 		// pid.setSetpoint(goalAngle);
+		Robot.drivetrain.velocityGains.applyToTalon(Robot.drivetrain.leftTalon1, 1, 0);
+		Robot.drivetrain.velocityGains.applyToTalon(Robot.drivetrain.rightTalon1, 1, 0);
 	}
 
 	@Override
@@ -85,15 +88,15 @@ public class TurnAngle extends Command {
 		double currentAngle = g.getTotalAngle();
 		double error = goalAngle - currentAngle;
 
-		double leftVel = getVelocity(currentAngle) * sign;
-		double rightVel = -getVelocity(currentAngle) * sign;
+		double leftVel = (getVelocity(currentAngle)) * sign;
+		double rightVel = -(getVelocity(currentAngle)) * sign;
 
-		double currentHeading = g.getTotalAngle();
-		double headingError = goalAngle - currentHeading;
-		double headingAdjustment = headingError * HEADING_P;
+		// double currentHeading = g.getTotalAngle();
+		// double headingError = goalAngle - currentHeading;
+		// double headingAdjustment = headingError * HEADING_P;
 
-		drivetrain.leftTalon1.set(ControlMode.Velocity, leftVel + headingAdjustment);
-		drivetrain.rightTalon1.set(ControlMode.Velocity, rightVel - headingAdjustment);
+		drivetrain.leftTalon1.set(ControlMode.Velocity, leftVel);// + headingAdjustment);
+		drivetrain.rightTalon1.set(ControlMode.Velocity, rightVel);// - headingAdjustment);
 
 		if (!inDeadband && Math.abs(goalAngle - g.getTotalAngle()) < ANGLE_DEADBAND) {
 			deadbandTimer.start();
@@ -103,7 +106,12 @@ public class TurnAngle extends Command {
 			deadbandTimer.reset();
 			deadbandTimer.stop();
 		}
-		System.out.println("ANGLE ERROR: " + error + " should finish: " + (Math.abs(error) < ANGLE_DEADBAND));
+		// System.out.println("ANGLE ERROR: " + error + " should finish: " +
+		// (Math.abs(error) < ANGLE_DEADBAND));
+		System.out.println("left error: " + Robot.drivetrain.leftTalon1.getClosedLoopError(0));
+		System.out.println("right error: " + Robot.drivetrain.rightTalon1.getClosedLoopError(0));
+		System.out.println("left target: " + Robot.drivetrain.leftTalon1.getClosedLoopTarget(0));
+		System.out.println("right target: " + Robot.drivetrain.rightTalon1.getClosedLoopTarget(0));
 	}
 
 	@Override

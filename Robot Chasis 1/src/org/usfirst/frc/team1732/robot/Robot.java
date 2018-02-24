@@ -8,7 +8,7 @@
 package org.usfirst.frc.team1732.robot;
 
 import org.usfirst.frc.team1732.robot.autotools.DriverStationData;
-import org.usfirst.frc.team1732.robot.commands.ReverseDrivetrainMovements;
+import org.usfirst.frc.team1732.robot.commands.autotest.TurnAngle;
 import org.usfirst.frc.team1732.robot.input.Joysticks;
 import org.usfirst.frc.team1732.robot.odomotry.PositionEstimator;
 import org.usfirst.frc.team1732.robot.sensors.Sensors;
@@ -39,9 +39,9 @@ public class Robot extends TimedRobot {
 
 	public static SRXMomentRecorder leftRecorder;
 	public static SRXMomentRecorder rightRecorder;
-	
-//	public static SampleAveraging actualVoltage;
-	
+
+	// public static SampleAveraging actualVoltage;
+
 	// config
 	public static final int PERIOD_MS = 20;
 	public static final double PERIOD_S = PERIOD_MS / 1000.0;
@@ -60,11 +60,9 @@ public class Robot extends TimedRobot {
 		claw = new Claw();
 
 		joysticks = new Joysticks();
-		leftRecorder = new SRXMomentRecorder(drivetrain.leftTalon1,
-				drivetrain.leftEncoder);
-		rightRecorder = new SRXMomentRecorder(drivetrain.rightTalon1,
-				drivetrain.rightEncoder);
-		
+		leftRecorder = new SRXMomentRecorder(drivetrain.leftTalon1, drivetrain.leftEncoder);
+		rightRecorder = new SRXMomentRecorder(drivetrain.rightTalon1, drivetrain.rightEncoder);
+
 	}
 
 	@Override
@@ -76,45 +74,48 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void disabledInit() {
-//		actualVoltage.start();
-		rightRecorder.stopRecording();
-		leftRecorder.stopRecording();
+		// actualVoltage.start();
+		// rightRecorder.stopRecording();
+		// leftRecorder.stopRecording();
 	}
 
 	@Override
 	public void autonomousInit() {
-//		actualVoltage.stop();
-//		Timer t = new Timer();
-//		t.reset();
-//		t.start();
-//		Path path;
-//		// path = new Path(new Waypoint(0, 0, Math.PI / 2, 0), true);
-//		// path.addWaypoint(new Waypoint(90, 50, 0, 0));
-//		path = new Path(new Waypoint(0, 0, Math.PI / 2, 0), true);
-//		path.addWaypoint(new Waypoint(0, 100, Math.PI / 2, 0));
-//		path.generateProfile(Drivetrain.MAX_IN_SEC, Drivetrain.MAX_IN_SEC2 / 4.0);
-//		System.out.println("Time to make path: " + t.get());
-//
-//		//
-//		// // With Correction
-//		// Iterator<TrajectoryPoint[]> iterator =
-//		// path.getIterator(TrajectoryDuration.Trajectory_Duration_20ms,
-//		// Robot.drivetrain.leftFFF, Robot.drivetrain.rightFFF, 0, 0,
-//		// Drivetrain.EFFECTIVE_ROBOT_WIDTH_IN,
-//		// 1.0 / Drivetrain.ENCODER_INCHES_PER_PULSE, true,
-//		// sensors::getCurrentAngleCorrectedInRadian,
-//		// drivetrain.rightTalon1::getActiveTrajectoryHeading,
-//		// drivetrain.leftTalon1::getActiveTrajectoryHeading);
-//		//
-//		// // Without Correction
-//		MyIterator iterator = path.getIteratorZeroAtStart(2, Robot.drivetrain.leftFF, Robot.drivetrain.rightFF,
-//				Drivetrain.EFFECTIVE_ROBOT_WIDTH_IN, 1.0 / Drivetrain.ENCODER_INCHES_PER_PULSE);
-//		// iterator = Path.getPreloadedIterator(iterator);
-//		System.out.println("Time to make path: " + t.get());
+		// actualVoltage.stop();
+		// Timer t = new Timer();
+		// t.reset();
+		// t.start();
+		// Path path;
+		// // path = new Path(new Waypoint(0, 0, Math.PI / 2, 0), true);
+		// // path.addWaypoint(new Waypoint(90, 50, 0, 0));
+		// path = new Path(new Waypoint(0, 0, Math.PI / 2, 0), true);
+		// path.addWaypoint(new Waypoint(0, 100, Math.PI / 2, 0));
+		// path.generateProfile(Drivetrain.MAX_IN_SEC, Drivetrain.MAX_IN_SEC2 / 4.0);
+		// System.out.println("Time to make path: " + t.get());
+		//
+		// //
+		// // // With Correction
+		// // Iterator<TrajectoryPoint[]> iterator =
+		// // path.getIterator(TrajectoryDuration.Trajectory_Duration_20ms,
+		// // Robot.drivetrain.leftFFF, Robot.drivetrain.rightFFF, 0, 0,
+		// // Drivetrain.EFFECTIVE_ROBOT_WIDTH_IN,
+		// // 1.0 / Drivetrain.ENCODER_INCHES_PER_PULSE, true,
+		// // sensors::getCurrentAngleCorrectedInRadian,
+		// // drivetrain.rightTalon1::getActiveTrajectoryHeading,
+		// // drivetrain.leftTalon1::getActiveTrajectoryHeading);
+		// //
+		// // // Without Correction
+		// MyIterator iterator = path.getIteratorZeroAtStart(2, Robot.drivetrain.leftFF,
+		// Robot.drivetrain.rightFF,
+		// Drivetrain.EFFECTIVE_ROBOT_WIDTH_IN, 1.0 /
+		// Drivetrain.ENCODER_INCHES_PER_PULSE);
+		// // iterator = Path.getPreloadedIterator(iterator);
+		// System.out.println("Time to make path: " + t.get());
 
-//		new TestPathing(iterator).start();
-		
-		new ReverseDrivetrainMovements().start();
+		// new TestPathing(iterator).start();
+
+		new TurnAngle(90, 70).start();
+		// new ReverseDrivetrainMovements().start();
 		// new TurnToAngle(-90, 80).start();
 		// new ScaleLeftSingle(DriverStationData.closeSwitchIsLeft).start();
 		// new TestMotors(-0.3, 0.3).start();
@@ -125,14 +126,14 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void teleopInit() {
-//		actualVoltage.stop();
-		leftRecorder.startRecording();
-		rightRecorder.startRecording();
+		// actualVoltage.stop();
+		// leftRecorder.startRecording();
+		// rightRecorder.startRecording();
 	}
 
 	@Override
 	public void testInit() {
-//		actualVoltage.stop();
+		// actualVoltage.stop();
 
 	}
 
