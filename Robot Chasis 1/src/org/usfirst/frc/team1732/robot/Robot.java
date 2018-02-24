@@ -19,7 +19,6 @@ import org.usfirst.frc.team1732.robot.util.SRXMomentRecorder;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Scheduler;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -66,21 +65,8 @@ public class Robot extends TimedRobot {
 		rightRecorder = new SRXMomentRecorder(drivetrain.rightTalon1,
 				drivetrain.rightEncoder);
 		
-//		actualVoltage = new SampleAveraging(100, Claw.panel::getVoltage);
-//		timeBetweenCalls = new Timer();
-//		timeBetweenCalls.reset();
-//		timeBetweenCalls.start();
-		time = System.currentTimeMillis();
-	}
-	
-	@Override
-	protected void loopFunc() {
-		SmartDashboard.putNumber("Time between calls", System.currentTimeMillis() - time);
-		time = System.currentTimeMillis();
-		super.loopFunc();
 	}
 
-	long time;
 	@Override
 	public void robotPeriodic() {
 		DriverStationData.gotPlatePositions();
@@ -91,11 +77,10 @@ public class Robot extends TimedRobot {
 	@Override
 	public void disabledInit() {
 //		actualVoltage.start();
-//		rightRecorder.stopRecording();
-//		leftRecorder.stopRecording();
+		rightRecorder.stopRecording();
+		leftRecorder.stopRecording();
 	}
 
-	@SuppressWarnings("unused")
 	@Override
 	public void autonomousInit() {
 //		actualVoltage.stop();

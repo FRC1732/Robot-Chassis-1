@@ -6,33 +6,34 @@ import static org.usfirst.frc.team1732.robot.Robot.rightRecorder;
 
 import org.usfirst.frc.team1732.robot.Robot;
 import org.usfirst.frc.team1732.robot.util.SRXMomentRecorder.Moment;
-import org.usfirst.frc.team1732.robot.util.TimedThread;
+import org.usfirst.frc.team1732.robot.util.TimedCommand;
 
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.command.Command;
 
 /**
  *
  */
-public class ReverseDrivetrainMovements extends Command {
+public class ReverseDrivetrainMovements extends TimedCommand {
 
 	public ReverseDrivetrainMovements() {
 		requires(drivetrain);
 	}
 
 	// Called just before this Command runs the first time
-	protected void initialize() {
+	@Override
+	public void init() {
 		leftRecorder.stopRecording();
 		rightRecorder.stopRecording();
 		last = Timer.getFPGATimestamp();
-		new TimedThread(this::loop, Robot.PERIOD_MS * 1000000).runUntil(this);
+		setDelay(Robot.PERIOD_MS);
 	}
 	
 	private double last;
 	private double total;
 	private int i;
 	// Called repeatedly when this Command is scheduled to run
-	private void loop() {
+	@Override
+	public void exec() {
 		Moment left = leftRecorder.getNext(Timer.getFPGATimestamp() - last),
 				right = rightRecorder.getNext(Timer.getFPGATimestamp() - last);
 		total+= (Timer.getFPGATimestamp() - last);
@@ -52,17 +53,15 @@ public class ReverseDrivetrainMovements extends Command {
 			 drivetrain.setRight(-right.percent);
 		}
 	}
-	
-	protected void execute() {
-//		run();
-	}
 
 	// Make this return true when this Command no longer needs to run execute()
+	@Override
 	protected boolean isFinished() {
 		return leftRecorder.isFinished() || rightRecorder.isFinished();
 	}
 
 	// Called once after isFinished returns true
+	@Override
 	protected void end() {
 		drivetrain.setStop();
 		System.out.println(total / i);
