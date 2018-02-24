@@ -32,9 +32,9 @@ public class Drivetrain extends Subsystem {
 	public static final double MAX_OUTPUT = 1.0;
 	public static final double ENCODER_INCHES_PER_PULSE = 0.002099;
 
-	public static final double MAX_IN_SEC = 90; // max vel
+	public static final double MAX_IN_SEC = 150; // max vel
 	public static final double MAX_UNITS_PER_100MS = MAX_IN_SEC / ENCODER_INCHES_PER_PULSE / 10; // max vel
-	public static final double MAX_IN_SEC2 = 500; // max acc
+	public static final double MAX_IN_SEC2 = 400; // max acc
 
 	// Feedforward
 	public final Feedforward leftFF = new Feedforward(0.0574657, 0.0089855, 1.6010019, 0.0574657, 0.0089855,
@@ -47,12 +47,12 @@ public class Drivetrain extends Subsystem {
 	public final ClosedLoopProfile leftMPGains = mpGains;
 	public final ClosedLoopProfile rightMPGains = mpGains;
 
-	public final ClosedLoopProfile velocityGains = new ClosedLoopProfile("Velocity pid", 0, 0, 0,
+	public final ClosedLoopProfile velocityGains = new ClosedLoopProfile("Velocity pid", 0.2, 0, 0,
 			1023 / MAX_UNITS_PER_100MS, 0, 0, 0, 0);
 
 	public static final double ROBOT_LENGTH_IN = 34.5;
 	public static final double ROBOT_WIDTH_IN = 35;
-	public static final double EFFECTIVE_ROBOT_WIDTH_IN = 27;
+	public static final double EFFECTIVE_ROBOT_WIDTH_IN = 27.5;
 
 	public final DoubleProfileLoader profileManager;
 
@@ -96,6 +96,10 @@ public class Drivetrain extends Subsystem {
 		leftEncoder.zero();
 
 		profileManager = new DoubleProfileLoader(leftTalon1, rightTalon1);
+	}
+
+	public double convertVelocitySetpoint(double desired) {
+		return desired / MAX_IN_SEC * MAX_UNITS_PER_100MS;
 	}
 
 	@Override
