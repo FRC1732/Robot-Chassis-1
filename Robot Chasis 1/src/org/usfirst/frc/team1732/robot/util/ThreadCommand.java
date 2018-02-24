@@ -29,7 +29,7 @@ public abstract class ThreadCommand extends Command {
 	private void sleepExactly() {
 		while (RobotController.getFPGATime() - last < microDelay && !Thread.interrupted()) {
 			try {
-				Thread.sleep(microDelay / 1000, 0);
+				Thread.sleep(0, microDelay / 100);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -37,11 +37,18 @@ public abstract class ThreadCommand extends Command {
 		last = RobotController.getFPGATime();
 	}
 
+	// Timer test = new Timer();
+
 	private void loop() {
 		last = RobotController.getFPGATime();
+		// test.reset();
+		// test.start();
 		while (isRunning() && !isFinished()) {
 			exec();
 			sleepExactly();
+			// System.out.println("Loop time: " + test.get());
+			// test.reset();
+			// test.start();
 		}
 	}
 
