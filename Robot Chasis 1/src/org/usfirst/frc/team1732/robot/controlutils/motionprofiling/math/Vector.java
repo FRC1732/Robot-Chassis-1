@@ -112,6 +112,11 @@ public final class Vector {
 		return Math.atan2(y, x);
 	}
 
+	public double getHeading() {
+		double angle = getAbsoluteAngle();
+		return (-angle) + Math.PI / 2;
+	}
+
 	@Override
 	public boolean equals(Object other) {
 		if (!(other instanceof Vector))

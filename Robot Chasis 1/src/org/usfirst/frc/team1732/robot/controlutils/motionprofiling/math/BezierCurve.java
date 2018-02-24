@@ -127,7 +127,7 @@ public final class BezierCurve implements Curve {
 
 	@Override
 	public double getHeadingAtArcLength(double arcLength) {
-		return tangent(tFromArcLength(arcLength)).getAbsoluteAngle();
+		return tangent(tFromArcLength(arcLength)).getHeading();
 	}
 
 }
