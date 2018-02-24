@@ -37,7 +37,6 @@ public final class Path {
 	private final ArrayList<PathSegment> segments = new ArrayList<>();
 	private Waypoint prev;
 	private MotionProfile profile;
-	private static final double curvatureAdjust = 1.05;
 
 	/**
 	 * 
@@ -171,14 +170,15 @@ public final class Path {
 		double goalPos = segments.get(0).curve.getTotalArcLength() + previousState.pos();
 
 		MotionProfileGoal goalState = new MotionProfileGoal(goalPos, Math.abs(segments.get(0).end.vel),
-				CompletionBehavior.OVERSHOOT);
+				CompletionBehavior.VIOLATE_MAX_ACCEL); // necessary because we restrict profiles to only moving forwards
+														// or backwards
 		MotionProfile currentProfile = GenerateMotionProfile.generateStraightMotionProfile(constraints, goalState,
 				previousState);
 		previousState = currentProfile.endState();
 
 		for (int i = 1; i < segments.size(); i++) {
 			goalPos = segments.get(i).curve.getTotalArcLength() + previousState.pos();
-			goalState = new MotionProfileGoal(goalPos, segments.get(i).end.vel, CompletionBehavior.OVERSHOOT);
+			goalState = new MotionProfileGoal(goalPos, segments.get(i).end.vel, CompletionBehavior.VIOLATE_MAX_ACCEL);
 			currentProfile.appendProfile(
 					GenerateMotionProfile.generateStraightMotionProfile(constraints, goalState, previousState));
 			previousState = currentProfile.endState();
@@ -313,28 +313,24 @@ public final class Path {
 
 	}
 
-	public static class TrajectoryPointPair {
-		public final TrajectoryPoint left;
-		public final TrajectoryPoint right;
+	public static class PointPair<T> {
+		public final T left;
+		public final T right;
 
-		public TrajectoryPointPair() {
-			this(new TrajectoryPoint(), new TrajectoryPoint());
-		}
-
-		public TrajectoryPointPair(TrajectoryPoint left, TrajectoryPoint right) {
+		public PointPair(T left, T right) {
 			this.left = left;
 			this.right = right;
 		}
 
 	}
 
-	public static class MyIterator implements Iterator<TrajectoryPointPair> {
+	public static class MyIterator<T> implements Iterator<T> {
 
-		private final Iterator<TrajectoryPointPair> iterator;
+		private final Iterator<T> iterator;
 		public final int baseDurationMs;
 		public final double baseDurationSec;
 
-		public MyIterator(Iterator<TrajectoryPointPair> iterator, int baseDurationMs) {
+		public MyIterator(Iterator<T> iterator, int baseDurationMs) {
 			this.iterator = iterator;
 			this.baseDurationMs = baseDurationMs;
 			this.baseDurationSec = baseDurationMs / 1000.0;
@@ -346,7 +342,7 @@ public final class Path {
 		}
 
 		@Override
-		public TrajectoryPointPair next() {
+		public T next() {
 			return iterator.next();
 		}
 
@@ -366,39 +362,34 @@ public final class Path {
 		double r = 1 / curvature;
 		double lR = Math.abs(r - robotWidth / 2);
 		double rR = Math.abs(r + robotWidth / 2);
-		if (curvature <= 0) {
-			lR = lR * curvatureAdjust;
-		} else {
-			rR = rR * curvatureAdjust;
-		}
 		r = Math.max(lR, rR);
 		return rR / r;
 	}
 
-	public static MyIterator getPreloadedIterator(MyIterator input) {
-		ArrayList<TrajectoryPointPair> array = new ArrayList<>();
+	public static <T> MyIterator<PointPair<T>> getPreloadedIterator(MyIterator<PointPair<T>> input) {
+		ArrayList<PointPair<T>> array = new ArrayList<>();
 		while (input.hasNext()) {
 			array.add(input.next());
 		}
-		return new MyIterator(array.iterator(), input.baseDurationMs);
+		return new MyIterator<PointPair<T>>(array.iterator(), input.baseDurationMs);
 	}
 
-	public MyIterator getIteratorWithOffset(int baseDurationMs, Feedforward leftFF, Feedforward rightFF,
-			int initialLeftSensorUnits, int initialRightSensorUnits, double robotWidth,
+	public MyIterator<PointPair<TrajectoryPoint>> getIteratorWithOffset(int baseDurationMs, Feedforward leftFF,
+			Feedforward rightFF, int initialLeftSensorUnits, int initialRightSensorUnits, double robotWidth,
 			double sensorUnitsPerYourUnits) {
 		return getIterator(baseDurationMs, leftFF, rightFF, initialLeftSensorUnits, initialRightSensorUnits, robotWidth,
 				sensorUnitsPerYourUnits, false);
 	}
 
-	public MyIterator getIteratorZeroAtStart(int baseDurationMs, Feedforward leftFF, Feedforward rightFF,
-			double robotWidth, double sensorUnitsPerYourUnits) {
+	public MyIterator<PointPair<TrajectoryPoint>> getIteratorZeroAtStart(int baseDurationMs, Feedforward leftFF,
+			Feedforward rightFF, double robotWidth, double sensorUnitsPerYourUnits) {
 		return getIterator(baseDurationMs, leftFF, rightFF, 0, 0, robotWidth, sensorUnitsPerYourUnits, true);
 	}
 
-	public MyIterator getIterator(int baseDurationMs, Feedforward leftFF, Feedforward rightFF,
-			int initialLeftSensorUnits, int initialRightSensorUnits, double robotWidth, double sensorUnitsPerYourUnits,
-			boolean zeroAtStart) {
-		Iterator<TrajectoryPointPair> iterator = new Iterator<TrajectoryPointPair>() {
+	public MyIterator<PointPair<TrajectoryPoint>> getIterator(int baseDurationMs, Feedforward leftFF,
+			Feedforward rightFF, int initialLeftSensorUnits, int initialRightSensorUnits, double robotWidth,
+			double sensorUnitsPerYourUnits, boolean zeroAtStart) {
+		Iterator<PointPair<TrajectoryPoint>> iterator = new Iterator<PointPair<TrajectoryPoint>>() {
 
 			int cs = 0;
 			PathSegment currentSegment = segments.get(0);
@@ -426,10 +417,9 @@ public final class Path {
 			}
 
 			@Override
-			public TrajectoryPointPair next() {
-				TrajectoryPointPair pair = new TrajectoryPointPair();
-				TrajectoryPoint leftPoint = pair.left;
-				TrajectoryPoint rightPoint = pair.right;
+			public PointPair<TrajectoryPoint> next() {
+				TrajectoryPoint leftPoint = new TrajectoryPoint();
+				TrajectoryPoint rightPoint = new TrajectoryPoint();
 				leftPoint.timeDur = additionalDuration;
 				rightPoint.timeDur = additionalDuration;
 				leftPoint.headingDeg = 0;
@@ -533,10 +523,87 @@ public final class Path {
 				}
 				currentStartState = currentEndState;
 				i++;
-				return pair;
+				return new PointPair<TrajectoryPoint>(leftPoint, rightPoint);
 			}
 		};
-		return new MyIterator(iterator, baseDurationMs);
+		return new MyIterator<PointPair<TrajectoryPoint>>(iterator, baseDurationMs);
+	}
+
+	public static class VelocityPoint {
+		public int timeDurationMs;
+		public double velocity;
+		public double headingDeg;
+	}
+
+	public MyIterator<PointPair<VelocityPoint>> getVelocityIterator(double robotWidth) {
+		int pointDurationMs = 5; // navx can only update at 200 Hz
+		Iterator<PointPair<VelocityPoint>> iterator = new Iterator<PointPair<VelocityPoint>>() {
+
+			int cs = 0;
+			PathSegment currentSegment = segments.get(0);
+			double currentSegmentLength = currentSegment.curve.getTotalArcLength();
+			double segmentLengthSum = 0;
+
+			double totalTime = profile.duration();
+			double pointDurationSec = pointDurationMs / 1000.0;
+			int pointCount = (int) (totalTime / (pointDurationSec)) + 1; // because we start at i=0 instead of 1
+
+			int i = 0;
+
+			@Override
+			public boolean hasNext() {
+				return i < pointCount;
+			}
+
+			@Override
+			public PointPair<VelocityPoint> next() {
+				VelocityPoint leftPoint = new VelocityPoint();
+				VelocityPoint rightPoint = new VelocityPoint();
+				leftPoint.timeDurationMs = pointDurationMs;
+				rightPoint.timeDurationMs = pointDurationMs;
+
+				MotionState currentEndState = profile.stateByTimeClamped((i) * pointDurationSec);
+				// System.out.println("End Pos: " + currentEndState.pos());
+				if (Math.abs(currentEndState.pos()) >= currentSegmentLength + segmentLengthSum) {
+					System.out.println("CurrentState pos is greater than current curve length");
+					if (cs < segments.size() - 1) {
+						System.out.println("Selecting the next curve.");
+						segmentLengthSum += currentSegmentLength;
+						cs++;
+						currentSegment = segments.get(cs);
+						currentSegmentLength = currentSegment.curve.getTotalArcLength();
+					} else {
+						System.out.println("No more curves available.");
+					}
+				}
+
+				double endCurvature = currentSegment.curve
+						.getCurvatureAtArcLength(Math.abs(currentEndState.pos()) - segmentLengthSum);
+				double endArcLength = Math.abs(currentEndState.pos()) - segmentLengthSum;
+
+				double heading = currentSegment.curve.getHeadingAtArcLength(endArcLength);
+
+				leftPoint.headingDeg = heading;
+				rightPoint.headingDeg = heading;
+
+				if (Util.epsilonEquals(0, endCurvature, 1.0e-30)) { // if straight
+					leftPoint.velocity = currentEndState.vel();
+					rightPoint.velocity = currentEndState.vel();
+				} else { // if curving
+					leftPoint.velocity = currentEndState.vel()
+							* getLeftAdjust(currentSegment.curve, robotWidth, endArcLength);
+					rightPoint.velocity = currentEndState.vel()
+							* getRightAdjust(currentSegment.curve, robotWidth, endArcLength);
+				}
+				i++;
+				return new PointPair<VelocityPoint>(leftPoint, rightPoint);
+			}
+		};
+		return new MyIterator<PointPair<VelocityPoint>>(iterator, pointDurationMs);
+	}
+
+	public double getOriginalHeading() {
+		return segments.get(0).start.heading.getHeading();
 	}
 
 }

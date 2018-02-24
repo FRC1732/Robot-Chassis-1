@@ -1,10 +1,11 @@
 package org.usfirst.frc.team1732.robot.controlutils.motionprofiling;
 
 import org.usfirst.frc.team1732.robot.controlutils.motionprofiling.pathing.Path.MyIterator;
-import org.usfirst.frc.team1732.robot.controlutils.motionprofiling.pathing.Path.TrajectoryPointPair;
+import org.usfirst.frc.team1732.robot.controlutils.motionprofiling.pathing.Path.PointPair;
 
 import com.ctre.phoenix.motion.MotionProfileStatus;
 import com.ctre.phoenix.motion.SetValueMotionProfile;
+import com.ctre.phoenix.motion.TrajectoryPoint;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
@@ -21,7 +22,7 @@ public class DoubleProfileLoader {
 	private final TalonSRX leftTalon;
 	private final TalonSRX rightTalon;
 
-	private volatile MyIterator pointIterator;
+	private volatile MyIterator<PointPair<TrajectoryPoint>> pointIterator;
 	private volatile Mode mode = new Mode(false, STATE.WAITING, SetValueMotionProfile.Disable);
 	private volatile boolean printData = false;
 
@@ -71,7 +72,7 @@ public class DoubleProfileLoader {
 	 * 
 	 * @param pointIterator
 	 */
-	public void setTrajectory(MyIterator pointIterator) {
+	public void setTrajectory(MyIterator<PointPair<TrajectoryPoint>> pointIterator) {
 		this.pointIterator = pointIterator;
 		leftTalon.configMotionProfileTrajectoryPeriod(pointIterator.baseDurationMs, 0);
 		rightTalon.configMotionProfileTrajectoryPeriod(pointIterator.baseDurationMs, 0);
@@ -80,7 +81,7 @@ public class DoubleProfileLoader {
 	/**
 	 * Call this once to start the profile and erase currently stored trajectories
 	 */
-	public void startProfile(MyIterator pointIterator) {
+	public void startProfile(MyIterator<PointPair<TrajectoryPoint>> pointIterator) {
 		setTrajectory(pointIterator);
 		mode = new Mode(true, STATE.WAITING, SetValueMotionProfile.Disable);
 	}
@@ -114,20 +115,20 @@ public class DoubleProfileLoader {
 	}
 
 	private void fillUntilFullOrDone() {
-		MyIterator iterator = pointIterator;
+		MyIterator<PointPair<TrajectoryPoint>> iterator = pointIterator;
 		while (iterator.hasNext() && !leftTalon.isMotionProfileTopLevelBufferFull()
 				&& !rightTalon.isMotionProfileTopLevelBufferFull()) {
-			TrajectoryPointPair pair = iterator.next();
+			PointPair<TrajectoryPoint> pair = iterator.next();
 			leftTalon.pushMotionProfileTrajectory(pair.left);
 			rightTalon.pushMotionProfileTrajectory(pair.right);
 		}
 	}
 
 	private void fillUntilFullOrIter(int iterations) {
-		MyIterator iterator = pointIterator;
+		MyIterator<PointPair<TrajectoryPoint>> iterator = pointIterator;
 		for (int i = 0; i < iterations && iterator.hasNext() && !leftTalon.isMotionProfileTopLevelBufferFull()
 				&& !rightTalon.isMotionProfileTopLevelBufferFull(); i++) {
-			TrajectoryPointPair pair = iterator.next();
+			PointPair<TrajectoryPoint> pair = iterator.next();
 			leftTalon.pushMotionProfileTrajectory(pair.left);
 			rightTalon.pushMotionProfileTrajectory(pair.right);
 		}

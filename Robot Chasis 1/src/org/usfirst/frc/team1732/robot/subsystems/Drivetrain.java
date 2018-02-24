@@ -32,6 +32,10 @@ public class Drivetrain extends Subsystem {
 	public static final double MAX_OUTPUT = 1.0;
 	public static final double ENCODER_INCHES_PER_PULSE = 0.002099;
 
+	public static final double MAX_IN_SEC = 90; // max vel
+	public static final double MAX_UNITS_PER_100MS = MAX_IN_SEC / ENCODER_INCHES_PER_PULSE / (100); // max vel
+	public static final double MAX_IN_SEC2 = 500; // max acc
+
 	// Feedforward
 	public final Feedforward leftFF = new Feedforward(0.0574657, 0.0089855, 1.6010019, 0.0574657, 0.0089855,
 			-1.6010019);
@@ -43,22 +47,8 @@ public class Drivetrain extends Subsystem {
 	public final ClosedLoopProfile leftMPGains = mpGains;
 	public final ClosedLoopProfile rightMPGains = mpGains;
 
-	/*
-	 * The following 2 values are determined from the feedforward constants.
-	 * 
-	 * Max vel is determined by doing (12 - voltIntercept)/2.0 / kV
-	 * 
-	 * Max acc is determined by doing (12 - voltIntercept)/2.0 / kA
-	 * 
-	 * This makes it possible to be accelerating at max acceleration near max
-	 * velocity (because we cannot exceed a voltage draw of 12V). If we made
-	 * acceleration continuous by instead changing 'jerk', then we would be able to
-	 * set these slightly higher, depending on how high we set the jerk value. Using
-	 * a very high jerk value would not be any different than what we have now, but
-	 * using too low of a jerk value would cause the robot to accelerate slowly.
-	 */
-	public static final double MAX_IN_SEC = 90; // max vel
-	public static final double MAX_IN_SEC2 = 500; // max acc
+	public final ClosedLoopProfile velocityGains = new ClosedLoopProfile("Velocity pid", 0, 0, 0,
+			1023 / MAX_UNITS_PER_100MS, 0, 0, 0, 0);
 
 	public static final double ROBOT_LENGTH_IN = 34.5;
 	public static final double ROBOT_WIDTH_IN = 35;
@@ -84,9 +74,13 @@ public class Drivetrain extends Subsystem {
 
 		ClosedLoopProfile.applyZeroGainToTalon(leftTalon1, 0, 1);
 		ClosedLoopProfile.applyZeroGainToTalon(rightTalon1, 0, 1);
+		ClosedLoopProfile.applyZeroGainToTalon(leftTalon1, 1, 1);
+		ClosedLoopProfile.applyZeroGainToTalon(rightTalon1, 1, 1);
 		leftMPGains.applyToTalon(leftTalon1, 0, 0);
 		rightMPGains.applyToTalon(rightTalon1, 0, 0);
 
+		velocityGains.applyToTalon(leftTalon1, 1, 0);
+		velocityGains.applyToTalon(rightTalon1, 1, 0);
 		// two of these control the shifting. I didn't want to follow the wires
 		// new Solenoid(1).set(true);
 		// new Solenoid(2).set(true);

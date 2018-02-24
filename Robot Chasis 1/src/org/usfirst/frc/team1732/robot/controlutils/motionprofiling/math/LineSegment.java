@@ -81,7 +81,7 @@ public class LineSegment implements Curve {
 
 	@Override
 	public double getHeadingAtArcLength(double arcLength) {
-		return getDirection().normalized().getAbsoluteAngle();
+		return getDirection().getHeading();
 	}
 
 }
