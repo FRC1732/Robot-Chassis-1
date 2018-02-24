@@ -6,14 +6,14 @@ import static org.usfirst.frc.team1732.robot.Robot.rightRecorder;
 
 import org.usfirst.frc.team1732.robot.Robot;
 import org.usfirst.frc.team1732.robot.util.SRXMomentRecorder.Moment;
-import org.usfirst.frc.team1732.robot.util.TimedCommand;
+import org.usfirst.frc.team1732.robot.util.ThreadCommand;
 
 import edu.wpi.first.wpilibj.Timer;
 
 /**
  *
  */
-public class ReverseDrivetrainMovements extends TimedCommand {
+public class ReverseDrivetrainMovements extends ThreadCommand {
 
 	public ReverseDrivetrainMovements() {
 		requires(drivetrain);

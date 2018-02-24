@@ -3,7 +3,7 @@ package org.usfirst.frc.team1732.robot.util;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.command.Command;
 
-public abstract class TimedCommand extends Command {
+public abstract class ThreadCommand extends Command {
 	private int microDelay = 20;
 	
 	public int getMicroDelay() {

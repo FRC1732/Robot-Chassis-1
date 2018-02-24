@@ -1,12 +1,12 @@
 package org.usfirst.frc.team1732.robot.commands;
 
 import org.usfirst.frc.team1732.robot.Robot;
-import org.usfirst.frc.team1732.robot.util.TimedCommand;
+import org.usfirst.frc.team1732.robot.util.ThreadCommand;
 
 /**
  *
  */
-public class DriveWithJoysticks extends TimedCommand {
+public class DriveWithJoysticks extends ThreadCommand {
 
 	public DriveWithJoysticks() {
 		requires(Robot.drivetrain);

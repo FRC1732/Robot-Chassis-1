@@ -5,7 +5,7 @@ import static org.usfirst.frc.team1732.robot.Robot.sensors;
 
 import org.usfirst.frc.team1732.robot.Robot;
 import org.usfirst.frc.team1732.robot.sensors.navx.GyroReader;
-import org.usfirst.frc.team1732.robot.util.TimedCommand;
+import org.usfirst.frc.team1732.robot.util.ThreadCommand;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.Timer;
 /**
  *
  */
-public class TurnAngle extends TimedCommand {
+public class TurnAngle extends ThreadCommand {
 
 	private static final double DEADBAND_TIME = 0.25;
 	private static final double ANGLE_DEADBAND = 3;
