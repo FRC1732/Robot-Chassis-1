@@ -82,6 +82,8 @@ public class FollowVelocityPath extends Command {
 	// Called once after isFinished returns true
 	@Override
 	protected void end() {
+		Robot.drivetrain.leftTalon1.setControlFramePeriod(ControlFrame.Control_3_General, 10);
+		Robot.drivetrain.rightTalon1.setControlFramePeriod(ControlFrame.Control_3_General, 10);
 		System.out.println("Consumed all points from iterator. Holding last velocity");
 		profileRunner.interrupt();
 	}

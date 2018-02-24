@@ -3,10 +3,9 @@ package org.usfirst.frc.team1732.robot.commands.autotest;
 import static org.usfirst.frc.team1732.robot.Robot.drivetrain;
 import static org.usfirst.frc.team1732.robot.Robot.sensors;
 
-import org.usfirst.frc.team1732.robot.Util;
 import org.usfirst.frc.team1732.robot.sensors.navx.GyroReader;
-import org.usfirst.frc.team1732.robot.subsystems.Drivetrain;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 
 import edu.wpi.first.wpilibj.Timer;
@@ -17,20 +16,16 @@ import edu.wpi.first.wpilibj.command.Command;
  */
 public class TurnAngle extends Command {
 
-	private static final double OUTER_DEADBAND = 20;
 	private static final double DEADBAND_TIME = 0.25;
 	private static final double ANGLE_DEADBAND = 3;
-	private static final double ERROR_P = 0.025;
+	private static final double HEADING_P = 0;
 
-	private final Timer timer;
 	private final Timer deadbandTimer;
 	private boolean inDeadband = false;
 	private final double sign;
 	private final double goalAngle;
 	private final double maxVel;
 	private final double k;
-	private final double radius;
-	private final double endTime;
 
 	private GyroReader g = sensors.navX.makeReader();
 
@@ -55,32 +50,22 @@ public class TurnAngle extends Command {
 	// });
 
 	public TurnAngle(double angle, double maxVel) {
-		timer = new Timer();
 		deadbandTimer = new Timer();
-		timer.reset();
-		timer.stop();
 		deadbandTimer.reset();
 		deadbandTimer.stop();
 		this.goalAngle = angle;
 		this.sign = Math.signum(angle);
 		this.maxVel = maxVel;
-		radius = Drivetrain.EFFECTIVE_ROBOT_WIDTH_IN / 2.0 * 1.2;
-		double distance = radius * Math.toRadians(Math.abs(angle));
-		k = 2 * maxVel / distance;
+		k = Math.PI / Math.abs(angle);
 		drivetrain.setNeutralMode(NeutralMode.Brake);
-		endTime = Math.PI / k;
 	}
 
 	// private double getPosition(double t) {
 	// return -maxVel / k * Math.cos(k * t) + maxVel / k;
 	// }
 
-	private double getVelocity(double t) {
-		return maxVel * Math.sin(k * t);
-	}
-
-	private double getAcceleration(double t) {
-		return maxVel * k * Math.cos(k * t);
+	private double getVelocity(double angle) {
+		return maxVel * Math.sin(k * angle);
 	}
 
 	// private double getAngle(double t) {
@@ -90,42 +75,26 @@ public class TurnAngle extends Command {
 	@Override
 	protected void initialize() {
 		g.zero();
-		timer.start();
 		System.out.println("Turn to angle started");
 		// pid.setSetpoint(goalAngle);
 	}
 
 	@Override
 	protected void execute() {
-		double time = timer.get();
 
 		double currentAngle = g.getTotalAngle();
 		double error = goalAngle - currentAngle;
 
-		if (time >= endTime) {
-			System.out.println("Passed max time");
-			double errorSign = Math.signum(error);
-			drivetrain.setLeft(Util.limit(error * ERROR_P, 0.1 * errorSign, 0.2 * errorSign));
-			drivetrain.setRight(Util.limit(error * ERROR_P * -1.0, 0.1 * errorSign * -1.0, 0.2 * errorSign * -1.0));
-		} else {
-			double leftVel = getVelocity(time) * sign;
-			double leftAcc = (getAcceleration(time)) * sign;
-			double rightVel = -getVelocity(time) * sign;
-			double rightAcc = -(getAcceleration(time)) * sign;
+		double leftVel = getVelocity(currentAngle) * sign;
+		double rightVel = -getVelocity(currentAngle) * sign;
 
-			double adjust = 1.0;
-			double leftVolt = drivetrain.leftFF.getAppliedVoltage(leftVel, leftAcc * adjust, 1.1);
-			double rightVolt = drivetrain.rightFF.getAppliedVoltage(rightVel, rightAcc * adjust, 1.1);
+		double currentHeading = g.getTotalAngle();
+		double headingError = goalAngle - currentHeading;
+		double headingAdjustment = headingError * HEADING_P;
 
-			if (Math.abs(error) < OUTER_DEADBAND) {
-				drivetrain.setLeft(leftVolt / 12.0 * 0.75);
-				drivetrain.setRight(rightVolt / 12 * 0.75);
-				System.out.println("inside outer deadband");
-			} else {
-				drivetrain.setLeft(leftVolt / 12.0);
-				drivetrain.setRight(rightVolt / 12.0);
-			}
-		}
+		drivetrain.leftTalon1.set(ControlMode.Velocity, leftVel + headingAdjustment);
+		drivetrain.rightTalon1.set(ControlMode.Velocity, rightVel - headingAdjustment);
+
 		if (!inDeadband && Math.abs(goalAngle - g.getTotalAngle()) < ANGLE_DEADBAND) {
 			deadbandTimer.start();
 			inDeadband = true;
@@ -139,8 +108,7 @@ public class TurnAngle extends Command {
 
 	@Override
 	protected boolean isFinished() {
-		return Math.abs(goalAngle - g.getTotalAngle()) < ANGLE_DEADBAND
-				&& deadbandTimer.get() > DEADBAND_TIME;
+		return Math.abs(goalAngle - g.getTotalAngle()) < ANGLE_DEADBAND && deadbandTimer.get() > DEADBAND_TIME;
 	}
 
 	@Override
