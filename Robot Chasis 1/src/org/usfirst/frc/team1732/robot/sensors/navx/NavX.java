@@ -27,7 +27,7 @@ public class NavX extends GyroBase {
 	}
 
 	@Override
-	protected void zero() {
+	public void zero() {
 		navx.zeroYaw();
 	}
 

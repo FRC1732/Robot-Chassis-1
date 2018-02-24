@@ -114,7 +114,7 @@ public class Robot extends TimedRobot {
 
 		// new TestPathing(iterator).start();
 
-		new TurnAngle(90, 70).start();
+		new TurnAngle(90, 60).start();
 		// new ReverseDrivetrainMovements().start();
 		// new TurnToAngle(-90, 80).start();
 		// new ScaleLeftSingle(DriverStationData.closeSwitchIsLeft).start();

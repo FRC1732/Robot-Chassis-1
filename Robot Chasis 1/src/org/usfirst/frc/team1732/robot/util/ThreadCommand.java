@@ -4,12 +4,12 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.command.Command;
 
 public abstract class ThreadCommand extends Command {
-	private int microDelay = 20;
-	
+	private int microDelay = 20 * 1000;
+
 	public int getMicroDelay() {
 		return microDelay;
 	}
-	
+
 	public void setMicroDelay(int microDelay) {
 		this.microDelay = microDelay;
 	}
@@ -23,28 +23,30 @@ public abstract class ThreadCommand extends Command {
 		init();
 		new Thread(this::loop).start();
 	}
-	
+
 	private long last = 0;
+
 	private void sleepExactly() {
-		while(RobotController.getFPGATime() - last < microDelay) {
+		while (RobotController.getFPGATime() - last < microDelay && !Thread.interrupted()) {
 			try {
-				Thread.sleep(0, microDelay * 10);
+				Thread.sleep(0, microDelay * 1000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
 		last = RobotController.getFPGATime();
 	}
-	
+
 	private void loop() {
 		last = RobotController.getFPGATime();
-		while(isRunning() && !isFinished()) {
+		while (isRunning() && !isFinished()) {
 			exec();
 			sleepExactly();
 		}
 	}
-	
+
 	protected abstract void exec();
+
 	protected abstract void init();
-	
+
 }
