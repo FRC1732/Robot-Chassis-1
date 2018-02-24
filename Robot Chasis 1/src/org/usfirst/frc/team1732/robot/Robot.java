@@ -8,11 +8,7 @@
 package org.usfirst.frc.team1732.robot;
 
 import org.usfirst.frc.team1732.robot.autotools.DriverStationData;
-import org.usfirst.frc.team1732.robot.commands.DriveTrainCharacterizer;
 import org.usfirst.frc.team1732.robot.commands.ReverseDrivetrainMovements;
-import org.usfirst.frc.team1732.robot.controlutils.motionprofiling.pathing.Path;
-import org.usfirst.frc.team1732.robot.controlutils.motionprofiling.pathing.Path.MyIterator;
-import org.usfirst.frc.team1732.robot.controlutils.motionprofiling.pathing.Waypoint;
 import org.usfirst.frc.team1732.robot.input.Joysticks;
 import org.usfirst.frc.team1732.robot.odomotry.PositionEstimator;
 import org.usfirst.frc.team1732.robot.sensors.Sensors;
@@ -21,9 +17,7 @@ import org.usfirst.frc.team1732.robot.subsystems.Claw;
 import org.usfirst.frc.team1732.robot.subsystems.Drivetrain;
 import org.usfirst.frc.team1732.robot.util.SRXMomentRecorder;
 
-import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
