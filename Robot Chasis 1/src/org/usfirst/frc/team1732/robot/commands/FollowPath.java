@@ -2,6 +2,9 @@ package org.usfirst.frc.team1732.robot.commands;
 
 import org.usfirst.frc.team1732.robot.Robot;
 import org.usfirst.frc.team1732.robot.controlutils.motionprofiling.pathing.Path.MyIterator;
+import org.usfirst.frc.team1732.robot.controlutils.motionprofiling.pathing.Path.PointPair;
+
+import com.ctre.phoenix.motion.TrajectoryPoint;
 
 import edu.wpi.first.wpilibj.command.Command;
 
@@ -13,9 +16,9 @@ import edu.wpi.first.wpilibj.command.Command;
  */
 public class FollowPath extends Command {
 
-	private final MyIterator iterator;
+	private final MyIterator<PointPair<TrajectoryPoint>> iterator;
 
-	public FollowPath(MyIterator iterator) {
+	public FollowPath(MyIterator<PointPair<TrajectoryPoint>> iterator) {
 		requires(Robot.drivetrain);
 		this.iterator = iterator;
 	}
