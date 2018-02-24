@@ -1,7 +1,6 @@
 package org.usfirst.frc.team1732.robot.util;
 
 import java.util.Deque;
-import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.LinkedBlockingDeque;
 
 import org.usfirst.frc.team1732.robot.Robot;
