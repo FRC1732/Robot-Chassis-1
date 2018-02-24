@@ -33,7 +33,7 @@ public class Drivetrain extends Subsystem {
 	public static final double ENCODER_INCHES_PER_PULSE = 0.002099;
 
 	public static final double MAX_IN_SEC = 90; // max vel
-	public static final double MAX_UNITS_PER_100MS = MAX_IN_SEC / ENCODER_INCHES_PER_PULSE / (100); // max vel
+	public static final double MAX_UNITS_PER_100MS = MAX_IN_SEC / ENCODER_INCHES_PER_PULSE / 10; // max vel
 	public static final double MAX_IN_SEC2 = 500; // max acc
 
 	// Feedforward
