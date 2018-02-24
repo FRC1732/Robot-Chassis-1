@@ -1,30 +1,27 @@
 package org.usfirst.frc.team1732.robot.commands;
 
 import org.usfirst.frc.team1732.robot.Robot;
-
-import edu.wpi.first.wpilibj.command.Command;
+import org.usfirst.frc.team1732.robot.util.TimedCommand;
 
 /**
  *
  */
-public class DriveWithJoysticks extends Command {
+public class DriveWithJoysticks extends TimedCommand {
 
 	public DriveWithJoysticks() {
 		requires(Robot.drivetrain);
 	}
 
 	// Called just before this Command runs the first time
-	protected void initialize() {
+	protected void init() {
 	}
 
 	// Called repeatedly when this Command is scheduled to run
-	protected void execute() {
+	protected void exec() {
 		if (Robot.joysticks.isReversed()) {
-			Robot.drivetrain.drive.tankDrive(-Robot.joysticks.getRight(), -Robot.joysticks.getLeft(),
-					false);
+			Robot.drivetrain.drive.tankDrive(-Robot.joysticks.getRight(), -Robot.joysticks.getLeft(), false);
 		} else {
-			Robot.drivetrain.drive.tankDrive(Robot.joysticks.getLeft(), Robot.joysticks.getRight(),
-					false);
+			Robot.drivetrain.drive.tankDrive(Robot.joysticks.getLeft(), Robot.joysticks.getRight(), false);
 		}
 	}
 

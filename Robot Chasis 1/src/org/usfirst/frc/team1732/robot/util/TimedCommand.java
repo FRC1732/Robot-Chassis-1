@@ -44,7 +44,7 @@ public abstract class TimedCommand extends Command {
 		}
 	}
 	
-	public abstract void exec();
-	public abstract void init();
+	protected abstract void exec();
+	protected abstract void init();
 	
 }
