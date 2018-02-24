@@ -5,21 +5,22 @@ import static org.usfirst.frc.team1732.robot.Robot.sensors;
 
 import org.usfirst.frc.team1732.robot.Robot;
 import org.usfirst.frc.team1732.robot.sensors.navx.GyroReader;
+import org.usfirst.frc.team1732.robot.util.TimedCommand;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.command.Command;
 
 /**
  *
  */
-public class TurnAngle extends Command {
+public class TurnAngle extends TimedCommand {
 
 	private static final double DEADBAND_TIME = 0.25;
 	private static final double ANGLE_DEADBAND = 3;
-	private static final double HEADING_P = 0;
+	private static final double HEADING_P = 0.15;
+	private static final double baseVel = 0;
 
 	private final Timer deadbandTimer;
 	private boolean inDeadband = false;
@@ -51,6 +52,7 @@ public class TurnAngle extends Command {
 	// });
 
 	public TurnAngle(double angle, double maxVel) {
+		requires(Robot.drivetrain);
 		deadbandTimer = new Timer();
 		deadbandTimer.reset();
 		deadbandTimer.stop();
@@ -85,18 +87,18 @@ public class TurnAngle extends Command {
 	@Override
 	protected void execute() {
 
-		double currentAngle = g.getTotalAngle();
-		double error = goalAngle - currentAngle;
+		double currentHeading = g.getTotalAngle();
 
-		double leftVel = (getVelocity(currentAngle)) * sign;
-		double rightVel = -(getVelocity(currentAngle)) * sign;
+		double leftVel = (getVelocity(currentHeading) + baseVel) * sign;
+		double rightVel = -(getVelocity(currentHeading) + baseVel) * sign;
 
-		// double currentHeading = g.getTotalAngle();
-		// double headingError = goalAngle - currentHeading;
-		// double headingAdjustment = headingError * HEADING_P;
+		double headingError = goalAngle - currentHeading;
+		double headingAdjustment = headingError * HEADING_P;
 
-		drivetrain.leftTalon1.set(ControlMode.Velocity, leftVel);// + headingAdjustment);
-		drivetrain.rightTalon1.set(ControlMode.Velocity, rightVel);// - headingAdjustment);
+		drivetrain.leftTalon1.set(ControlMode.Velocity,
+				Robot.drivetrain.convertVelocitySetpoint(leftVel + headingAdjustment));
+		drivetrain.rightTalon1.set(ControlMode.Velocity,
+				Robot.drivetrain.convertVelocitySetpoint(rightVel - headingAdjustment));
 
 		if (!inDeadband && Math.abs(goalAngle - g.getTotalAngle()) < ANGLE_DEADBAND) {
 			deadbandTimer.start();
@@ -106,12 +108,13 @@ public class TurnAngle extends Command {
 			deadbandTimer.reset();
 			deadbandTimer.stop();
 		}
-		// System.out.println("ANGLE ERROR: " + error + " should finish: " +
-		// (Math.abs(error) < ANGLE_DEADBAND));
-		System.out.println("left error: " + Robot.drivetrain.leftTalon1.getClosedLoopError(0));
-		System.out.println("right error: " + Robot.drivetrain.rightTalon1.getClosedLoopError(0));
-		System.out.println("left target: " + Robot.drivetrain.leftTalon1.getClosedLoopTarget(0));
-		System.out.println("right target: " + Robot.drivetrain.rightTalon1.getClosedLoopTarget(0));
+		System.out.println("angle: " + currentHeading + " " + headingError + " "
+				+ (Math.abs(headingError) < ANGLE_DEADBAND) + " " + headingAdjustment);
+		System.out.println();
+		System.out.println("left: " + Robot.drivetrain.leftTalon1.getClosedLoopError(0) + " "
+				+ Robot.drivetrain.leftTalon1.getClosedLoopTarget(0) + " " + leftVel);
+		System.out.println("right: " + Robot.drivetrain.rightTalon1.getClosedLoopError(0) + " "
+				+ Robot.drivetrain.rightTalon1.getClosedLoopTarget(0) + " " + rightVel);
 	}
 
 	@Override
@@ -123,5 +126,17 @@ public class TurnAngle extends Command {
 	protected void end() {
 		System.out.println("Turn to angle finsished");
 		drivetrain.setStop();
+	}
+
+	@Override
+	protected void exec() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	protected void init() {
+		// TODO Auto-generated method stub
+
 	}
 }

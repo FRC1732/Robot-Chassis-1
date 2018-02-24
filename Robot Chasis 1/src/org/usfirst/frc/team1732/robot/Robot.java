@@ -69,7 +69,7 @@ public class Robot extends TimedRobot {
 	public void robotPeriodic() {
 		DriverStationData.gotPlatePositions();
 		Scheduler.getInstance().run();
-		// NavXData.sendNavXData(sensors.navX);
+		sensors.navX.sendNavXData();
 	}
 
 	@Override
