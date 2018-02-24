@@ -19,7 +19,7 @@ public class TurnAngle extends ThreadCommand {
 	private static final double DEADBAND_TIME = 0.25;
 	private static final double ANGLE_DEADBAND = 3;
 	private static final double HEADING_P = 0.5;
-	private static final double baseVel = 10;
+	private static final double baseVel = 5;
 
 	private final Timer deadbandTimer;
 	private boolean inDeadband = false;
@@ -55,7 +55,9 @@ public class TurnAngle extends ThreadCommand {
 		double headingAdjustment = headingError * HEADING_P;
 
 		if (Math.abs(headingAdjustment) < baseVel) {
-			headingAdjustment += Math.signum(headingAdjustment) * baseVel;
+			drivetrain.setLeft(0.15 * Math.signum(headingError));
+			drivetrain.setRight(-0.15 * Math.signum(headingError));
+			return;
 		}
 		drivetrain.leftTalon1.set(ControlMode.Velocity, Robot.drivetrain.convertVelocitySetpoint(headingAdjustment));
 		drivetrain.rightTalon1.set(ControlMode.Velocity, Robot.drivetrain.convertVelocitySetpoint(-headingAdjustment));

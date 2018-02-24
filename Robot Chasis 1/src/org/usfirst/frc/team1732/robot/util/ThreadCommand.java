@@ -4,7 +4,7 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.command.Command;
 
 public abstract class ThreadCommand extends Command {
-	private int microDelay = 20 * 1000;
+	private int microDelay = 20 * 1000; // 20 milliseconds
 
 	public int getMicroDelay() {
 		return microDelay;
@@ -29,7 +29,7 @@ public abstract class ThreadCommand extends Command {
 	private void sleepExactly() {
 		while (RobotController.getFPGATime() - last < microDelay && !Thread.interrupted()) {
 			try {
-				Thread.sleep(0, microDelay * 1000);
+				Thread.sleep(microDelay / 1000, 0);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
