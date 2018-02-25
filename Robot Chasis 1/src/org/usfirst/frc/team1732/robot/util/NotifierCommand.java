@@ -101,10 +101,6 @@ public abstract class NotifierCommand extends Command {
 
 	/**
 	 * Create a Notifier for timer event notification.
-	 *
-	 * @param run
-	 *            The handler that is called at the notification time which is set
-	 *            using StartSingle or StartPeriodic.
 	 */
 	public NotifierCommand(int loopPeriodMilliseconds) {
 		m_period = loopPeriodMilliseconds / 1000.0;
