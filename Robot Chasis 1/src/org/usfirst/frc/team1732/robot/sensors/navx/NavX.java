@@ -13,6 +13,7 @@ public class NavX extends GyroBase {
 	public NavX(boolean zeroAtStart, AHRS navx) {
 		super(false);
 		this.navx = navx;
+		System.out.println("navx update rate: " + navx.getActualUpdateRate());
 		// if (zeroAtStart) zero();
 	}
 

@@ -15,15 +15,15 @@ public class ScaleRight extends CommandGroup {
 		if (scaleIsRight) {
 			addSequential(new DriveDistance(Field.Scale.RIGHT_NULL_ZONE.getMinY() - Drivetrain.ROBOT_LENGTH_IN));
 			// addSequential(new ZeroNavXAndWaitToStopMoving());
-			addSequential(new TurnAngle(-30, 10));
+			addSequential(new TurnAngle(-30));
 		} else {
 			addSequential(new DriveDistance(Field.Scale.PLATFORM.getMinY() - Drivetrain.ROBOT_LENGTH_IN - 5));
 			// addSequential(new ZeroNavXAndWaitToStopMoving());
-			addSequential(new TurnAngle(-90, 80));
+			addSequential(new TurnAngle(-90));
 			addSequential(
 					new DriveDistance(Field.Scale.LEFT_NULL_ZONE.getMaxX() - Field.Scale.RIGHT_NULL_ZONE.getCenterX()));
 			// addSequential(new ZeroNavXAndWaitToStopMoving());
-			addSequential(new TurnAngle(90, 80));
+			addSequential(new TurnAngle(90));
 			addSequential(new DriveDistance(Field.Scale.LEFT_NULL_ZONE.getMinY()
 					- ((Field.Scale.PLATFORM.getMinY() - Drivetrain.ROBOT_LENGTH_IN - 5))));
 		}
