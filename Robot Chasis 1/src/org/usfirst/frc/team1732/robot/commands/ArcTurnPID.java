@@ -1,17 +1,13 @@
 package org.usfirst.frc.team1732.robot.commands;
 
 import static java.lang.Math.abs;
-import static java.lang.Math.atan2;
 import static java.lang.Math.min;
-import static java.lang.Math.sin;
 import static java.lang.Math.toDegrees;
-import static java.lang.Math.toRadians;
 import static org.usfirst.frc.team1732.robot.Robot.drivetrain;
 import static org.usfirst.frc.team1732.robot.Robot.sensors;
 
-import java.util.function.BiFunction;
-
 import org.usfirst.frc.team1732.robot.Robot;
+import org.usfirst.frc.team1732.robot.commands.ArcTurn.ArcTurnCalculation;
 import org.usfirst.frc.team1732.robot.controlutils.DisplacementPIDSource;
 import org.usfirst.frc.team1732.robot.sensors.encoders.EncoderReader;
 import org.usfirst.frc.team1732.robot.sensors.navx.GyroReader;
@@ -44,7 +40,7 @@ public class ArcTurnPID extends Command {
 		outer = left ? drivetrain.makeRightEncoderReader() : drivetrain.makeLeftEncoderReader();
 		sign = left ? -1 : 1;
 		// 0.016, 0.054
-		rot = new PIDController(0.02, 0.02, 0.05, new DisplacementPIDSource() {
+		rot = new PIDController(0.02, 0.02, 0, new DisplacementPIDSource() {
 			public double pidGet() {
 				return g.getTotalAngle();
 			}
@@ -76,17 +72,17 @@ public class ArcTurnPID extends Command {
 		};
 	}
 
-	public enum ArcTurnCalculation {
-		RADIUS_THETA((r, t) -> r, (r, t) -> toRadians(t)), //
-		HEIGHT_THETA((h, t) -> (h - (Drivetrain.ROBOT_LENGTH_IN / 2)) / sin(toRadians(t)), (h, t) -> toRadians(t)), //
-		WIDTH_HEIGHT((w, h) -> (w * w + h * h) / (2 * w), (w, h) -> atan2(h, (w * w + h * h) / (2 * w) - w));
-		BiFunction<Double, Double, Double> getR, getT;
-
-		private ArcTurnCalculation(BiFunction<Double, Double, Double> r, BiFunction<Double, Double, Double> t) {
-			getR = r;
-			getT = t;
-		}
-	}
+	// public enum ArcTurnCalculation {
+	// RADIUS_THETA((r, t) -> r, (r, t) -> toRadians(t)), //
+	// HEIGHT_THETA((h, t) -> (h - (Drivetrain.ROBOT_LENGTH_IN / 2)) / sin(toRadians(t)), (h, t) -> toRadians(t)), //
+	// WIDTH_HEIGHT((w, h) -> (w * w + h * h) / (2 * w), (w, h) -> atan2(h, (w * w + h * h) / (2 * w) - w));
+	// BiFunction<Double, Double, Double> getR, getT;
+	//
+	// private ArcTurnCalculation(BiFunction<Double, Double, Double> r, BiFunction<Double, Double, Double> t) {
+	// getR = r;
+	// getT = t;
+	// }
+	// }
 
 	protected void initialize() {
 		System.out.println("ArcTurn: Starting R = " + R + ", T = " + T);

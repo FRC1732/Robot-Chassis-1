@@ -14,7 +14,8 @@ import org.usfirst.frc.team1732.robot.sensors.Sensors;
 import org.usfirst.frc.team1732.robot.subsystems.Arm;
 import org.usfirst.frc.team1732.robot.subsystems.Claw;
 import org.usfirst.frc.team1732.robot.subsystems.Drivetrain;
-import org.usfirst.frc.team1732.robot.util.SRXMomentRecorder;
+import org.usfirst.frc.team1732.robot.util.SRXMomentRecorderD;
+import org.usfirst.frc.team1732.robot.util.SRXMomentRecorderM;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Scheduler;
@@ -36,8 +37,10 @@ public class Robot extends TimedRobot {
 	public static Joysticks joysticks;
 	public static PositionEstimator positionEstimator;
 
-	public static SRXMomentRecorder leftRecorder;
-	public static SRXMomentRecorder rightRecorder;
+	public static SRXMomentRecorderD leftRecorderD;
+	public static SRXMomentRecorderD rightRecorderD;
+	public static SRXMomentRecorderM leftRecorderM;
+	public static SRXMomentRecorderM rightRecorderM;
 
 	// public static SampleAveraging actualVoltage;
 
@@ -59,8 +62,8 @@ public class Robot extends TimedRobot {
 		claw = new Claw();
 
 		joysticks = new Joysticks();
-		leftRecorder = new SRXMomentRecorder(drivetrain.leftTalon1, drivetrain.leftEncoder);
-		rightRecorder = new SRXMomentRecorder(drivetrain.rightTalon1, drivetrain.rightEncoder);
+		leftRecorderD = new SRXMomentRecorderD(drivetrain.leftTalon1, drivetrain.leftEncoder.makeReader());
+		rightRecorderD = new SRXMomentRecorderD(drivetrain.rightTalon1, drivetrain.rightEncoder.makeReader());
 
 	}
 

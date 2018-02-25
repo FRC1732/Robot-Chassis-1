@@ -10,14 +10,14 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.wpilibj.Timer;
 
-public class SRXMomentRecorder {
+public class SRXMomentRecorderM {
 	private TalonSRX talon;
 	private TalonEncoder encoder;
 	private Deque<Moment> moments = new LinkedBlockingDeque<>();
 	private boolean recording = false;
 	private Moment currentMoment = null;
 
-	public SRXMomentRecorder(TalonSRX device, TalonEncoder reader) {
+	public SRXMomentRecorderM(TalonSRX device, TalonEncoder reader) {
 		talon = device;
 		encoder = reader;
 	}

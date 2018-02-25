@@ -9,9 +9,11 @@ import edu.wpi.first.wpilibj.SPI;
 public class Sensors {
 
 	public final NavX navX;
+	public final Limelight limelight;
 
 	public Sensors() {
 		navX = new NavX(true, new AHRS(SPI.Port.kMXP, (byte) 200));
+		limelight = new Limelight();
 	}
 
 	public static double convertTotalAngle(double angle) {
