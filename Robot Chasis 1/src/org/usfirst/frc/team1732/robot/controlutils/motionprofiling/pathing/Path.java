@@ -3,6 +3,8 @@ package org.usfirst.frc.team1732.robot.controlutils.motionprofiling.pathing;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import org.usfirst.frc.team1732.robot.Util;
 import org.usfirst.frc.team1732.robot.controlutils.Feedforward;
@@ -530,13 +532,90 @@ public final class Path {
 	}
 
 	public static class VelocityPoint {
-		public int timeDurationMs;
 		public double velocity;
 		public double headingDeg;
+
+		public VelocityPoint() {
+			velocity = 0;
+			headingDeg = 0;
+		}
+
+		public VelocityPoint(double vel, double head) {
+			this.velocity = vel;
+			this.headingDeg = head;
+		}
+	}
+
+	public static class PointProfile {
+
+		public final double pointDurSec;
+		public final int pointDurMs;
+		public double totalTimeSec;
+		public final double finalAbsCenterPos;
+		public final double initialHeading;
+
+		private final TreeMap<Double, PointPair<VelocityPoint>> map;
+
+		public PointProfile(MyIterator<PointPair<VelocityPoint>> iterator, double finalAbsCenterPos,
+				double initialHeading) {
+			totalTimeSec = 0;
+			this.pointDurSec = iterator.baseDurationSec;
+			this.pointDurMs = iterator.baseDurationMs;
+			this.finalAbsCenterPos = finalAbsCenterPos;
+			this.initialHeading = initialHeading;
+			map = new TreeMap<>();
+			while (iterator.hasNext()) {
+				PointPair<VelocityPoint> pair = iterator.next();
+				map.put(totalTimeSec, pair);
+				// System.out.println(pair.left.velocity + ", " + pair.right.velocity);
+				totalTimeSec += pointDurSec;
+			}
+		}
+
+		public double getTotalTimeSec() {
+			return totalTimeSec;
+		}
+
+		public PointPair<VelocityPoint> getInterpolatedPoint(double timeSec) {
+			PointPair<VelocityPoint> value = map.get(timeSec);
+			if (value != null) {
+				return value;
+			}
+			Entry<Double, PointPair<VelocityPoint>> lower = map.floorEntry(timeSec);
+			Entry<Double, PointPair<VelocityPoint>> upper = map.ceilingEntry(timeSec);
+
+			if (lower == null && upper == null) {
+				System.err.println("ERROR: BOTH SHOULDN'T BE NULL");
+				return null;
+			} else if (lower == null) {
+				return upper.getValue();
+			} else if (upper == null) {
+				return lower.getValue();
+			}
+
+			VelocityPoint leftLow = lower.getValue().left;
+			VelocityPoint leftUp = upper.getValue().left;
+
+			VelocityPoint rightLow = lower.getValue().right;
+			VelocityPoint rightUp = upper.getValue().right;
+
+			double dt = upper.getKey() - lower.getKey();
+			double mu = (timeSec - lower.getKey()) / dt;
+			double leftV = Util.interpolate(leftLow.velocity, leftUp.velocity, mu);
+			double rightV = Util.interpolate(rightLow.velocity, rightUp.velocity, mu);
+			double leftH = Util.interpolate(leftLow.headingDeg, leftUp.headingDeg, mu);
+			double rightH = Util.interpolate(rightLow.headingDeg, rightUp.headingDeg, mu);
+			return new PointPair<VelocityPoint>(new VelocityPoint(leftV, leftH), new VelocityPoint(rightV, rightH));
+		}
+	}
+
+	public PointProfile getVelocityProfile(double robotWidth) {
+		return new PointProfile(getVelocityIterator(robotWidth), Math.abs(getProfile().endPos()),
+				Math.toDegrees(getOriginalHeading()));
 	}
 
 	public MyIterator<PointPair<VelocityPoint>> getVelocityIterator(double robotWidth) {
-		int pointDurationMs = 5; // navx can only update at 200 Hz
+		int pointDurationMs = 20; // navx can only update at 200 Hz
 		Iterator<PointPair<VelocityPoint>> iterator = new Iterator<PointPair<VelocityPoint>>() {
 
 			int cs = 0;
@@ -559,8 +638,6 @@ public final class Path {
 			public PointPair<VelocityPoint> next() {
 				VelocityPoint leftPoint = new VelocityPoint();
 				VelocityPoint rightPoint = new VelocityPoint();
-				leftPoint.timeDurationMs = pointDurationMs;
-				rightPoint.timeDurationMs = pointDurationMs;
 
 				MotionState currentEndState = profile.stateByTimeClamped((i) * pointDurationSec);
 				// System.out.println("End Pos: " + currentEndState.pos());
@@ -581,7 +658,7 @@ public final class Path {
 						.getCurvatureAtArcLength(Math.abs(currentEndState.pos()) - segmentLengthSum);
 				double endArcLength = Math.abs(currentEndState.pos()) - segmentLengthSum;
 
-				double heading = currentSegment.curve.getHeadingAtArcLength(endArcLength);
+				double heading = Math.toDegrees(currentSegment.curve.getHeadingAtArcLength(endArcLength));
 
 				leftPoint.headingDeg = heading;
 				rightPoint.headingDeg = heading;
@@ -590,10 +667,15 @@ public final class Path {
 					leftPoint.velocity = currentEndState.vel();
 					rightPoint.velocity = currentEndState.vel();
 				} else { // if curving
-					leftPoint.velocity = currentEndState.vel()
-							* getLeftAdjust(currentSegment.curve, robotWidth, endArcLength);
-					rightPoint.velocity = currentEndState.vel()
-							* getRightAdjust(currentSegment.curve, robotWidth, endArcLength);
+					double curvature = currentSegment.curve.getCurvatureAtArcLength(endArcLength);
+					double r = 1 / curvature;
+					double lR = Math.abs(r - robotWidth / 2);
+					double rR = Math.abs(r + robotWidth / 2);
+					r = Math.abs(r);
+					double lK = lR / r;
+					double rK = rR / r;
+					leftPoint.velocity = currentEndState.vel() * lK;
+					rightPoint.velocity = currentEndState.vel() * rK;
 				}
 				i++;
 				return new PointPair<VelocityPoint>(leftPoint, rightPoint);

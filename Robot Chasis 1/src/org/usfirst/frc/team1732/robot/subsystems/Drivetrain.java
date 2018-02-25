@@ -47,7 +47,7 @@ public class Drivetrain extends Subsystem {
 	public final ClosedLoopProfile leftMPGains = mpGains;
 	public final ClosedLoopProfile rightMPGains = mpGains;
 
-	public final ClosedLoopProfile velocityGains = new ClosedLoopProfile("Velocity pid", 0.2, 0, 0,
+	public final ClosedLoopProfile velocityGains = new ClosedLoopProfile("Velocity pid", 0.3, 0, 0,
 			1023 / MAX_UNITS_PER_100MS, 0, 0, 0, 0);
 
 	public static final double ROBOT_LENGTH_IN = 34.5;

@@ -6,15 +6,15 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 public class ClosedLoopProfile {
 
-	private final String name;
-	private double kP;
-	private double kI;
-	private double kD;
-	private double kF;
-	private int integralZone;
-	private int allowableError;
-	private int maxIntegralAccumulated;
-	private double secondsFromNeutralToFull;
+	public final String name;
+	public double kP;
+	public double kI;
+	public double kD;
+	public double kF;
+	public int integralZone;
+	public int allowableError;
+	public int maxIntegralAccumulated;
+	public double secondsFromNeutralToFull;
 
 	public ClosedLoopProfile(String name, double kP, double kI, double kD, double kF, int integralZone,
 			int allowableError, int maxIntegralAccumulated, double secondsFromNeutralToFull) {
