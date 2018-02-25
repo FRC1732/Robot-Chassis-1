@@ -118,18 +118,20 @@ public abstract class NotifierCommand extends Command {
 					break;
 				}
 
-				Runnable handler = null;
+				// Runnable handler = null;
 				// m_processLock.lock();
 				// try {
-				handler = m_handler;
+				// handler = m_handler;
 				m_expirationTime += m_period;
 				updateAlarm();
 				// } finally {
 				// m_processLock.unlock();
 				// }
 
-				if (handler != null && m_isRunning) {
-					handler.run();
+				// if (handler != null && m_isRunning) {
+				// handler.run();
+				if (m_isRunning) {
+					m_handler.run();
 					if (isDone()) {
 						m_isRunning = false;
 					}
