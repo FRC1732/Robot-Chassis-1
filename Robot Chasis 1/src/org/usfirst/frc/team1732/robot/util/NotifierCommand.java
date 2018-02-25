@@ -29,7 +29,7 @@ public abstract class NotifierCommand extends Command {
 
 	@Override
 	protected final boolean isFinished() {
-		return m_isRunning;
+		return !m_isRunning;
 	}
 
 	protected abstract void whenEnded();
