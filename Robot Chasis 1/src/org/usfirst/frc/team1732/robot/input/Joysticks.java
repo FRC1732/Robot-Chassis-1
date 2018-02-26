@@ -1,9 +1,9 @@
 package org.usfirst.frc.team1732.robot.input;
 
-import org.usfirst.frc.team1732.robot.commands.RunClawIn;
-import org.usfirst.frc.team1732.robot.commands.RunClawOut;
 import org.usfirst.frc.team1732.robot.commands.armcontrol.SetArmIntake;
 import org.usfirst.frc.team1732.robot.commands.armcontrol.SetArmScore;
+import org.usfirst.frc.team1732.robot.commands.old.RunClawIn;
+import org.usfirst.frc.team1732.robot.commands.old.RunClawOut;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
