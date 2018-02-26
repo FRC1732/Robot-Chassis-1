@@ -1,4 +1,4 @@
-package org.usfirst.frc.team1732.robot.commands;
+package org.usfirst.frc.team1732.robot.commands.arc;
 
 import static java.lang.Math.abs;
 import static java.lang.Math.atan2;

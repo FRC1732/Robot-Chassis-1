@@ -1,6 +1,7 @@
 package org.usfirst.frc.team1732.robot.commands;
 
-import org.usfirst.frc.team1732.robot.commands.DriveToCube.TurnDirection;
+import org.usfirst.frc.team1732.robot.commands.drive.DriveToCube;
+import org.usfirst.frc.team1732.robot.commands.drive.DriveToCube.TurnDirection;
 
 import edu.wpi.first.wpilibj.command.CommandGroup;
 

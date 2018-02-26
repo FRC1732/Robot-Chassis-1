@@ -1,8 +1,8 @@
 package org.usfirst.frc.team1732.robot.commands.auto;
 
 import org.usfirst.frc.team1732.robot.autotools.Field;
-import org.usfirst.frc.team1732.robot.commands.DriveDistance;
 import org.usfirst.frc.team1732.robot.commands.autotest.TurnAngle;
+import org.usfirst.frc.team1732.robot.commands.drive.DriveDistance;
 import org.usfirst.frc.team1732.robot.subsystems.Drivetrain;
 
 import edu.wpi.first.wpilibj.command.CommandGroup;

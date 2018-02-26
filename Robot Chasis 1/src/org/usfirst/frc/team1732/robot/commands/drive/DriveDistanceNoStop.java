@@ -1,4 +1,4 @@
-package org.usfirst.frc.team1732.robot.commands;
+package org.usfirst.frc.team1732.robot.commands.drive;
 
 import static org.usfirst.frc.team1732.robot.Robot.PERIOD_S;
 import static org.usfirst.frc.team1732.robot.Robot.drivetrain;

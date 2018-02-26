@@ -1,4 +1,4 @@
-package org.usfirst.frc.team1732.robot.commands;
+package org.usfirst.frc.team1732.robot.commands.arc;
 
 import static java.lang.Math.min;
 import static java.lang.Math.toDegrees;

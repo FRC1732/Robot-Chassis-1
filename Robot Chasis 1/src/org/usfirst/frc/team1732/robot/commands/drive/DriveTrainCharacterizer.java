@@ -1,4 +1,4 @@
-package org.usfirst.frc.team1732.robot.commands;
+package org.usfirst.frc.team1732.robot.commands.drive;
 
 import java.io.File;
 import java.io.FileWriter;

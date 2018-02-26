@@ -1,4 +1,4 @@
-package org.usfirst.frc.team1732.robot.commands;
+package org.usfirst.frc.team1732.robot.commands.arc;
 
 import static java.lang.Math.abs;
 import static java.lang.Math.min;
@@ -7,7 +7,7 @@ import static org.usfirst.frc.team1732.robot.Robot.drivetrain;
 import static org.usfirst.frc.team1732.robot.Robot.sensors;
 
 import org.usfirst.frc.team1732.robot.Robot;
-import org.usfirst.frc.team1732.robot.commands.ArcTurn.ArcTurnCalculation;
+import org.usfirst.frc.team1732.robot.commands.arc.ArcTurn.ArcTurnCalculation;
 import org.usfirst.frc.team1732.robot.controlutils.DisplacementPIDSource;
 import org.usfirst.frc.team1732.robot.sensors.encoders.EncoderReader;
 import org.usfirst.frc.team1732.robot.sensors.navx.GyroReader;

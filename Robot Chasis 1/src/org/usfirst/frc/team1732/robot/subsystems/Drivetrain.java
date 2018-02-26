@@ -1,7 +1,7 @@
 package org.usfirst.frc.team1732.robot.subsystems;
 
 import org.usfirst.frc.team1732.robot.Util;
-import org.usfirst.frc.team1732.robot.commands.DriveWithJoysticks;
+import org.usfirst.frc.team1732.robot.commands.drive.DriveWithJoysticks;
 import org.usfirst.frc.team1732.robot.controlutils.ClosedLoopProfile;
 import org.usfirst.frc.team1732.robot.controlutils.Feedforward;
 import org.usfirst.frc.team1732.robot.controlutils.motionprofiling.DoubleProfileLoader;
