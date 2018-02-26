@@ -1,5 +1,7 @@
 package org.usfirst.frc.team1732.robot;
 
+import java.util.Map.Entry;
+import java.util.TreeMap;
 import java.util.function.Function;
 
 public class Util {
@@ -126,14 +128,39 @@ public class Util {
 		double modifiedPD = (1 - Math.cos(percentDone * Math.PI)) / 2;
 		return startOut * (1 - modifiedPD) + endOut * modifiedPD;
 	}
+
 	public static double lerp(double y1, double y2, double mu) {
 		return (y1 * (1 - mu)) + (y2 * mu);
 	}
+
 	public static double cerp(double y1, double y2, double mu) {
 		double mu2 = (1 - Math.cos(mu * Math.PI)) / 2;
 		return (y1 * (1 - mu2)) + (y2 * mu2);
 	}
+
 	public static double map(double x, double iMin, double iMax, double fMin, double fMax) {
 		return (x - iMin) * (fMax - fMin) / (iMax - iMin) + fMin;
+	}
+
+	public static Double interpolateFromTree(TreeMap<Double, Double> map, double key) {
+		Double value = map.get(key);
+		if (value != null) {
+			return value;
+		}
+		Entry<Double, Double> lower = map.floorEntry(key);
+		Entry<Double, Double> upper = map.ceilingEntry(key);
+
+		if (lower == null && upper == null) {
+			System.err.println("ERROR: BOTH SHOULDN'T BE NULL");
+			return null;
+		} else if (lower == null) {
+			return upper.getValue();
+		} else if (upper == null) {
+			return lower.getValue();
+		}
+
+		double dt = upper.getKey() - lower.getKey();
+		double mu = (key - lower.getKey()) / dt;
+		return Util.interpolate(lower.getValue(), upper.getValue(), mu);
 	}
 }
