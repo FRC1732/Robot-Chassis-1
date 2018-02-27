@@ -8,12 +8,13 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.hal.NotifierJNI;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 // based off the Notifier class from wpilib
 public abstract class NotifierCommand extends Command {
 
 	protected abstract void init();
-
+	
 	@Override
 	protected final void initialize() {
 		init();

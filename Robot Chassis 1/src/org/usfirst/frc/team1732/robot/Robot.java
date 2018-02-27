@@ -14,11 +14,13 @@ import org.usfirst.frc.team1732.robot.sensors.Sensors;
 import org.usfirst.frc.team1732.robot.subsystems.Arm;
 import org.usfirst.frc.team1732.robot.subsystems.Claw;
 import org.usfirst.frc.team1732.robot.subsystems.Drivetrain;
+import org.usfirst.frc.team1732.robot.util.Dashboard;
 import org.usfirst.frc.team1732.robot.util.SRXMomentRecorderD;
 import org.usfirst.frc.team1732.robot.util.SRXMomentRecorderM;
 import org.usfirst.frc.team1732.robot.util.SRXVoltageRecord;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Scheduler;
 
 /**
@@ -29,7 +31,9 @@ import edu.wpi.first.wpilibj.command.Scheduler;
  * project.
  */
 public class Robot extends TimedRobot {
-
+	//util
+	public static Dashboard dash;
+	
 	// subsystems
 	public static Drivetrain drivetrain;
 	public static Claw claw;
@@ -59,6 +63,8 @@ public class Robot extends TimedRobot {
 	@Override
 	public void robotInit() {
 		setPeriod(PERIOD_S);
+		dash = new Dashboard();
+		dash.add("Update Rate", Robot::getUpdateRate);
 		drivetrain = new Drivetrain();
 		sensors = new Sensors();
 		arm = new Arm();
@@ -69,10 +75,19 @@ public class Robot extends TimedRobot {
 		rightRecorderD = new SRXMomentRecorderD(drivetrain.rightTalon1, drivetrain.rightEncoder.makeReader());
 		leftVoltageRecord = new SRXVoltageRecord(drivetrain.leftTalon1);
 		rightVoltageRecord = new SRXVoltageRecord(drivetrain.rightTalon1);
+		
 	}
-
+	
+	private double last;
+	private static double fps;
+	public static double getUpdateRate() {
+		return fps;
+	}
+	
 	@Override
 	public void robotPeriodic() {
+		fps = Timer.getFPGATimestamp() - last;
+		last = Timer.getFPGATimestamp();
 		DriverStationData.gotPlatePositions();
 		Scheduler.getInstance().run();
 		sensors.navX.sendNavXData();

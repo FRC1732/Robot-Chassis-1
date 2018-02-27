@@ -1,5 +1,6 @@
 package org.usfirst.frc.team1732.robot.subsystems;
 
+import org.usfirst.frc.team1732.robot.Robot;
 import org.usfirst.frc.team1732.robot.Util;
 import org.usfirst.frc.team1732.robot.commands.drive.DriveWithJoysticks;
 import org.usfirst.frc.team1732.robot.controlutils.ClosedLoopProfile;
@@ -96,6 +97,26 @@ public class Drivetrain extends Subsystem {
 		leftEncoder.zero();
 
 		profileManager = new DoubleProfileLoader(leftTalon1, rightTalon1);
+		
+		Robot.dash.add("Left Velocity", leftEncoder::getRate);
+		Robot.dash.add("Right Velocity", rightEncoder::getRate);
+		Robot.dash.add("Left Position", leftEncoder::getPosition);
+		Robot.dash.add("Right Position", leftEncoder::getPosition);
+		Robot.dash.add("Left Voltage", leftTalon1::getMotorOutputVoltage);
+		Robot.dash.add("Right Voltage", rightTalon1::getMotorOutputVoltage);
+		Robot.dash.add("Right Pulses", leftEncoder::getPulses);
+		Robot.dash.add("Left Pulses", rightEncoder::getPulses);
+		
+		Robot.dash.add("Left Rate", this::getLeftSensorVelocity);
+		Robot.dash.add("Right Rate", this::getRightSensorVelocity);
+	}
+	
+	public double getLeftSensorVelocity() {
+		return leftTalon1.getSelectedSensorVelocity(0);
+	}
+	
+	public double getRightSensorVelocity() {
+		return rightTalon1.getSelectedSensorVelocity(0);
 	}
 
 	public double convertVelocitySetpoint(double desired) {
@@ -105,21 +126,6 @@ public class Drivetrain extends Subsystem {
 	@Override
 	public void initDefaultCommand() {
 		setDefaultCommand(new DriveWithJoysticks());
-	}
-
-	@Override
-	public void periodic() {
-		SmartDashboard.putNumber("Left Rate", leftTalon1.getSelectedSensorVelocity(0));
-		SmartDashboard.putNumber("Right Rate", rightTalon1.getSelectedSensorVelocity(0));
-		SmartDashboard.putNumber("Left Velocity", leftEncoder.getRate());
-		SmartDashboard.putNumber("Right Velocity", rightEncoder.getRate());
-		SmartDashboard.putNumber("Left Position", leftEncoder.getPosition());
-		SmartDashboard.putNumber("Right Position", rightEncoder.getPosition());
-		SmartDashboard.putNumber("Left Voltage", leftTalon1.getMotorOutputVoltage());
-		SmartDashboard.putNumber("Right Voltage", rightTalon1.getMotorOutputVoltage());
-		SmartDashboard.putNumber("Right Pulses", leftEncoder.getPulses());
-		SmartDashboard.putNumber("Left Pulses", rightEncoder.getPulses());
-
 	}
 
 	public EncoderReader makeRightEncoderReader() {
