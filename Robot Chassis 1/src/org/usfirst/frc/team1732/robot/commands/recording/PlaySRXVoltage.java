@@ -22,8 +22,13 @@ public class PlaySRXVoltage extends NotifierCommand {
 
 	@Override
 	protected void exec() {
-		Robot.drivetrain.setLeft(Robot.leftVoltageRecord.getPercentOutputAtTime(timeSinceStarted()));
-		Robot.drivetrain.setRight(Robot.rightVoltageRecord.getPercentOutputAtTime(timeSinceStarted()));
+		double left = -Robot.leftVoltageRecord
+				.getPercentOutputAtTime(Robot.leftVoltageRecord.getTimeLength() - timeSinceStarted());
+		double right = -Robot.rightVoltageRecord
+				.getPercentOutputAtTime(Robot.rightVoltageRecord.getTimeLength() - timeSinceStarted());
+		Robot.drivetrain.setLeft(left);
+		Robot.drivetrain.setRight(right);
+		System.out.println(timeSinceStarted() + " " + left + " " + right);
 	}
 
 	@Override
@@ -36,5 +41,6 @@ public class PlaySRXVoltage extends NotifierCommand {
 	@Override
 	protected void whenEnded() {
 		// don't do anything, just use the last voltage;
+		System.out.println("finished playing");
 	}
 }
