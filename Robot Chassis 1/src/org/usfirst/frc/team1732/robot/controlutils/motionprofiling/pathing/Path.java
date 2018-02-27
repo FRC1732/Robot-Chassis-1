@@ -111,7 +111,7 @@ public final class Path {
 		Vector h5 = w.heading.rotate(Math.PI / 2);
 		Vector v5 = new LineSegment(v4, v4.add(h5)).getIntersection(new LineSegment(w));
 		Vector v2 = new LineSegment(v1, v3).getPointAtPercent(n);
-		Vector v6 = new LineSegment(v5, v7).getPointAtPercent(n);
+		Vector v6 = new LineSegment(v5, v7).getPointAtPercent(1 - n);
 		return new BezierCurve(v1, v2, v3, v4, v5, v6, v7);
 	}
 
@@ -128,7 +128,7 @@ public final class Path {
 		LineSegment ac = new LineSegment(v1, v3);
 		LineSegment ce = new LineSegment(v3, v5);
 		Vector v2 = ac.getPointAtPercent(n);
-		Vector v4 = ce.getPointAtPercent(n);
+		Vector v4 = ce.getPointAtPercent(1 - n);
 		return new BezierCurve(v1, v2, v3, v4, v5);
 	}
 
@@ -143,7 +143,7 @@ public final class Path {
 		Vector v3 = l4.getIntersection(new LineSegment(prev));
 		Vector v5 = l4.getIntersection(new LineSegment(w));
 		Vector v2 = new LineSegment(v1, v3).getPointAtPercent(n);
-		Vector v6 = new LineSegment(v5, v7).getPointAtPercent(n);
+		Vector v6 = new LineSegment(v5, v7).getPointAtPercent(1 - n);
 		return new BezierCurve(v1, v2, v3, v4, v5, v6, v7);
 	}
 
