@@ -173,9 +173,9 @@ public abstract class NotifierCommand extends Command {
 	private final void startPeriodic() {
 		m_processLock.lock();
 		try {
+			timer.reset();
 			m_expirationTime = RobotController.getFPGATime() * 1e-6 + m_period;
 			updateAlarm();
-			timer.reset();
 			timer.start();
 			m_isRunning = true;
 		} finally {

@@ -4,6 +4,8 @@ import org.usfirst.frc.team1732.robot.commands.armcontrol.SetArmIntake;
 import org.usfirst.frc.team1732.robot.commands.armcontrol.SetArmScore;
 import org.usfirst.frc.team1732.robot.commands.old.RunClawIn;
 import org.usfirst.frc.team1732.robot.commands.old.RunClawOut;
+import org.usfirst.frc.team1732.robot.commands.recording.PlaySRXVoltage;
+import org.usfirst.frc.team1732.robot.commands.recording.RecordSRXVoltage;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
@@ -31,6 +33,9 @@ public class Joysticks {
 		//
 		new JoystickButton(left, 2).whileHeld(new SetArmScore());
 		new JoystickButton(right, 2).whileHeld(new SetArmIntake());
+
+		new JoystickButton(buttons, 6).toggleWhenPressed(new RecordSRXVoltage());
+		new JoystickButton(buttons, 7).whenPressed(new PlaySRXVoltage());
 	}
 
 	// our joysticks return negative when they're pressed forward

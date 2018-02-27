@@ -16,6 +16,7 @@ import org.usfirst.frc.team1732.robot.subsystems.Claw;
 import org.usfirst.frc.team1732.robot.subsystems.Drivetrain;
 import org.usfirst.frc.team1732.robot.util.SRXMomentRecorderD;
 import org.usfirst.frc.team1732.robot.util.SRXMomentRecorderM;
+import org.usfirst.frc.team1732.robot.util.SRXVoltageRecord;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Scheduler;
@@ -41,6 +42,8 @@ public class Robot extends TimedRobot {
 	public static SRXMomentRecorderD rightRecorderD;
 	public static SRXMomentRecorderM leftRecorderM;
 	public static SRXMomentRecorderM rightRecorderM;
+	public static SRXVoltageRecord leftVoltageRecord;
+	public static SRXVoltageRecord rightVoltageRecord;
 
 	// public static SampleAveraging actualVoltage;
 
@@ -64,7 +67,8 @@ public class Robot extends TimedRobot {
 		joysticks = new Joysticks();
 		leftRecorderD = new SRXMomentRecorderD(drivetrain.leftTalon1, drivetrain.leftEncoder.makeReader());
 		rightRecorderD = new SRXMomentRecorderD(drivetrain.rightTalon1, drivetrain.rightEncoder.makeReader());
-
+		leftVoltageRecord = new SRXVoltageRecord(drivetrain.leftTalon1);
+		rightVoltageRecord = new SRXVoltageRecord(drivetrain.rightTalon1);
 	}
 
 	@Override
