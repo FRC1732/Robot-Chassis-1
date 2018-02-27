@@ -150,13 +150,13 @@ public class Drivetrain extends Subsystem {
 	}
 
 	public void setLeft(double d) {
-		System.out.println("left:" + d);
+		// System.out.println("left:" + d);
 		d = limit(d);
 		leftTalon1.set(ControlMode.PercentOutput, d);
 	}
 
 	public void setRight(double d) {
-		System.out.println("right: " + d);
+		// System.out.println("right: " + d);
 		d = limit(d);
 		rightTalon1.set(ControlMode.PercentOutput, limit(d));
 	}

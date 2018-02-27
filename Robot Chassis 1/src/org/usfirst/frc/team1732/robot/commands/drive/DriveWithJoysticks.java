@@ -18,7 +18,7 @@ public class DriveWithJoysticks extends NotifierCommand {
 	// Called just before this Command runs the first time
 	@Override
 	protected void init() {
-		Robot.drivetrain.setNeutralMode(NeutralMode.Coast);
+		Robot.drivetrain.setNeutralMode(NeutralMode.Brake);
 	}
 
 	// Called repeatedly when this Command is scheduled to run
