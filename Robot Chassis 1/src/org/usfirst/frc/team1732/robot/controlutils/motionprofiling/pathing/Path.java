@@ -571,6 +571,24 @@ public final class Path {
 				totalTimeSec += pointDurSec;
 			}
 		}
+		
+		public PointProfile(Iterator<PointPair<VelocityPoint>> iterator, double finalAbsCenterPos,
+				double initialHeading) {
+			totalTimeSec = 0;
+//			this.pointDurSec = iterator.baseDurationSec;
+			this.pointDurSec = 0;
+			this.pointDurms = 0;
+//			this.pointDurMs = iterator.baseDurationMs;
+			this.finalAbsCenterPos = finalAbsCenterPos;
+			this.initialHeading = initialHeading;
+			map = new TreeMap<>();
+			while (iterator.hasNext()) {
+				PointPair<VelocityPoint> pair = iterator.next();
+				map.put(totalTimeSec, pair);
+				// System.out.println(pair.left.velocity + ", " + pair.right.velocity);
+				totalTimeSec += pointDurSec;
+			}
+		}
 
 		public double getTotalTimeSec() {
 			return totalTimeSec;
