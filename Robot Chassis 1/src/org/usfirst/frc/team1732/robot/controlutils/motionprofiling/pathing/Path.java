@@ -571,14 +571,14 @@ public final class Path {
 				totalTimeSec += pointDurSec;
 			}
 		}
-		
+
 		public PointProfile(Iterator<PointPair<VelocityPoint>> iterator, double finalAbsCenterPos,
 				double initialHeading) {
 			totalTimeSec = 0;
-//			this.pointDurSec = iterator.baseDurationSec;
+			// this.pointDurSec = iterator.baseDurationSec;
 			this.pointDurSec = 0;
-			this.pointDurms = 0;
-//			this.pointDurMs = iterator.baseDurationMs;
+			this.pointDurMs = 0;
+			// this.pointDurMs = iterator.baseDurationMs;
 			this.finalAbsCenterPos = finalAbsCenterPos;
 			this.initialHeading = initialHeading;
 			map = new TreeMap<>();

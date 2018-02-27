@@ -18,7 +18,7 @@ public class SRXMomentRecorderM {
 	private Deque<Pair<Moment>> moments = new LinkedBlockingDeque<>();
 	private boolean recording = false;
 	private Moment currentMoment = null;
-	
+
 	public SRXMomentRecorderM(TalonSRX left, TalonEncoder leftr, TalonSRX right, TalonEncoder rightr) {
 		this.left = left;
 		this.leftr = leftr;
@@ -31,15 +31,16 @@ public class SRXMomentRecorderM {
 	private double time;
 	private int i = 0;
 	private double totalTime = 0;
-	
+
 	public void startRecording() {
 		moments.clear();
 		recording = true;
 		time = Timer.getFPGATimestamp();
-		vel = encoder.getRate();
+		lvel = Robot.drivetrain.leftEncoder.getRate();
+		rvel = Robot.drivetrain.rightEncoder.getRate();
 		new Thread(this::runRecord).start();
 	}
-	
+
 	private void runRecord() {
 		while (!Thread.interrupted()) {
 			record();
@@ -49,18 +50,16 @@ public class SRXMomentRecorderM {
 			}
 		}
 	}
-	
+
 	public void record() {
 		if (recording) {
 			moments.push(new Pair<Moment>(
-					new Moment(left.getMotorOutputVoltage(),
-					left.getMotorOutputPercent(), leftr.getRate(),
-					(leftr.getRate() - lvel) / (Timer.getFPGATimestamp() - time),
-					Robot.sensors.navX.getTotalAngle(), Timer.getFPGATimestamp() - time),
-					new Moment(right.getMotorOutputVoltage(),
-					right.getMotorOutputPercent(), rightr.getRate(),
-					(rightr.getRate() - rvel) / (Timer.getFPGATimestamp() - time),
-					Robot.sensors.navX.getTotalAngle(), Timer.getFPGATimestamp() - time)));
+					new Moment(left.getMotorOutputVoltage(), left.getMotorOutputPercent(), leftr.getRate(),
+							(leftr.getRate() - lvel) / (Timer.getFPGATimestamp() - time),
+							Robot.sensors.navX.getTotalAngle(), Timer.getFPGATimestamp() - time),
+					new Moment(right.getMotorOutputVoltage(), right.getMotorOutputPercent(), rightr.getRate(),
+							(rightr.getRate() - rvel) / (Timer.getFPGATimestamp() - time),
+							Robot.sensors.navX.getTotalAngle(), Timer.getFPGATimestamp() - time)));
 			totalTime += Timer.getFPGATimestamp() - time;
 			i++;
 			lvel = leftr.getRate();
@@ -68,18 +67,18 @@ public class SRXMomentRecorderM {
 			time = Timer.getFPGATimestamp();
 		}
 	}
-	
+
 	public void stopRecording() {
 		recording = false;
 		System.out.println("Average Time: " + totalTime / i + " vs theory: " + Robot.PERIOD_S);
 	}
-	
+
 	public Pair<Moment> getLast() {
 		return moments.pop();
 	}
-	
+
 	private Pair<Moment> current;
-	
+
 	public Pair<Moment> getNext(double deltaTime) {
 		if (isFinished()) {
 			return null;
@@ -89,7 +88,7 @@ public class SRXMomentRecorderM {
 			current.one.deltaTime -= deltaTime;
 			return current;
 		}
-		
+
 		if (current.one.deltaTime > deltaTime) {
 			current.one.deltaTime -= deltaTime;
 			return current;
@@ -99,11 +98,11 @@ public class SRXMomentRecorderM {
 			return getNext(deltaTime);
 		}
 	}
-	
+
 	public boolean isFinished() {
 		return moments.isEmpty();
 	}
-	
+
 	public class Moment {
 		/**
 		 * Voltage in <strong>volts</strong>
@@ -129,9 +128,9 @@ public class SRXMomentRecorderM {
 		 * The change in time in <strong>sec</strong>
 		 */
 		protected double deltaTime;
-		
-		public Moment(double voltage, double percent, double velocity, double acceleration,
-				double heading, double deltaTime) {
+
+		public Moment(double voltage, double percent, double velocity, double acceleration, double heading,
+				double deltaTime) {
 			this.voltage = voltage;
 			this.percent = percent;
 			this.velocity = velocity;
@@ -139,7 +138,7 @@ public class SRXMomentRecorderM {
 			this.heading = heading;
 			this.deltaTime = deltaTime;
 		}
-		
+
 		@Override
 		public String toString() {
 			return String.format("Voltage: %.3f, EncoderPos: %.3f", voltage, velocity);
