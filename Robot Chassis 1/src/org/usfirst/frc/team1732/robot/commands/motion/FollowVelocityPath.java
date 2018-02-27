@@ -28,13 +28,11 @@ public class FollowVelocityPath extends NotifierCommand {
 	 *            initial heading of the robot according to the path
 	 */
 	public FollowVelocityPath(PointProfile profile) {
-		super(1);
+		super(5);
 		requires(Robot.drivetrain);
 		this.navx = Robot.sensors.navX.makeReader();
 		leftE = Robot.drivetrain.makeLeftEncoderReader();
 		rightE = Robot.drivetrain.makeRightEncoderReader();
-		System.out.println("Initial heading: " + profile.initialHeading);
-		System.out.println("Final Center Pos : " + profile.finalAbsCenterPos);
 		this.profile = profile;
 	}
 
@@ -43,6 +41,8 @@ public class FollowVelocityPath extends NotifierCommand {
 		navx.zero();
 		leftE.zero();
 		rightE.zero();
+		System.out.println("Initial heading: " + profile.initialHeading);
+		System.out.println("Final Center Pos : " + profile.finalAbsCenterPos);
 		Robot.drivetrain.velocityGains.applyToTalon(Robot.drivetrain.leftTalon1, 1, 0);
 		Robot.drivetrain.velocityGains.applyToTalon(Robot.drivetrain.rightTalon1, 1, 0);
 		// timer.reset();
@@ -80,8 +80,8 @@ public class FollowVelocityPath extends NotifierCommand {
 	@Override
 	protected boolean isDone() {
 		return timeSinceStarted() > profile.getTotalTimeSec()
-				&& Util.epsilonEquals(profile.finalAbsCenterPos, Math.abs(leftE.getPosition()), 30)
-				&& Util.epsilonEquals(profile.finalAbsCenterPos, Math.abs(rightE.getPosition()), 30);
+				&& Util.epsilonEquals(profile.finalAbsCenterPos, Math.abs(leftE.getPosition()), 80)
+				&& Util.epsilonEquals(profile.finalAbsCenterPos, Math.abs(rightE.getPosition()), 80);
 	}
 
 	@Override
