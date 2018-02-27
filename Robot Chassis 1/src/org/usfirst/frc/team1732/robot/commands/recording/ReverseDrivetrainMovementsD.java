@@ -17,6 +17,7 @@ public class ReverseDrivetrainMovementsD extends Command {
 	protected void initialize() {
 		leftRecorderD.stopRecording();
 		rightRecorderD.stopRecording();
+		
 	}
 	protected void execute() {
 		double left = leftRecorderD.getLastVoltage(), right = rightRecorderD.getLastVoltage();

@@ -6,6 +6,7 @@ import static org.usfirst.frc.team1732.robot.Robot.rightRecorderM;
 
 import org.usfirst.frc.team1732.robot.Robot;
 import org.usfirst.frc.team1732.robot.util.SRXMomentRecorderM.Moment;
+import org.usfirst.frc.team1732.robot.util.Pair;
 import org.usfirst.frc.team1732.robot.util.ThreadCommand;
 
 import edu.wpi.first.wpilibj.Timer;
@@ -22,8 +23,7 @@ public class ReverseDrivetrainMovementsM extends ThreadCommand {
 	// Called just before this Command runs the first time
 	@Override
 	public void init() {
-		leftRecorderM.stopRecording();
-		rightRecorderM.stopRecording();
+		Robot.recorderM.stopRecording();
 		last = Timer.getFPGATimestamp();
 		setDelay(Robot.PERIOD_MS);
 	}
@@ -35,12 +35,11 @@ public class ReverseDrivetrainMovementsM extends ThreadCommand {
 	// Called repeatedly when this Command is scheduled to run
 	@Override
 	public void exec() {
-		Moment left = leftRecorderM.getNext(Timer.getFPGATimestamp() - last),
-				right = rightRecorderM.getNext(Timer.getFPGATimestamp() - last);
+		Pair<Moment> now = Robot.recorderM.getNext(Timer.getFPGATimestamp() - last);
 		total += (Timer.getFPGATimestamp() - last);
 		i++;
 		last = Timer.getFPGATimestamp();
-		if (left != null && right != null) {
+		if (now != null) {
 			// System.out.printf("Left: %.5f, Right: %.5f%n", left, right);
 			// Almost works, but is off by some amount. I think that this is becuase the
 			// robot has a variable battery output
@@ -50,8 +49,8 @@ public class ReverseDrivetrainMovementsM extends ThreadCommand {
 			// -right.acceleration) / 12);
 			// drivetrain.setLeft(-left.voltage / 12);
 			// drivetrain.setRight(-right.voltage / 12);
-			drivetrain.setLeft(-left.percent);
-			drivetrain.setRight(-right.percent);
+			drivetrain.setLeft(-now.one.percent);
+			drivetrain.setRight(-now.two.percent);
 		}
 	}
 
