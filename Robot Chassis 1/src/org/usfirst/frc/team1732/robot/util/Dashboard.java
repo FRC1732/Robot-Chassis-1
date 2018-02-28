@@ -10,9 +10,10 @@ public class Dashboard {
 	private static ConcurrentLinkedQueue<Entry> entries;
 
 	public Dashboard() {
+		entries = new ConcurrentLinkedQueue<>();
 		Thread thread = new Thread(this::loop);
 		thread.setDaemon(true);
-		entries = new ConcurrentLinkedQueue<>();
+		thread.start();
 	}
 
 	private void sleepExactly() {
