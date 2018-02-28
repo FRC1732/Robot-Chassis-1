@@ -87,8 +87,8 @@ public class LookupTable {
 			return lower.getValue();
 		}
 
-		Function<Double, Double> f = d -> Util.linearInterpolate(lower.getKey(), lower.getValue(), upper.getKey(),
-				upper.getValue(), d);
+		double mu = (input - lower.getKey()) / (upper.getKey() - lower.getKey());
+		Function<Double, Double> f = d -> Util.lerp(lower.getValue(), upper.getValue(), mu);
 
 		return inOut.computeIfAbsent(input, f);
 	}
@@ -108,8 +108,8 @@ public class LookupTable {
 			return lower.getValue();
 		}
 
-		Function<Double, Double> f = d -> Util.linearInterpolate(lower.getKey(), lower.getValue(), upper.getKey(),
-				upper.getValue(), d);
+		double mu = (output - lower.getKey()) / (upper.getKey() - lower.getKey());
+		Function<Double, Double> f = d -> Util.lerp(lower.getValue(), upper.getValue(), mu);
 
 		return outIn.computeIfAbsent(output, f);
 	}

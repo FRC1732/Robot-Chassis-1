@@ -67,18 +67,22 @@ public class ArcTurnPID extends Command {
 							}
 							this.wait((long) Robot.PERIOD_MS);
 						}
-					} catch (InterruptedException e) {}
+					} catch (InterruptedException e) {
+					}
 			}
 		};
 	}
 
 	// public enum ArcTurnCalculation {
 	// RADIUS_THETA((r, t) -> r, (r, t) -> toRadians(t)), //
-	// HEIGHT_THETA((h, t) -> (h - (Drivetrain.ROBOT_LENGTH_IN / 2)) / sin(toRadians(t)), (h, t) -> toRadians(t)), //
-	// WIDTH_HEIGHT((w, h) -> (w * w + h * h) / (2 * w), (w, h) -> atan2(h, (w * w + h * h) / (2 * w) - w));
+	// HEIGHT_THETA((h, t) -> (h - (Drivetrain.ROBOT_LENGTH_IN / 2)) /
+	// sin(toRadians(t)), (h, t) -> toRadians(t)), //
+	// WIDTH_HEIGHT((w, h) -> (w * w + h * h) / (2 * w), (w, h) -> atan2(h, (w * w +
+	// h * h) / (2 * w) - w));
 	// BiFunction<Double, Double, Double> getR, getT;
 	//
-	// private ArcTurnCalculation(BiFunction<Double, Double, Double> r, BiFunction<Double, Double, Double> t) {
+	// private ArcTurnCalculation(BiFunction<Double, Double, Double> r,
+	// BiFunction<Double, Double, Double> t) {
 	// getR = r;
 	// getT = t;
 	// }
@@ -94,9 +98,11 @@ public class ArcTurnPID extends Command {
 		t.start();
 		drivetrain.setNeutralMode(NeutralMode.Brake);
 	}
+
 	protected boolean isFinished() {
 		return isFinished;
 	}
+
 	protected void end() {
 		drivetrain.setStop();
 		rot.disable();

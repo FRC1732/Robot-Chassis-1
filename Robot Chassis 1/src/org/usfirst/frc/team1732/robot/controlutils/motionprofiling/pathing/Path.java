@@ -619,11 +619,34 @@ public final class Path {
 
 			double dt = upper.getKey() - lower.getKey();
 			double mu = (timeSec - lower.getKey()) / dt;
-			double leftV = Util.interpolate(leftLow.velocity, leftUp.velocity, mu);
-			double rightV = Util.interpolate(rightLow.velocity, rightUp.velocity, mu);
-			double leftH = Util.interpolate(leftLow.headingDeg, leftUp.headingDeg, mu);
-			double rightH = Util.interpolate(rightLow.headingDeg, rightUp.headingDeg, mu);
+			double leftV = Util.lerp(leftLow.velocity, leftUp.velocity, mu);
+			double rightV = Util.lerp(rightLow.velocity, rightUp.velocity, mu);
+			double leftH = Util.lerp(leftLow.headingDeg, leftUp.headingDeg, mu);
+			double rightH = Util.lerp(rightLow.headingDeg, rightUp.headingDeg, mu);
 			return new PointPair<VelocityPoint>(new VelocityPoint(leftV, leftH), new VelocityPoint(rightV, rightH));
+		}
+
+		public PointPair<VelocityPoint> getCeilingPoint(double timeSec) {
+			PointPair<VelocityPoint> value = map.get(timeSec);
+			if (value != null) {
+				return value;
+			}
+			Entry<Double, PointPair<VelocityPoint>> lower = map.floorEntry(timeSec);
+			Entry<Double, PointPair<VelocityPoint>> upper = map.ceilingEntry(timeSec);
+
+			if (lower == null && upper == null) {
+				System.err.println("ERROR: BOTH SHOULDN'T BE NULL");
+				return null;
+			} else if (lower == null) {
+				return upper.getValue();
+			} else if (upper == null) {
+				return lower.getValue();
+			}
+
+			VelocityPoint upperLeft = upper.getValue().left;
+			VelocityPoint upperRight = upper.getValue().right;
+			return new PointPair<VelocityPoint>(new VelocityPoint(upperLeft.velocity, upperLeft.headingDeg),
+					new VelocityPoint(upperRight.velocity, upperRight.headingDeg));
 		}
 	}
 
@@ -675,15 +698,15 @@ public final class Path {
 				double endCurvature = currentSegment.curve
 						.getCurvatureAtArcLength(Math.abs(currentEndState.pos()) - segmentLengthSum);
 				double endArcLength = Math.abs(currentEndState.pos()) - segmentLengthSum;
+				double endVel = profile.velocityByTimeClamped((i) * pointDurationSec);
+				double endHeading = Math.toDegrees(currentSegment.curve.getHeadingAtArcLength(endArcLength));
 
-				double heading = Math.toDegrees(currentSegment.curve.getHeadingAtArcLength(endArcLength));
-
-				leftPoint.headingDeg = heading;
-				rightPoint.headingDeg = heading;
+				leftPoint.headingDeg = endHeading;
+				rightPoint.headingDeg = endHeading;
 
 				if (Util.epsilonEquals(0, endCurvature, 1.0e-30)) { // if straight
-					leftPoint.velocity = currentEndState.vel();
-					rightPoint.velocity = currentEndState.vel();
+					leftPoint.velocity = endVel;
+					rightPoint.velocity = endVel;
 				} else { // if curving
 					double curvature = currentSegment.curve.getCurvatureAtArcLength(endArcLength);
 					double r = 1 / curvature;
@@ -692,8 +715,8 @@ public final class Path {
 					r = Math.abs(r);
 					double lK = lR / r;
 					double rK = rR / r;
-					leftPoint.velocity = currentEndState.vel() * lK;
-					rightPoint.velocity = currentEndState.vel() * rK;
+					leftPoint.velocity = endVel * lK;
+					rightPoint.velocity = endVel * rK;
 				}
 				i++;
 				return new PointPair<VelocityPoint>(leftPoint, rightPoint);

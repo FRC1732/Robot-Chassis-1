@@ -28,7 +28,7 @@ public class FollowVelocityPath extends NotifierCommand {
 	 *            initial heading of the robot according to the path
 	 */
 	public FollowVelocityPath(PointProfile profile) {
-		super(5);
+		super(1);
 		requires(Robot.drivetrain);
 		this.navx = Robot.sensors.navX.makeReader();
 		leftE = Robot.drivetrain.makeLeftEncoderReader();
@@ -56,7 +56,7 @@ public class FollowVelocityPath extends NotifierCommand {
 		// System.out.println("Time: " + timer.get());
 		// timer.reset();
 		// timer.start();
-		PointPair<VelocityPoint> pair = profile.getInterpolatedPoint(timeSinceStarted());
+		PointPair<VelocityPoint> pair = profile.getCeilingPoint(timeSinceStarted());
 		VelocityPoint left = pair.left;
 		VelocityPoint right = pair.right;
 		double desiredHeading = left.headingDeg - profile.initialHeading;
