@@ -8,6 +8,7 @@
 package org.usfirst.frc.team1732.robot;
 
 import org.usfirst.frc.team1732.robot.autotools.DriverStationData;
+import org.usfirst.frc.team1732.robot.commands.TestMotors;
 import org.usfirst.frc.team1732.robot.input.Joysticks;
 import org.usfirst.frc.team1732.robot.odomotry.PositionEstimator;
 import org.usfirst.frc.team1732.robot.sensors.Sensors;
@@ -18,6 +19,8 @@ import org.usfirst.frc.team1732.robot.util.Dashboard;
 import org.usfirst.frc.team1732.robot.util.SRXMomentRecorderD;
 import org.usfirst.frc.team1732.robot.util.SRXMomentRecorderM;
 import org.usfirst.frc.team1732.robot.util.SRXVoltageRecord;
+
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
@@ -70,14 +73,12 @@ public class Robot extends TimedRobot {
 		claw = new Claw();
 
 		joysticks = new Joysticks();
-		leftRecorderD = new SRXMomentRecorderD(drivetrain.leftTalon1,
-				drivetrain.leftEncoder.makeReader());
-		rightRecorderD = new SRXMomentRecorderD(drivetrain.rightTalon1,
-				drivetrain.rightEncoder.makeReader());
+		leftRecorderD = new SRXMomentRecorderD(drivetrain.leftTalon1, drivetrain.leftEncoder.makeReader());
+		rightRecorderD = new SRXMomentRecorderD(drivetrain.rightTalon1, drivetrain.rightEncoder.makeReader());
 		leftVoltageRecord = new SRXVoltageRecord(drivetrain.leftTalon1);
 		rightVoltageRecord = new SRXVoltageRecord(drivetrain.rightTalon1);
-		recorderM = new SRXMomentRecorderM(drivetrain.leftTalon1, drivetrain.leftEncoder,
-				drivetrain.rightTalon1, drivetrain.rightEncoder);
+		recorderM = new SRXMomentRecorderM(drivetrain.leftTalon1, drivetrain.leftEncoder, drivetrain.rightTalon1,
+				drivetrain.rightEncoder);
 
 		sensors.navX.addNavXData();
 	}
@@ -127,6 +128,7 @@ public class Robot extends TimedRobot {
 		// // iterator = Path.getPreloadedIterator(iterator);
 		// System.out.println("Time to make path: " + t.get());
 
+		new TestMotors(1, -1, NeutralMode.Coast, 4);
 		// new TestPathing(iterator).start();
 
 		// new TurnAngle(45).start();
