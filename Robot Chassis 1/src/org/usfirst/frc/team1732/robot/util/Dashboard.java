@@ -24,7 +24,9 @@ public class Dashboard {
 
 	private void loop() {
 		while (true) {
-			entries.forEach(this::call);
+			synchronized (entries) {
+				entries.forEach(this::call);
+			}
 			sleepExactly();
 		}
 	}
@@ -34,7 +36,9 @@ public class Dashboard {
 	}
 
 	public void add(String name, Supplier<?> sup) {
-		entries.add(new Entry(name, sup));
+		synchronized (entries) {
+			entries.add(new Entry(name, sup));
+		}
 	}
 
 	private class Entry {
