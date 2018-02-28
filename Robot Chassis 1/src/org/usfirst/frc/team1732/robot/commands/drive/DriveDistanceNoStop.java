@@ -32,10 +32,12 @@ public class DriveDistanceNoStop extends Command {
 			public double pidGet() {
 				return g.getTotalAngle();
 			}
-		}, d -> {}, PERIOD_S);
+		}, d -> {
+		}, PERIOD_S);
 		rot.setSetpoint(0);
 		rot.setAbsoluteTolerance(1);
 	}
+
 	protected void initialize() {
 		l.zero();
 		r.zero();

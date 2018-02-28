@@ -11,23 +11,23 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Command;
 
 public class ReverseWithVelocityM extends Command {
-	
+
 	private static final double HEADING_P = 1;
-	
+
 	private double last;
 	private double total;
 	private int i;
-	
+
 	private double initialHeading;
-	
+
 	public ReverseWithVelocityM() {
 	}
-	
+
 	@Override
 	protected void initialize() {
 		initialHeading = Robot.sensors.navX.getTotalAngle();
 	}
-	
+
 	@Override
 	protected void execute() {
 		Pair<Moment> now = Robot.recorderM.getNext(Timer.getFPGATimestamp() - last);
@@ -45,10 +45,10 @@ public class ReverseWithVelocityM extends Command {
 					.convertVelocitySetpoint(-now.two.velocity - headingAdjustment * Math.signum(-now.two.velocity)));
 		}
 	}
-	
+
 	@Override
 	protected boolean isFinished() {
 		return Robot.recorderM.isFinished();
 	}
-	
+
 }

@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public abstract class NotifierCommand extends Command {
 
 	protected abstract void init();
-	
+
 	@Override
 	protected final void initialize() {
 		init();
