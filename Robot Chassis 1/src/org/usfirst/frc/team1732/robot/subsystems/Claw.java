@@ -2,7 +2,6 @@ package org.usfirst.frc.team1732.robot.subsystems;
 
 import java.util.function.Supplier;
 
-import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;

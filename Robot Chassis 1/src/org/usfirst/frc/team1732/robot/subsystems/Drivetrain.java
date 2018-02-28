@@ -16,7 +16,6 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.wpilibj.command.Subsystem;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Drivetrain extends Subsystem {
 
@@ -97,7 +96,7 @@ public class Drivetrain extends Subsystem {
 		leftEncoder.zero();
 
 		profileManager = new DoubleProfileLoader(leftTalon1, rightTalon1);
-		
+
 		Robot.dash.add("Left Velocity", leftEncoder::getRate);
 		Robot.dash.add("Right Velocity", rightEncoder::getRate);
 		Robot.dash.add("Left Position", leftEncoder::getPosition);
@@ -106,15 +105,15 @@ public class Drivetrain extends Subsystem {
 		Robot.dash.add("Right Voltage", rightTalon1::getMotorOutputVoltage);
 		Robot.dash.add("Right Pulses", leftEncoder::getPulses);
 		Robot.dash.add("Left Pulses", rightEncoder::getPulses);
-		
+
 		Robot.dash.add("Left Rate", this::getLeftSensorVelocity);
 		Robot.dash.add("Right Rate", this::getRightSensorVelocity);
 	}
-	
+
 	public double getLeftSensorVelocity() {
 		return leftTalon1.getSelectedSensorVelocity(0);
 	}
-	
+
 	public double getRightSensorVelocity() {
 		return rightTalon1.getSelectedSensorVelocity(0);
 	}
