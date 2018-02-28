@@ -1,17 +1,18 @@
 package org.usfirst.frc.team1732.robot.util;
 
-import java.util.LinkedList;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Dashboard {
-	private static LinkedList<Entry> entries;
+	private static ConcurrentLinkedQueue<Entry> entries;
 
 	public Dashboard() {
-		new Thread(this::loop).start();
-		entries = new LinkedList<>();
+		Thread thread = new Thread(this::loop);
+		thread.setDaemon(true);
+		entries = new ConcurrentLinkedQueue<>();
 	}
 
 	private void sleepExactly() {
@@ -23,10 +24,8 @@ public class Dashboard {
 	}
 
 	private void loop() {
-		while (true) {
-			synchronized (entries) {
-				entries.forEach(this::call);
-			}
+		while (!Thread.interrupted()) {
+			entries.forEach(this::call);
 			sleepExactly();
 		}
 	}
@@ -36,9 +35,7 @@ public class Dashboard {
 	}
 
 	public void add(String name, Supplier<?> sup) {
-		synchronized (entries) {
-			entries.add(new Entry(name, sup));
-		}
+		entries.add(new Entry(name, sup));
 	}
 
 	private class Entry {
