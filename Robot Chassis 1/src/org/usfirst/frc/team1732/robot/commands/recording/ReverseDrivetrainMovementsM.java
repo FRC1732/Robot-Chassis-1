@@ -1,12 +1,10 @@
 package org.usfirst.frc.team1732.robot.commands.recording;
 
 import static org.usfirst.frc.team1732.robot.Robot.drivetrain;
-import static org.usfirst.frc.team1732.robot.Robot.leftRecorderM;
-import static org.usfirst.frc.team1732.robot.Robot.rightRecorderM;
 
 import org.usfirst.frc.team1732.robot.Robot;
-import org.usfirst.frc.team1732.robot.util.SRXMomentRecorderM.Moment;
 import org.usfirst.frc.team1732.robot.util.Pair;
+import org.usfirst.frc.team1732.robot.util.SRXMomentRecorderM.Moment;
 import org.usfirst.frc.team1732.robot.util.ThreadCommand;
 
 import edu.wpi.first.wpilibj.Timer;
@@ -57,7 +55,7 @@ public class ReverseDrivetrainMovementsM extends ThreadCommand {
 	// Make this return true when this Command no longer needs to run execute()
 	@Override
 	protected boolean isFinished() {
-		return leftRecorderM.isFinished() || rightRecorderM.isFinished();
+		return Robot.recorderM.isFinished();
 	}
 
 	// Called once after isFinished returns true

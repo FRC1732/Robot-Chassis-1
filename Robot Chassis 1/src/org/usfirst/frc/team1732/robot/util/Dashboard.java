@@ -31,7 +31,7 @@ public class Dashboard {
 		e.putToDashboard();
 	}
 	
-	private static LinkedList<Entry> entries;
+	private static LinkedList<Entry> entries = new LinkedList<>();
 	
 	public void add(String name, Supplier<?> sup) {
 		entries.add(new Entry(name, sup));

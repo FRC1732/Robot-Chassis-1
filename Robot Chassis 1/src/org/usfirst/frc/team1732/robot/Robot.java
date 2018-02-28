@@ -8,6 +8,7 @@
 package org.usfirst.frc.team1732.robot;
 
 import org.usfirst.frc.team1732.robot.autotools.DriverStationData;
+import org.usfirst.frc.team1732.robot.commands.recording.ReverseWithVelocityM;
 import org.usfirst.frc.team1732.robot.input.Joysticks;
 import org.usfirst.frc.team1732.robot.odomotry.PositionEstimator;
 import org.usfirst.frc.team1732.robot.sensors.Sensors;
@@ -78,6 +79,8 @@ public class Robot extends TimedRobot {
 		rightVoltageRecord = new SRXVoltageRecord(drivetrain.rightTalon1);
 		recorderM = new SRXMomentRecorderM(drivetrain.leftTalon1, drivetrain.leftEncoder,
 				drivetrain.rightTalon1, drivetrain.rightEncoder);
+
+		sensors.navX.sendNavXData();
 	}
 	
 	private double last;
@@ -93,7 +96,6 @@ public class Robot extends TimedRobot {
 		last = Timer.getFPGATimestamp();
 		DriverStationData.gotPlatePositions();
 		Scheduler.getInstance().run();
-		sensors.navX.sendNavXData();
 	}
 	
 	@Override
@@ -136,6 +138,8 @@ public class Robot extends TimedRobot {
 		// new Test().start();
 		// new DriveTrainCharacterizer(TestMode.STEP_VOLTAGE,
 		// Direction.Forward).start();
+		
+		new ReverseWithVelocityM().start();
 	}
 	
 	@Override

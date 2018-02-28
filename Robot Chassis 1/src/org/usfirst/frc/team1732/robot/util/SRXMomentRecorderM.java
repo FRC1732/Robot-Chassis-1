@@ -36,7 +36,8 @@ public class SRXMomentRecorderM {
 		moments.clear();
 		recording = true;
 		time = Timer.getFPGATimestamp();
-		vel = encoder.getRate();
+		rvel = rightr.getRate();
+		lvel = leftr.getRate();
 		new Thread(this::runRecord).start();
 	}
 	
