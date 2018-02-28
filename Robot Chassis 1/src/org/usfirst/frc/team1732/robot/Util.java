@@ -91,11 +91,6 @@ public class Util {
 		return epsilonEquals(v1, v2, 1.0e-12);
 	}
 
-	public static double linearInterpolate(double x0, double y0, double x1, double y1, double x) {
-		double slope = (y1 - y0) / (x1 - x0);
-		return slope * (x - x0) + y0;
-	}
-
 	public static double curvature2d(double x1, double x2, double y1, double y2) {
 		return (x1 * y2 - y1 * x2) / Math.pow(x1 * x1 + y1 * y1, 1.5);
 	}
@@ -116,17 +111,6 @@ public class Util {
 				return false;
 		}
 		return true;
-	}
-
-	public static double interpolate(double low, double high, double mu) {
-		return (high - low) * mu + low;
-	}
-
-	public static double cosineInterpolate(double startOut, double startPos, double endOut, double endPos,
-			double currentPos) {
-		double percentDone = (currentPos - startPos) / (endPos - startPos);
-		double modifiedPD = (1 - Math.cos(percentDone * Math.PI)) / 2;
-		return startOut * (1 - modifiedPD) + endOut * modifiedPD;
 	}
 
 	public static double lerp(double y1, double y2, double mu) {
@@ -161,6 +145,6 @@ public class Util {
 
 		double dt = upper.getKey() - lower.getKey();
 		double mu = (key - lower.getKey()) / dt;
-		return Util.interpolate(lower.getValue(), upper.getValue(), mu);
+		return Util.lerp(lower.getValue(), upper.getValue(), mu);
 	}
 }

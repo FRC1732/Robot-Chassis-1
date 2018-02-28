@@ -8,6 +8,7 @@
 package org.usfirst.frc.team1732.robot;
 
 import org.usfirst.frc.team1732.robot.autotools.DriverStationData;
+import org.usfirst.frc.team1732.robot.commands.TestMotors;
 import org.usfirst.frc.team1732.robot.input.Joysticks;
 import org.usfirst.frc.team1732.robot.odomotry.PositionEstimator;
 import org.usfirst.frc.team1732.robot.sensors.Sensors;
@@ -33,7 +34,7 @@ import edu.wpi.first.wpilibj.command.Scheduler;
 public class Robot extends TimedRobot {
 	// util
 	public static Dashboard dash;
-	
+
 	// subsystems
 	public static Drivetrain drivetrain;
 	public static Claw claw;
@@ -41,20 +42,20 @@ public class Robot extends TimedRobot {
 	public static Sensors sensors;
 	public static Joysticks joysticks;
 	public static PositionEstimator positionEstimator;
-	
+
 	public static SRXMomentRecorderD leftRecorderD;
 	public static SRXMomentRecorderD rightRecorderD;
 	public static SRXMomentRecorderM recorderM;
 	public static SRXVoltageRecord leftVoltageRecord;
 	public static SRXVoltageRecord rightVoltageRecord;
-	
+
 	// public static SampleAveraging actualVoltage;
-	
+
 	// config
 	public static final int PERIOD_MS = 20;
 	public static final double PERIOD_S = PERIOD_MS / 1000.0;
 	public static final int CONFIG_TIMEOUT = 10; // recommended timeout by CTRE
-	
+
 	/**
 	 * This function is run when the robot is first started up and should be used
 	 * for any initialization code.
@@ -68,25 +69,23 @@ public class Robot extends TimedRobot {
 		sensors = new Sensors();
 		arm = new Arm();
 		claw = new Claw();
-		
+
 		joysticks = new Joysticks();
-		leftRecorderD = new SRXMomentRecorderD(drivetrain.leftTalon1,
-				drivetrain.leftEncoder.makeReader());
-		rightRecorderD = new SRXMomentRecorderD(drivetrain.rightTalon1,
-				drivetrain.rightEncoder.makeReader());
+		leftRecorderD = new SRXMomentRecorderD(drivetrain.leftTalon1, drivetrain.leftEncoder.makeReader());
+		rightRecorderD = new SRXMomentRecorderD(drivetrain.rightTalon1, drivetrain.rightEncoder.makeReader());
 		leftVoltageRecord = new SRXVoltageRecord(drivetrain.leftTalon1);
 		rightVoltageRecord = new SRXVoltageRecord(drivetrain.rightTalon1);
-		recorderM = new SRXMomentRecorderM(drivetrain.leftTalon1, drivetrain.leftEncoder,
-				drivetrain.rightTalon1, drivetrain.rightEncoder);
+		recorderM = new SRXMomentRecorderM(drivetrain.leftTalon1, drivetrain.leftEncoder, drivetrain.rightTalon1,
+				drivetrain.rightEncoder);
 	}
-	
+
 	private double last;
 	private static double fps;
-	
+
 	public static double getUpdateRate() {
 		return fps;
 	}
-	
+
 	@Override
 	public void robotPeriodic() {
 		fps = Timer.getFPGATimestamp() - last;
@@ -95,7 +94,7 @@ public class Robot extends TimedRobot {
 		Scheduler.getInstance().run();
 		sensors.navX.sendNavXData();
 	}
-	
+
 	@Override
 	public void disabledInit() {
 		// actualVoltage.start();
@@ -103,9 +102,10 @@ public class Robot extends TimedRobot {
 		// leftRecorder.stopRecording();
 		recorderM.stopRecording();
 	}
-	
+
 	@Override
 	public void autonomousInit() {
+		new TestMotors(-1, 1);
 		// actualVoltage.stop();
 		// Timer t = new Timer();
 		// t.reset();
@@ -117,7 +117,7 @@ public class Robot extends TimedRobot {
 		// path.addWaypoint(new Waypoint(0, 100, Math.PI / 2, 0));
 		// path.generateProfile(Drivetrain.MAX_IN_SEC, Drivetrain.MAX_IN_SEC2 / 4.0);
 		// System.out.println("Time to make path: " + t.get());
-		
+
 		// Without Correction
 		// MyIterator iterator = path.getIteratorZeroAtStart(2, Robot.drivetrain.leftFF,
 		// Robot.drivetrain.rightFF,
@@ -125,9 +125,9 @@ public class Robot extends TimedRobot {
 		// Drivetrain.ENCODER_INCHES_PER_PULSE);
 		// // iterator = Path.getPreloadedIterator(iterator);
 		// System.out.println("Time to make path: " + t.get());
-		
+
 		// new TestPathing(iterator).start();
-		
+
 		// new TurnAngle(45).start();
 		// new ReverseDrivetrainMovements().start();
 		// new TurnToAngle(-90, 80).start();
@@ -137,7 +137,7 @@ public class Robot extends TimedRobot {
 		// new DriveTrainCharacterizer(TestMode.STEP_VOLTAGE,
 		// Direction.Forward).start();
 	}
-	
+
 	@Override
 	public void teleopInit() {
 		// actualVoltage.stop();
@@ -145,11 +145,11 @@ public class Robot extends TimedRobot {
 		// rightRecorder.startRecording();
 		recorderM.startRecording();
 	}
-	
+
 	@Override
 	public void testInit() {
 		// actualVoltage.stop();
-		
+
 	}
-	
+
 }

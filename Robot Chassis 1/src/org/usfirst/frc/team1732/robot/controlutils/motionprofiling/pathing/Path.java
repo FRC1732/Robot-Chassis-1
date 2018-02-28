@@ -619,10 +619,10 @@ public final class Path {
 
 			double dt = upper.getKey() - lower.getKey();
 			double mu = (timeSec - lower.getKey()) / dt;
-			double leftV = Util.interpolate(leftLow.velocity, leftUp.velocity, mu);
-			double rightV = Util.interpolate(rightLow.velocity, rightUp.velocity, mu);
-			double leftH = Util.interpolate(leftLow.headingDeg, leftUp.headingDeg, mu);
-			double rightH = Util.interpolate(rightLow.headingDeg, rightUp.headingDeg, mu);
+			double leftV = Util.lerp(leftLow.velocity, leftUp.velocity, mu);
+			double rightV = Util.lerp(rightLow.velocity, rightUp.velocity, mu);
+			double leftH = Util.lerp(leftLow.headingDeg, leftUp.headingDeg, mu);
+			double rightH = Util.lerp(rightLow.headingDeg, rightUp.headingDeg, mu);
 			return new PointPair<VelocityPoint>(new VelocityPoint(leftV, leftH), new VelocityPoint(rightV, rightH));
 		}
 	}

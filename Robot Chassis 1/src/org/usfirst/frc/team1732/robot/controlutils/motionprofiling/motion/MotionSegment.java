@@ -34,8 +34,7 @@ public class MotionSegment {
 				&& !MotionUtil.epsilonEquals(start().vel(), 0.0, MotionUtil.kEpsilon)
 				&& !MotionUtil.epsilonEquals(end().vel(), 0.0, MotionUtil.kEpsilon)) {
 			// Velocity direction reverses within the segment.
-			System.err.println(
-					"Segment velocity reverses! Start vel: " + start().vel() + ", End vel: " + end().vel());
+			System.err.println("Segment velocity reverses! Start vel: " + start().vel() + ", End vel: " + end().vel());
 			return false;
 		}
 		if (!start().extrapolate(end().t()).equals(end())) {
@@ -72,6 +71,15 @@ public class MotionSegment {
 
 	public void setEnd(MotionState end) {
 		mEnd = end;
+	}
+
+	public double getVelocityAtTime(double t) {
+		// double lT = mStart.t;
+		// double lV = mStart.vel;
+		// double rT = mEnd.t;
+		// double rV = mEnd.vel;
+		// return Util.cosineInterpolate(startOut, startPos, endOut, endPos, currentPos)
+		return 0;
 	}
 
 	@Override
