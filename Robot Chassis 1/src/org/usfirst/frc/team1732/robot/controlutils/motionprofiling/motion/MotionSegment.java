@@ -1,5 +1,7 @@
 package org.usfirst.frc.team1732.robot.controlutils.motionprofiling.motion;
 
+import org.usfirst.frc.team1732.robot.Util;
+
 /**
  * A MotionSegment is a movement from a start MotionState to an end MotionState
  * with a constant acceleration.
@@ -74,12 +76,8 @@ public class MotionSegment {
 	}
 
 	public double getVelocityAtTime(double t) {
-		// double lT = mStart.t;
-		// double lV = mStart.vel;
-		// double rT = mEnd.t;
-		// double rV = mEnd.vel;
-		// return Util.cosineInterpolate(startOut, startPos, endOut, endPos, currentPos)
-		return 0;
+		double mu = (t - mStart.t) / (mEnd.t - mStart.t);
+		return Util.cerp(mStart.vel, mEnd.vel, mu);
 	}
 
 	@Override
