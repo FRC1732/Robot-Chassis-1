@@ -28,7 +28,7 @@ public class FollowVelocityPath extends NotifierCommand {
 	 *            initial heading of the robot according to the path
 	 */
 	public FollowVelocityPath(PointProfile profile) {
-		super(5);
+		super(1);
 		requires(Robot.drivetrain);
 		this.navx = Robot.sensors.navX.makeReader();
 		leftE = Robot.drivetrain.makeLeftEncoderReader();
