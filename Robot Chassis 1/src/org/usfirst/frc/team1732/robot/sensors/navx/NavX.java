@@ -1,11 +1,8 @@
 package org.usfirst.frc.team1732.robot.sensors.navx;
 
 import org.usfirst.frc.team1732.robot.Robot;
-import org.usfirst.frc.team1732.robot.sensors.Sensors;
 
 import com.kauailabs.navx.frc.AHRS;
-
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class NavX extends GyroBase {
 
@@ -33,7 +30,7 @@ public class NavX extends GyroBase {
 		navx.zeroYaw();
 	}
 
-	public void sendNavXData() {
+	public void addNavXData() {
 		String imu = "IMU/";
 		/* Display 6-axis Processed Angle Data */
 		Robot.dash.add(imu + "IMU_Connected", navx::isConnected);
@@ -55,7 +52,7 @@ public class NavX extends GyroBase {
 		/* path for upgrading from the Kit-of-Parts gyro to the navx-MXP */
 
 		Robot.dash.add(imu + "IMU_TotalYaw", navx::getAngle);
-//		Robot.dash.add(imu + "IMU_Angle", Sensors::convertTotalAngle(navx.getAngle));
+		// Robot.dash.add(imu + "IMU_Angle", Sensors::convertTotalAngle(navx.getAngle));
 		Robot.dash.add(imu + "IMU_YawRateDPS", navx::getRate);
 
 		/* Display Processed Acceleration Data (Linear Acceleration, Motion Detect) */
@@ -98,7 +95,8 @@ public class NavX extends GyroBase {
 		/* Omnimount Yaw Axis Information */
 		/* For more info, see http://navx-mxp.kauailabs.com/installation/omnimount */
 		AHRS.BoardYawAxis yaw_axis = navx.getBoardYawAxis();
-//		SmartDashboard.putString(imu + "YawAxisDirection", yaw_axis.up ? "Up" : "Down");
+		// SmartDashboard.putString(imu + "YawAxisDirection", yaw_axis.up ? "Up" :
+		// "Down");
 		Robot.dash.add(imu + "YawAxis", yaw_axis.board_axis::getValue);
 
 		/* Sensor Board Information */

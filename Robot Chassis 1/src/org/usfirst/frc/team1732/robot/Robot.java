@@ -79,7 +79,7 @@ public class Robot extends TimedRobot {
 		recorderM = new SRXMomentRecorderM(drivetrain.leftTalon1, drivetrain.leftEncoder,
 				drivetrain.rightTalon1, drivetrain.rightEncoder);
 
-		sensors.navX.sendNavXData();
+		sensors.navX.addNavXData();
 	}
 
 	private double last;
