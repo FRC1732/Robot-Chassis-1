@@ -1,7 +1,5 @@
 package org.usfirst.frc.team1732.robot.input;
 
-import org.usfirst.frc.team1732.robot.commands.armcontrol.SetArmIntake;
-import org.usfirst.frc.team1732.robot.commands.armcontrol.SetArmScore;
 import org.usfirst.frc.team1732.robot.commands.old.RunClawIn;
 import org.usfirst.frc.team1732.robot.commands.old.RunClawOut;
 import org.usfirst.frc.team1732.robot.commands.recording.PlaySRXVoltage;
@@ -30,9 +28,6 @@ public class Joysticks {
 		// new JoystickButton(left, 1).whileHeld(new RunArmWithTorqueCompensation(0));
 
 		new JoystickButton(right, 1).whileHeld(new RunClawOut());
-		//
-		new JoystickButton(left, 2).whileHeld(new SetArmScore());
-		new JoystickButton(right, 2).whileHeld(new SetArmIntake());
 
 		new JoystickButton(buttons, 6).toggleWhenPressed(new RecordSRXVoltage());
 		new JoystickButton(buttons, 7).whenPressed(new PlaySRXVoltage());

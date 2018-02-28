@@ -29,7 +29,8 @@ public class DriveDistance extends Command {
 			public double pidGet() {
 				return (l.getPosition() + r.getPosition()) / 2;
 			}
-		}, d -> {}, PERIOD_S);
+		}, d -> {
+		}, PERIOD_S);
 		trans.setSetpoint(dist);
 		trans.setAbsoluteTolerance(1);
 		rot = new PIDController(0.05, 0, 0, new DisplacementPIDSource() {
@@ -37,7 +38,8 @@ public class DriveDistance extends Command {
 			public double pidGet() {
 				return g.getTotalAngle();
 			}
-		}, d -> {}, PERIOD_S);
+		}, d -> {
+		}, PERIOD_S);
 		rot.setSetpoint(0);
 		rot.setAbsoluteTolerance(1);
 	}

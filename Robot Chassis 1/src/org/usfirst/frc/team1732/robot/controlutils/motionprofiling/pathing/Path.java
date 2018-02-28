@@ -111,7 +111,7 @@ public final class Path {
 		Vector h5 = w.heading.rotate(Math.PI / 2);
 		Vector v5 = new LineSegment(v4, v4.add(h5)).getIntersection(new LineSegment(w));
 		Vector v2 = new LineSegment(v1, v3).getPointAtPercent(n);
-		Vector v6 = new LineSegment(v5, v7).getPointAtPercent(n);
+		Vector v6 = new LineSegment(v5, v7).getPointAtPercent(1 - n);
 		return new BezierCurve(v1, v2, v3, v4, v5, v6, v7);
 	}
 
@@ -128,7 +128,7 @@ public final class Path {
 		LineSegment ac = new LineSegment(v1, v3);
 		LineSegment ce = new LineSegment(v3, v5);
 		Vector v2 = ac.getPointAtPercent(n);
-		Vector v4 = ce.getPointAtPercent(n);
+		Vector v4 = ce.getPointAtPercent(1 - n);
 		return new BezierCurve(v1, v2, v3, v4, v5);
 	}
 
@@ -143,7 +143,7 @@ public final class Path {
 		Vector v3 = l4.getIntersection(new LineSegment(prev));
 		Vector v5 = l4.getIntersection(new LineSegment(w));
 		Vector v2 = new LineSegment(v1, v3).getPointAtPercent(n);
-		Vector v6 = new LineSegment(v5, v7).getPointAtPercent(n);
+		Vector v6 = new LineSegment(v5, v7).getPointAtPercent(1 - n);
 		return new BezierCurve(v1, v2, v3, v4, v5, v6, v7);
 	}
 
@@ -572,6 +572,24 @@ public final class Path {
 			}
 		}
 
+		public PointProfile(Iterator<PointPair<VelocityPoint>> iterator, double finalAbsCenterPos,
+				double initialHeading) {
+			totalTimeSec = 0;
+			// this.pointDurSec = iterator.baseDurationSec;
+			this.pointDurSec = 0;
+			this.pointDurMs = 0;
+			// this.pointDurMs = iterator.baseDurationMs;
+			this.finalAbsCenterPos = finalAbsCenterPos;
+			this.initialHeading = initialHeading;
+			map = new TreeMap<>();
+			while (iterator.hasNext()) {
+				PointPair<VelocityPoint> pair = iterator.next();
+				map.put(totalTimeSec, pair);
+				// System.out.println(pair.left.velocity + ", " + pair.right.velocity);
+				totalTimeSec += pointDurSec;
+			}
+		}
+
 		public double getTotalTimeSec() {
 			return totalTimeSec;
 		}
@@ -601,11 +619,34 @@ public final class Path {
 
 			double dt = upper.getKey() - lower.getKey();
 			double mu = (timeSec - lower.getKey()) / dt;
-			double leftV = Util.interpolate(leftLow.velocity, leftUp.velocity, mu);
-			double rightV = Util.interpolate(rightLow.velocity, rightUp.velocity, mu);
-			double leftH = Util.interpolate(leftLow.headingDeg, leftUp.headingDeg, mu);
-			double rightH = Util.interpolate(rightLow.headingDeg, rightUp.headingDeg, mu);
+			double leftV = Util.lerp(leftLow.velocity, leftUp.velocity, mu);
+			double rightV = Util.lerp(rightLow.velocity, rightUp.velocity, mu);
+			double leftH = Util.lerp(leftLow.headingDeg, leftUp.headingDeg, mu);
+			double rightH = Util.lerp(rightLow.headingDeg, rightUp.headingDeg, mu);
 			return new PointPair<VelocityPoint>(new VelocityPoint(leftV, leftH), new VelocityPoint(rightV, rightH));
+		}
+
+		public PointPair<VelocityPoint> getCeilingPoint(double timeSec) {
+			PointPair<VelocityPoint> value = map.get(timeSec);
+			if (value != null) {
+				return value;
+			}
+			Entry<Double, PointPair<VelocityPoint>> lower = map.floorEntry(timeSec);
+			Entry<Double, PointPair<VelocityPoint>> upper = map.ceilingEntry(timeSec);
+
+			if (lower == null && upper == null) {
+				System.err.println("ERROR: BOTH SHOULDN'T BE NULL");
+				return null;
+			} else if (lower == null) {
+				return upper.getValue();
+			} else if (upper == null) {
+				return lower.getValue();
+			}
+
+			VelocityPoint upperLeft = upper.getValue().left;
+			VelocityPoint upperRight = upper.getValue().right;
+			return new PointPair<VelocityPoint>(new VelocityPoint(upperLeft.velocity, upperLeft.headingDeg),
+					new VelocityPoint(upperRight.velocity, upperRight.headingDeg));
 		}
 	}
 
@@ -657,15 +698,15 @@ public final class Path {
 				double endCurvature = currentSegment.curve
 						.getCurvatureAtArcLength(Math.abs(currentEndState.pos()) - segmentLengthSum);
 				double endArcLength = Math.abs(currentEndState.pos()) - segmentLengthSum;
+				double endVel = profile.velocityByTimeClamped((i) * pointDurationSec);
+				double endHeading = Math.toDegrees(currentSegment.curve.getHeadingAtArcLength(endArcLength));
 
-				double heading = Math.toDegrees(currentSegment.curve.getHeadingAtArcLength(endArcLength));
-
-				leftPoint.headingDeg = heading;
-				rightPoint.headingDeg = heading;
+				leftPoint.headingDeg = endHeading;
+				rightPoint.headingDeg = endHeading;
 
 				if (Util.epsilonEquals(0, endCurvature, 1.0e-30)) { // if straight
-					leftPoint.velocity = currentEndState.vel();
-					rightPoint.velocity = currentEndState.vel();
+					leftPoint.velocity = endVel;
+					rightPoint.velocity = endVel;
 				} else { // if curving
 					double curvature = currentSegment.curve.getCurvatureAtArcLength(endArcLength);
 					double r = 1 / curvature;
@@ -674,8 +715,8 @@ public final class Path {
 					r = Math.abs(r);
 					double lK = lR / r;
 					double rK = rR / r;
-					leftPoint.velocity = currentEndState.vel() * lK;
-					rightPoint.velocity = currentEndState.vel() * rK;
+					leftPoint.velocity = endVel * lK;
+					rightPoint.velocity = endVel * rK;
 				}
 				i++;
 				return new PointPair<VelocityPoint>(leftPoint, rightPoint);

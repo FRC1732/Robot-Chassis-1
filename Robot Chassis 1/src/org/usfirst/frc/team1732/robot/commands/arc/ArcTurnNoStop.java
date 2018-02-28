@@ -23,14 +23,17 @@ public class ArcTurnNoStop extends ArcTurn {
 			public double pidGet() {
 				return g.getTotalAngle();
 			}
-		}, d -> {}, Robot.PERIOD_S);
+		}, d -> {
+		}, Robot.PERIOD_S);
 	}
+
 	protected void initialize() {
 		super.initialize();
 		rot.setAbsoluteTolerance(1);
 		rot.enable();
 		System.out.println("ArcTurnNoStop: Robot will not stop at end");
 	}
+
 	protected void execute() {
 		double innerDist = left ? l.getPosition() : r.getPosition();
 		double outerDist = left ? r.getPosition() : l.getPosition();
@@ -44,9 +47,11 @@ public class ArcTurnNoStop extends ArcTurn {
 		else
 			drivetrain.drive.tankDrive(outer, inner);
 	}
+
 	protected boolean isFinished() {
 		return Util.epsilonEquals(percentDone, 1.5, 0.01) || percentDone > 1.5;
 	}
+
 	protected void end() {
 		rot.disable();
 		drivetrain.drive.arcadeDrive(0.5, 0, false);

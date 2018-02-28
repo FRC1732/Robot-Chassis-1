@@ -21,16 +21,19 @@ public class DriveToCube extends Command {
 	public DriveToCube(TurnDirection direction) {
 		this(direction, 1);
 	}
+
 	public DriveToCube(TurnDirection direction, double speed) {
 		requires(drivetrain);
 		turn = direction.getValue() * speed;
 	}
+
 	protected void initialize() {
 		rot = new PIDController(0.005, 0, 0.13, new DisplacementPIDSource() {
 			public double pidGet() {
 				return sensors.limelight.getRawHorizontalOffset();
 			}
-		}, d -> {}, Robot.DEFAULT_PERIOD);
+		}, d -> {
+		}, Robot.DEFAULT_PERIOD);
 		// within 2 degrees
 		rot.setAbsoluteTolerance(2);
 		rot.enable();
@@ -40,7 +43,8 @@ public class DriveToCube extends Command {
 				// System.out.println(sensors.limelight.getDistanceToTarget(-1));
 				return sensors.limelight.getDistanceToTarget(0);
 			}
-		}, d -> {}, Robot.DEFAULT_PERIOD);
+		}, d -> {
+		}, Robot.DEFAULT_PERIOD);
 		// within 5 inches
 		trans.setSetpoint(10);
 		trans.setAbsoluteTolerance(5);
@@ -48,15 +52,18 @@ public class DriveToCube extends Command {
 		drivetrain.setNeutralMode(NeutralMode.Brake);
 		System.out.println("DriveToCube: Starting");
 	}
+
 	protected void execute() {
 		if (sensors.limelight.hasValidTargets())
 			drivetrain.drive.arcadeDrive(trans.get(), -rot.get(), false);
 		else
 			drivetrain.drive.arcadeDrive(0, turn, false);
 	}
+
 	protected boolean isFinished() {
 		return sensors.limelight.hasValidTargets() && rot.onTarget() && trans.onTarget();
 	}
+
 	protected void end() {
 		rot.disable();
 		trans.disable();
@@ -71,6 +78,7 @@ public class DriveToCube extends Command {
 		private TurnDirection(int n) {
 			val = n;
 		}
+
 		public int getValue() {
 			return val;
 		}
