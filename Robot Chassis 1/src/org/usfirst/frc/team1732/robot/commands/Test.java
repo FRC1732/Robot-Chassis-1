@@ -1,7 +1,7 @@
 package org.usfirst.frc.team1732.robot.commands;
 
-import org.usfirst.frc.team1732.robot.commands.drive.DriveToCube;
-import org.usfirst.frc.team1732.robot.commands.drive.DriveToCube.TurnDirection;
+import org.usfirst.frc.team1732.robot.commands.drive.TurnToCube;
+import org.usfirst.frc.team1732.robot.commands.drive.TurnToCube.TurnDirection;
 
 import edu.wpi.first.wpilibj.command.CommandGroup;
 
@@ -16,7 +16,7 @@ public class Test extends CommandGroup {
 		// addSequential(new ArcTurn(Drivetrain.ROBOT_LENGTH_IN, 30, ArcTurnCalculation.HEIGHT_THETA, false));
 		addSequential(new TurnLEDOff());
 		// addSequential(new StartVoltageRecording());
-		addSequential(new DriveToCube(TurnDirection.LEFT, 0.5));
+		addSequential(new TurnToCube(TurnDirection.LEFT, 0.5));
 		// addSequential(new StopVoltageRecording());
 		// addSequential(new Wait(0.5));
 		// addSequential(new ReverseDrivetrainMovementsD());

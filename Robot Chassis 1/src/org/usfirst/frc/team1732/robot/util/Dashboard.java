@@ -7,9 +7,11 @@ import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Dashboard {
+	private static LinkedList<Entry> entries;
 
 	public Dashboard() {
 		new Thread(this::loop).start();
+		entries = new LinkedList<>();
 	}
 
 	private void sleepExactly() {
@@ -26,34 +28,33 @@ public class Dashboard {
 			sleepExactly();
 		}
 	}
-	
+
 	private void call(Entry e) {
 		e.putToDashboard();
 	}
-	
-	private static LinkedList<Entry> entries;
-	
+
 	public void add(String name, Supplier<?> sup) {
 		entries.add(new Entry(name, sup));
 	}
-	
+
 	private class Entry {
 		private final String name;
 		private final Supplier<?> sup;
+
 		public Entry(String name, Supplier<?> sup) {
 			this.name = name;
 			this.sup = sup;
 		}
-		
+
 		public void putToDashboard() {
 			Object o = sup.get();
-			if(o instanceof Number) {
+			if (o instanceof Number) {
 				SmartDashboard.putNumber(name, ((Number) o).doubleValue());
-			}else if(o instanceof Boolean) {
+			} else if (o instanceof Boolean) {
 				SmartDashboard.putBoolean(name, (Boolean) o);
-			}else if(o instanceof String) {
+			} else if (o instanceof String) {
 				SmartDashboard.putString(name, (String) o);
-			}else if(o instanceof Sendable) {
+			} else if (o instanceof Sendable) {
 				SmartDashboard.putData((Sendable) o);
 			}
 		}

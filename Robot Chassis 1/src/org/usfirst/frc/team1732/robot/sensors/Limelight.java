@@ -81,6 +81,9 @@ public class Limelight {
 	public double getDistanceToTarget(double defaultValue) {
 		return hasValidTargets() ? 123.31 * Math.pow(getTargetArea(), -0.529) : defaultValue;
 	}
+	public double getDistanceToTarget() {
+		return getDistanceToTarget(0);
+	}
 	// GATHERED DATA
 	/*
 	 * AREA____DIST
