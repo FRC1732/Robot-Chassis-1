@@ -56,7 +56,7 @@ public class FollowVelocityPath extends NotifierCommand {
 		// System.out.println("Time: " + timer.get());
 		// timer.reset();
 		// timer.start();
-		PointPair<VelocityPoint> pair = profile.getInterpolatedPoint(timeSinceStarted());
+		PointPair<VelocityPoint> pair = profile.getCeilingPoint(timeSinceStarted());
 		VelocityPoint left = pair.left;
 		VelocityPoint right = pair.right;
 		double desiredHeading = left.headingDeg - profile.initialHeading;
