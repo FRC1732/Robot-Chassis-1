@@ -24,6 +24,7 @@ public class SRXMomentRecorderM {
 		this.leftr = leftr;
 		this.right = right;
 		this.rightr = rightr;
+		new Thread(this::runRecord).start();
 	}
 
 	private double lvel;
@@ -38,11 +39,10 @@ public class SRXMomentRecorderM {
 		time = Timer.getFPGATimestamp();
 		rvel = rightr.getRate();
 		lvel = leftr.getRate();
-		new Thread(this::runRecord).start();
 	}
 	
 	private void runRecord() {
-		while (!Thread.interrupted()) {
+		while (true) {
 			record();
 			try {
 				Thread.sleep(10);
@@ -73,6 +73,7 @@ public class SRXMomentRecorderM {
 	public void stopRecording() {
 		recording = false;
 		System.out.println("Average Time: " + totalTime / i + " vs theory: " + Robot.PERIOD_S);
+		System.out.println("Frames to use: " + i + ", " + moments.size());
 	}
 	
 	public Pair<Moment> getLast() {

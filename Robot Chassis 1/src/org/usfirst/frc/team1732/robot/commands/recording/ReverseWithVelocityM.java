@@ -11,11 +11,9 @@ import edu.wpi.first.wpilibj.command.Command;
 
 public class ReverseWithVelocityM extends Command {
 	
-	private static final double HEADING_P = 1;
+	private static final double HEADING_P = 0;
 	
 	private double last;
-	
-	private double initialHeading;
 	
 	public ReverseWithVelocityM() {
 		requires(Robot.drivetrain);
@@ -24,8 +22,8 @@ public class ReverseWithVelocityM extends Command {
 	
 	@Override
 	protected void initialize() {
-		initialHeading = Robot.sensors.navX.getTotalAngle();
 		System.out.println("Starting");
+		last = Timer.getFPGATimestamp();
 	}
 	
 	@Override
@@ -33,17 +31,19 @@ public class ReverseWithVelocityM extends Command {
 		Pair<Moment> now = Robot.recorderM.getNext(Timer.getFPGATimestamp() - last);
 		last = Timer.getFPGATimestamp();
 		if (now != null) {
-			double desiredHeading = (now.one.heading) - initialHeading;
+			double desiredHeading = (now.one.heading);
 			double currentHeading = Robot.sensors.navX.getTotalAngle();
 			double headingError = desiredHeading - currentHeading;
-			double headingAdjustment = -headingError * HEADING_P;
+			double headingAdjustment = headingError * HEADING_P;
 			Robot.drivetrain.leftTalon1.set(ControlMode.Velocity,
 					Robot.drivetrain.convertVelocitySetpoint(-now.one.velocity
 							+ headingAdjustment * Math.signum(-now.one.velocity)));
 			Robot.drivetrain.rightTalon1.set(ControlMode.Velocity,
 					Robot.drivetrain.convertVelocitySetpoint(-now.two.velocity
 							- headingAdjustment * Math.signum(-now.two.velocity)));
-			System.out.println(now.one.heading);
+			System.out.println(headingError + "\t" + (-now.one.velocity) + "\t"
+					+ (-now.two.velocity) + "\t" + (Robot.drivetrain.leftEncoder.getRate())
+					+ "\t" + (Robot.drivetrain.rightEncoder.getRate()));
 		}
 	}
 	

@@ -79,6 +79,7 @@ public class Robot extends TimedRobot {
 				drivetrain.rightEncoder);
 
 		sensors.navX.addNavXData();
+		sensors.navX.zero();
 		
 		dash.add("Update Rate", Robot::getUpdateRate);
 	}

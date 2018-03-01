@@ -147,4 +147,12 @@ public class Util {
 		double mu = (key - lower.getKey()) / dt;
 		return Util.lerp(lower.getValue(), upper.getValue(), mu);
 	}
+	
+	public static void logForGraph(Object... elements) {
+		for(Object o : elements) {
+			System.out.print(o);
+			System.out.print(", ");
+		}
+		System.out.println();
+	}
 }
