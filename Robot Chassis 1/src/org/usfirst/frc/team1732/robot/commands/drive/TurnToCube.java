@@ -30,11 +30,12 @@ public class TurnToCube extends Command {
 			public double pidGet() {
 				return sensors.limelight.getNormalizedHorizontalOffset();
 			}
-		}, d -> drivetrain.drive.arcadeDrive(0, sensors.limelight.hasValidTargets() ? -d : turn, false),
+		}, d -> drivetrain.drive.arcadeDrive(0,
+				sensors.limelight.hasValidTargets() ? -Math.signum(d) * Math.max(Math.abs(d), 0.1) : turn, false),
 				Robot.PERIOD_S);
-		// within 5 percent
 		rot.setSetpoint(0);
-		rot.setAbsoluteTolerance(.05);
+		rot.setInputRange(-1, 1);
+		rot.setPercentTolerance(5);
 		rot.enable();
 		drivetrain.setNeutralMode(NeutralMode.Brake);
 		System.out.println("TurnToCube: Starting");

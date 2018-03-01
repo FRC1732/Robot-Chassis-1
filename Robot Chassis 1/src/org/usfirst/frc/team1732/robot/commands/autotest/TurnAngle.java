@@ -2,6 +2,8 @@ package org.usfirst.frc.team1732.robot.commands.autotest;
 
 import static org.usfirst.frc.team1732.robot.Robot.drivetrain;
 
+import java.util.function.Supplier;
+
 import org.usfirst.frc.team1732.robot.Robot;
 import org.usfirst.frc.team1732.robot.Util;
 import org.usfirst.frc.team1732.robot.controlutils.ClosedLoopProfile;
@@ -25,27 +27,24 @@ public class TurnAngle extends NotifierCommand {
 	private static final double endMinVel = 8;
 	private static final double endMaxVel = 30;
 
+	private final Supplier<Double> angle;
 	private final Timer deadbandTimer;
+	private final GyroReader navx;
 	private boolean inDeadband = false;
-	private final double goalAngle;
-	private final double maxVel;
-	private final double k;
-	private GyroReader navx;
+	private double goalAngle;
+	private double maxVel;
+	private double k;
 	private double endZone = 20;
 
-	public TurnAngle(double angle) {
+	public TurnAngle(Supplier<Double> a) {
 		super(5);
 		requires(Robot.drivetrain);
-		deadbandTimer = new Timer();
-		deadbandTimer.reset();
-		deadbandTimer.stop();
-		this.goalAngle = angle;
-		drivetrain.setNeutralMode(NeutralMode.Brake);
 		navx = Robot.sensors.navX.makeReader();
-		this.maxVel = Math.abs(angle) * 2.5 / 3.0;
-		this.k = Math.PI * 2 / (Math.abs(angle));
-		endZone = (25 * 90) / (60) * (maxVel / angle);
-		System.out.println("Endzone : " + endZone);
+		deadbandTimer = new Timer();
+		angle = a;
+	}
+	public TurnAngle(double angle) {
+		this(() -> angle);
 	}
 
 	private double getVelocity(double angle) {
@@ -54,14 +53,22 @@ public class TurnAngle extends NotifierCommand {
 
 	@Override
 	protected void init() {
-		navx.zero();
+		double a = angle.get();
+		deadbandTimer.reset();
+		deadbandTimer.stop();
+		this.goalAngle = a;
+		this.maxVel = Math.abs(a) * 2.5 / 3.0;
+		this.k = Math.PI * 2 / (Math.abs(a));
+		endZone = (25 * 90) / (60) * (maxVel / a);
+		System.out.println("Endzone : " + endZone);
 		System.out.println("Turn to angle started");
 		// pid.setSetpoint(goalAngle);
-		Robot.drivetrain.setNeutralMode(NeutralMode.Brake);
-		ClosedLoopProfile gains = Robot.drivetrain.velocityGains.clone();
+		navx.zero();
+		drivetrain.setNeutralMode(NeutralMode.Brake);
+		ClosedLoopProfile gains = drivetrain.velocityGains.clone();
 		gains.kP = 0.3;
-		gains.applyToTalon(Robot.drivetrain.leftTalon1, 1, 0);
-		gains.applyToTalon(Robot.drivetrain.rightTalon1, 1, 0);
+		gains.applyToTalon(drivetrain.leftTalon1, 1, 0);
+		gains.applyToTalon(drivetrain.rightTalon1, 1, 0);
 	}
 
 	@Override

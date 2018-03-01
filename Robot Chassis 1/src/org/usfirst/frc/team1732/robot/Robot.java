@@ -8,7 +8,8 @@
 package org.usfirst.frc.team1732.robot;
 
 import org.usfirst.frc.team1732.robot.autotools.DriverStationData;
-import org.usfirst.frc.team1732.robot.commands.TestMotors;
+import org.usfirst.frc.team1732.robot.commands.drive.TurnAndDriveToCube;
+import org.usfirst.frc.team1732.robot.commands.drive.TurnToCube.TurnDirection;
 import org.usfirst.frc.team1732.robot.input.Joysticks;
 import org.usfirst.frc.team1732.robot.odomotry.PositionEstimator;
 import org.usfirst.frc.team1732.robot.sensors.Sensors;
@@ -19,8 +20,6 @@ import org.usfirst.frc.team1732.robot.util.Dashboard;
 import org.usfirst.frc.team1732.robot.util.SRXMomentRecorderD;
 import org.usfirst.frc.team1732.robot.util.SRXMomentRecorderM;
 import org.usfirst.frc.team1732.robot.util.SRXVoltageRecord;
-
-import com.ctre.phoenix.motorcontrol.NeutralMode;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
@@ -128,7 +127,7 @@ public class Robot extends TimedRobot {
 		// // iterator = Path.getPreloadedIterator(iterator);
 		// System.out.println("Time to make path: " + t.get());
 
-		new TestMotors(1, -1, NeutralMode.Coast, 4).start();
+		// new TestMotors(1, -1, NeutralMode.Coast, 4).start();
 
 		// new TestPathing(iterator).start();
 
@@ -138,7 +137,7 @@ public class Robot extends TimedRobot {
 		// new ScaleLeftSingle(DriverStationData.closeSwitchIsLeft).start();
 		// new TestMotors(-0.3, 0.3).start();
 		// new Test().start();
-		// new TurnAndDriveToCube(TurnDirection.LEFT, 0.5).start();
+		new TurnAndDriveToCube(TurnDirection.LEFT, 0.5).start();
 		// new DriveTrainCharacterizer(TestMode.STEP_VOLTAGE,
 		// Direction.Forward).start();
 

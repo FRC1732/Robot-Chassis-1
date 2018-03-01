@@ -45,7 +45,7 @@ public class DriveDistance extends Command {
 	}
 	// Drive the reverse of what the encoders read
 	public DriveDistance(EncoderReader left, EncoderReader right) {
-		this(-(left.getPosition() + right.getPosition()) / 2);
+		this(() -> (left.getPosition() + right.getPosition()) * -0.5);
 	}
 	public DriveDistance(Supplier<Double> dist) {
 		this(dist, drivetrain.makeLeftEncoderReader(), drivetrain.makeRightEncoderReader());
