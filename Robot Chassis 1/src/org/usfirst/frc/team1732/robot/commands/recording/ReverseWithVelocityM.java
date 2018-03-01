@@ -1,6 +1,7 @@
 package org.usfirst.frc.team1732.robot.commands.recording;
 
 import org.usfirst.frc.team1732.robot.Robot;
+import org.usfirst.frc.team1732.robot.Util;
 import org.usfirst.frc.team1732.robot.util.Pair;
 import org.usfirst.frc.team1732.robot.util.SRXMomentRecorderM.Moment;
 
@@ -41,9 +42,9 @@ public class ReverseWithVelocityM extends Command {
 			Robot.drivetrain.rightTalon1.set(ControlMode.Velocity,
 					Robot.drivetrain.convertVelocitySetpoint(-now.two.velocity
 							- headingAdjustment * Math.signum(-now.two.velocity)));
-			System.out.println(headingError + "\t" + (-now.one.velocity) + "\t"
-					+ (-now.two.velocity) + "\t" + (Robot.drivetrain.leftEncoder.getRate())
-					+ "\t" + (Robot.drivetrain.rightEncoder.getRate()));
+			Util.logForGraph(headingError, -now.one.velocity, -now.two.velocity,
+					Robot.drivetrain.leftEncoder.getRate(),
+					Robot.drivetrain.rightEncoder.getRate());
 		}
 	}
 	
