@@ -8,7 +8,7 @@
 package org.usfirst.frc.team1732.robot;
 
 import org.usfirst.frc.team1732.robot.autotools.DriverStationData;
-import org.usfirst.frc.team1732.robot.commands.TestMotors;
+import org.usfirst.frc.team1732.robot.commands.recording.ReverseWithVelocityM;
 import org.usfirst.frc.team1732.robot.input.Joysticks;
 import org.usfirst.frc.team1732.robot.odomotry.PositionEstimator;
 import org.usfirst.frc.team1732.robot.sensors.Sensors;
@@ -19,8 +19,6 @@ import org.usfirst.frc.team1732.robot.util.Dashboard;
 import org.usfirst.frc.team1732.robot.util.SRXMomentRecorderD;
 import org.usfirst.frc.team1732.robot.util.SRXMomentRecorderM;
 import org.usfirst.frc.team1732.robot.util.SRXVoltageRecord;
-
-import com.ctre.phoenix.motorcontrol.NeutralMode;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
@@ -81,6 +79,8 @@ public class Robot extends TimedRobot {
 				drivetrain.rightEncoder);
 
 		sensors.navX.addNavXData();
+		
+		dash.add("Update Rate", Robot::getUpdateRate);
 	}
 
 	private double last;
@@ -103,7 +103,7 @@ public class Robot extends TimedRobot {
 		// actualVoltage.start();
 		// rightRecorder.stopRecording();
 		// leftRecorder.stopRecording();
-		// recorderM.stopRecording();
+		recorderM.stopRecording();
 	}
 
 	@Override
@@ -128,7 +128,7 @@ public class Robot extends TimedRobot {
 		// // iterator = Path.getPreloadedIterator(iterator);
 		// System.out.println("Time to make path: " + t.get());
 
-		new TestMotors(1, -1, NeutralMode.Coast, 4);
+//		new TestMotors(1, -1, NeutralMode.Coast, 4);
 		// new TestPathing(iterator).start();
 
 		// new TurnAngle(45).start();
@@ -141,7 +141,7 @@ public class Robot extends TimedRobot {
 		// new DriveTrainCharacterizer(TestMode.STEP_VOLTAGE,
 		// Direction.Forward).start();
 
-		// new ReverseWithVelocityM().start();
+		 new ReverseWithVelocityM().start();
 	}
 
 	@Override
@@ -149,7 +149,7 @@ public class Robot extends TimedRobot {
 		// actualVoltage.stop();
 		// leftRecorder.startRecording();
 		// rightRecorder.startRecording();
-		// recorderM.startRecording();
+		recorderM.startRecording();
 	}
 
 	@Override
