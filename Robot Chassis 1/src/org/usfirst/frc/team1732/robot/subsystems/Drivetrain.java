@@ -52,7 +52,7 @@ public class Drivetrain extends Subsystem {
 
 	public static final double ROBOT_LENGTH_IN = 34.5;
 	public static final double ROBOT_WIDTH_IN = 35;
-	public static final double EFFECTIVE_ROBOT_WIDTH_IN = 27.5;
+	public static final double EFFECTIVE_ROBOT_WIDTH_IN = 29.9676;
 
 	public final DoubleProfileLoader profileManager;
 
