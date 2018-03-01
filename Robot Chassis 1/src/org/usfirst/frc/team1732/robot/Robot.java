@@ -128,7 +128,8 @@ public class Robot extends TimedRobot {
 		// // iterator = Path.getPreloadedIterator(iterator);
 		// System.out.println("Time to make path: " + t.get());
 
-		new TestMotors(1, -1, NeutralMode.Coast, 4);
+		new TestMotors(1, -1, NeutralMode.Coast, 4).start();
+
 		// new TestPathing(iterator).start();
 
 		// new TurnAngle(45).start();

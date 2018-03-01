@@ -58,6 +58,8 @@ public class TestMotors extends Command {
 	protected void end() {
 		System.out.println("Max left: " + maxL);
 		System.out.println("Max right: " + maxR);
+		Robot.drivetrain.leftTalon1.configOpenloopRamp(0, Robot.CONFIG_TIMEOUT);
+		Robot.drivetrain.rightTalon1.configOpenloopRamp(0, Robot.CONFIG_TIMEOUT);
 		Robot.drivetrain.setStop();
 	}
 

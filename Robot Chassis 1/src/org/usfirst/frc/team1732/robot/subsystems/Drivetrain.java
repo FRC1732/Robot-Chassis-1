@@ -100,7 +100,7 @@ public class Drivetrain extends Subsystem {
 		Robot.dash.add("Left Velocity", leftEncoder::getRate);
 		Robot.dash.add("Right Velocity", rightEncoder::getRate);
 		Robot.dash.add("Left Position", leftEncoder::getPosition);
-		Robot.dash.add("Right Position", leftEncoder::getPosition);
+		Robot.dash.add("Right Position", rightEncoder::getPosition);
 		Robot.dash.add("Left Voltage", leftTalon1::getMotorOutputVoltage);
 		Robot.dash.add("Right Voltage", rightTalon1::getMotorOutputVoltage);
 		Robot.dash.add("Right Pulses", leftEncoder::getPulses);
