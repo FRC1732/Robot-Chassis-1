@@ -21,22 +21,23 @@ public class SRXVoltageRecord {
 	}
 
 	public void addVoltage(double time) {
-		voltages.put(time, talon.getMotorOutputVoltage());
+		// double volt = talon.getMotorOutputVoltage();
+		voltages.put(time, talon.getMotorOutputPercent());
 	}
 
 	public double getVoltageAtTime(double time) {
-		return Util.interpolateFromTree(voltages, time);
+		return Util.interpolateFromTree(voltages, time) * VOLTAGE_COMPENSATION_SATURATION;
 	}
 
 	public double getPercentOutputAtTime(double time) {
-		return Util.interpolateFromTree(voltages, time) / VOLTAGE_COMPENSATION_SATURATION;
+		return Util.interpolateFromTree(voltages, time);
 	}
 
 	public double getTimeLength() {
 		return voltages.lastKey();
 	}
 
-	public double getLastVoltage() {
+	public double getLastPercent() {
 		return voltages.lastEntry().getValue();
 	}
 

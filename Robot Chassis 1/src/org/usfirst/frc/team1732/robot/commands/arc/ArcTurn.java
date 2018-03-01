@@ -59,6 +59,7 @@ public class ArcTurn extends Command {
 		r.zero();
 		drivetrain.setNeutralMode(NeutralMode.Brake);
 	}
+
 	protected void execute() {
 		double innerDist = left ? l.getPosition() : r.getPosition();
 		double outerDist = left ? r.getPosition() : l.getPosition();
@@ -73,9 +74,11 @@ public class ArcTurn extends Command {
 		else
 			drivetrain.drive.tankDrive(outer, inner);
 	}
+
 	protected boolean isFinished() {
 		return abs(g.getTotalAngle() - sign * toDegrees(T)) <= 2;
 	}
+
 	protected void end() {
 		drivetrain.setStop();
 		System.out.println("ArcTurn: Ended");

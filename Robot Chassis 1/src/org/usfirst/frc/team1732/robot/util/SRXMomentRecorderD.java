@@ -26,8 +26,10 @@ public class SRXMomentRecorderD {
 			public double pidGet() {
 				return currentMoment == null ? 0 : -(currentMoment.encoderPos - encoder.getPosition());
 			}
-		}, d -> {});
+		}, d -> {
+		});
 	}
+
 	public void startRecording() {
 		moments.clear();
 		recording = true;
@@ -39,14 +41,17 @@ public class SRXMomentRecorderD {
 					synchronized (this) {
 						this.wait((long) Robot.PERIOD_MS);
 					}
-				} catch (InterruptedException e) {}
+				} catch (InterruptedException e) {
+				}
 			}
 		}).start();
 	}
+
 	public void stopRecording() {
 		recording = false;
 		pid.enable();
 	}
+
 	public double getLastVoltage() {
 		if (isFinished()) {
 			pid.disable();
@@ -55,11 +60,13 @@ public class SRXMomentRecorderD {
 		} else {
 			currentMoment = moments.pop();
 			double pidGet = pid.get(), out = currentMoment.voltage + pidGet;
-			// System.out.printf("%s, CurrentEncoder: %.3f, PID: %.3f, Output: %.3f%n", currentMoment.toString(),
+			// System.out.printf("%s, CurrentEncoder: %.3f, PID: %.3f, Output: %.3f%n",
+			// currentMoment.toString(),
 			// encoder.getPosition(), pidGet, out);
 			return out;
 		}
 	}
+
 	public boolean isFinished() {
 		return moments.empty();
 	}
@@ -72,6 +79,7 @@ public class SRXMomentRecorderD {
 			voltage = v;
 			encoderPos = c;
 		}
+
 		public String toString() {
 			return String.format("Voltage: %.3f, EncoderPos: %.3f", voltage, encoderPos);
 		}

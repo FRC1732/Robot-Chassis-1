@@ -1,24 +1,29 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* Copyright (c) 2017-2018 FIRST. All Rights Reserved. */
+/* Open Source Software - may be modified and shared by FRC teams. The code */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
+/* the project. */
 /*----------------------------------------------------------------------------*/
 
 package org.usfirst.frc.team1732.robot;
 
 import org.usfirst.frc.team1732.robot.autotools.DriverStationData;
+import org.usfirst.frc.team1732.robot.commands.TestMotors;
 import org.usfirst.frc.team1732.robot.input.Joysticks;
 import org.usfirst.frc.team1732.robot.odomotry.PositionEstimator;
 import org.usfirst.frc.team1732.robot.sensors.Sensors;
 import org.usfirst.frc.team1732.robot.subsystems.Arm;
 import org.usfirst.frc.team1732.robot.subsystems.Claw;
 import org.usfirst.frc.team1732.robot.subsystems.Drivetrain;
+import org.usfirst.frc.team1732.robot.util.Dashboard;
 import org.usfirst.frc.team1732.robot.util.SRXMomentRecorderD;
 import org.usfirst.frc.team1732.robot.util.SRXMomentRecorderM;
 import org.usfirst.frc.team1732.robot.util.SRXVoltageRecord;
 
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Scheduler;
 
 /**
@@ -29,6 +34,8 @@ import edu.wpi.first.wpilibj.command.Scheduler;
  * project.
  */
 public class Robot extends TimedRobot {
+	// util
+	public static Dashboard dash;
 
 	// subsystems
 	public static Drivetrain drivetrain;
@@ -40,8 +47,7 @@ public class Robot extends TimedRobot {
 
 	public static SRXMomentRecorderD leftRecorderD;
 	public static SRXMomentRecorderD rightRecorderD;
-	public static SRXMomentRecorderM leftRecorderM;
-	public static SRXMomentRecorderM rightRecorderM;
+	public static SRXMomentRecorderM recorderM;
 	public static SRXVoltageRecord leftVoltageRecord;
 	public static SRXVoltageRecord rightVoltageRecord;
 
@@ -59,6 +65,8 @@ public class Robot extends TimedRobot {
 	@Override
 	public void robotInit() {
 		setPeriod(PERIOD_S);
+		dash = new Dashboard();
+		dash.add("Update Rate", Robot::getUpdateRate);
 		drivetrain = new Drivetrain();
 		sensors = new Sensors();
 		arm = new Arm();
@@ -69,13 +77,25 @@ public class Robot extends TimedRobot {
 		rightRecorderD = new SRXMomentRecorderD(drivetrain.rightTalon1, drivetrain.rightEncoder.makeReader());
 		leftVoltageRecord = new SRXVoltageRecord(drivetrain.leftTalon1);
 		rightVoltageRecord = new SRXVoltageRecord(drivetrain.rightTalon1);
+		recorderM = new SRXMomentRecorderM(drivetrain.leftTalon1, drivetrain.leftEncoder, drivetrain.rightTalon1,
+				drivetrain.rightEncoder);
+
+		sensors.navX.addNavXData();
+	}
+
+	private double last;
+	private static double fps;
+
+	public static double getUpdateRate() {
+		return fps;
 	}
 
 	@Override
 	public void robotPeriodic() {
+		fps = Timer.getFPGATimestamp() - last;
+		last = Timer.getFPGATimestamp();
 		DriverStationData.gotPlatePositions();
 		Scheduler.getInstance().run();
-		sensors.navX.sendNavXData();
 	}
 
 	@Override
@@ -83,6 +103,7 @@ public class Robot extends TimedRobot {
 		// actualVoltage.start();
 		// rightRecorder.stopRecording();
 		// leftRecorder.stopRecording();
+		// recorderM.stopRecording();
 	}
 
 	@Override
@@ -107,6 +128,7 @@ public class Robot extends TimedRobot {
 		// // iterator = Path.getPreloadedIterator(iterator);
 		// System.out.println("Time to make path: " + t.get());
 
+		new TestMotors(1, -1, NeutralMode.Coast, 4);
 		// new TestPathing(iterator).start();
 
 		// new TurnAngle(45).start();
@@ -115,8 +137,11 @@ public class Robot extends TimedRobot {
 		// new ScaleLeftSingle(DriverStationData.closeSwitchIsLeft).start();
 		// new TestMotors(-0.3, 0.3).start();
 		// new Test().start();
+		// new TurnAndDriveToCube(TurnDirection.LEFT, 0.5).start();
 		// new DriveTrainCharacterizer(TestMode.STEP_VOLTAGE,
 		// Direction.Forward).start();
+
+		// new ReverseWithVelocityM().start();
 	}
 
 	@Override
@@ -124,6 +149,7 @@ public class Robot extends TimedRobot {
 		// actualVoltage.stop();
 		// leftRecorder.startRecording();
 		// rightRecorder.startRecording();
+		// recorderM.startRecording();
 	}
 
 	@Override

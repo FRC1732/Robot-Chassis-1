@@ -12,6 +12,7 @@ public class StopVoltageRecording extends InstantCommand {
 	public StopVoltageRecording() {
 		super();
 	}
+
 	protected void initialize() {
 		Robot.leftRecorderD.stopRecording();
 		Robot.rightRecorderD.stopRecording();

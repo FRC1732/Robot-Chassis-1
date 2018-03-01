@@ -18,6 +18,7 @@ public class Wait extends Command {
 
 	@Override
 	public void initialize() {
+		System.out.println("Wait: " + timeout + " seconds");
 		super.setTimeout(timeout);
 	}
 

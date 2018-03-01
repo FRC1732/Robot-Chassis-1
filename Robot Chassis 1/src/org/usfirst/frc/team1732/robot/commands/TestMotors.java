@@ -11,22 +11,32 @@ import edu.wpi.first.wpilibj.command.Command;
  */
 public class TestMotors extends Command {
 
-	private double l;
-	private double r;
+	private final double l;
+	private final double r;
+	private final double rampRate;
+	private final NeutralMode mode;
 
 	private double maxL = 0;
 	private double maxR = 0;
 
 	public TestMotors(double leftValue, double rightValue) {
+		this(leftValue, rightValue, NeutralMode.Coast, 0);
+	}
+
+	public TestMotors(double leftValue, double rightValue, NeutralMode mode, double rampRate) {
 		requires(Robot.drivetrain);
 		l = leftValue;
 		r = rightValue;
+		this.mode = mode;
+		this.rampRate = rampRate;
 	}
 
 	// Called just before this Command runs the first time
 	@Override
 	protected void initialize() {
-		Robot.drivetrain.setNeutralMode(NeutralMode.Coast);
+		Robot.drivetrain.setNeutralMode(mode);
+		Robot.drivetrain.leftTalon1.configOpenloopRamp(rampRate, Robot.CONFIG_TIMEOUT);
+		Robot.drivetrain.rightTalon1.configOpenloopRamp(rampRate, Robot.CONFIG_TIMEOUT);
 		Robot.drivetrain.setLeft(l);
 		Robot.drivetrain.setRight(r);
 	}

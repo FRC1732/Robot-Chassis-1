@@ -13,6 +13,7 @@ public class JoystickRangeButton extends Button {
 		this.axisNumber = axisNumber;
 		this.minActivation = minActivation;
 	}
+
 	public boolean get() {
 		return joystick.getRawAxis(axisNumber) > minActivation;
 	}

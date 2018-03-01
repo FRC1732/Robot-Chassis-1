@@ -12,6 +12,7 @@ public class StartVoltageRecording extends InstantCommand {
 	public StartVoltageRecording() {
 		super();
 	}
+
 	protected void initialize() {
 		Robot.leftRecorderD.startRecording();
 		Robot.rightRecorderD.startRecording();

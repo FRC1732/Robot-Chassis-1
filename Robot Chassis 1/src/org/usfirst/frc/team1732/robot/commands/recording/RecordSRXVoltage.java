@@ -15,6 +15,7 @@ public class RecordSRXVoltage extends NotifierCommand {
 	@Override
 	protected void init() {
 		Robot.leftVoltageRecord.clear();
+		System.out.println("Starting recording");
 	}
 
 	@Override
@@ -30,5 +31,6 @@ public class RecordSRXVoltage extends NotifierCommand {
 
 	@Override
 	protected void whenEnded() {
+		System.out.println("Stopping recording end time: " + timeSinceStarted());
 	}
 }
