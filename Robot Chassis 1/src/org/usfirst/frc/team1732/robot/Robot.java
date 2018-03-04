@@ -12,6 +12,7 @@ import org.usfirst.frc.team1732.robot.commands.recording.ReverseWithVelocityM;
 import org.usfirst.frc.team1732.robot.input.Joysticks;
 import org.usfirst.frc.team1732.robot.odomotry.PositionEstimator;
 import org.usfirst.frc.team1732.robot.sensors.Sensors;
+import org.usfirst.frc.team1732.robot.sensors.encoders.Tracking;
 import org.usfirst.frc.team1732.robot.subsystems.Arm;
 import org.usfirst.frc.team1732.robot.subsystems.Claw;
 import org.usfirst.frc.team1732.robot.subsystems.Drivetrain;
@@ -48,6 +49,8 @@ public class Robot extends TimedRobot {
 	public static SRXMomentRecorderM recorderM;
 	public static SRXVoltageRecord leftVoltageRecord;
 	public static SRXVoltageRecord rightVoltageRecord;
+	
+	public static Tracking tracker;
 
 	// public static SampleAveraging actualVoltage;
 
@@ -64,7 +67,7 @@ public class Robot extends TimedRobot {
 	public void robotInit() {
 		setPeriod(PERIOD_S);
 		dash = new Dashboard();
-		dash.add("Update Rate", Robot::getUpdateRate);
+		dash.add("Update Rate", Robot::getFps);
 		drivetrain = new Drivetrain();
 		sensors = new Sensors();
 		arm = new Arm();
@@ -77,17 +80,22 @@ public class Robot extends TimedRobot {
 		rightVoltageRecord = new SRXVoltageRecord(drivetrain.rightTalon1);
 		recorderM = new SRXMomentRecorderM(drivetrain.leftTalon1, drivetrain.leftEncoder, drivetrain.rightTalon1,
 				drivetrain.rightEncoder);
+		
+		tracker = new Tracking(drivetrain.leftEncoder, drivetrain.rightEncoder);
 
 		sensors.navX.addNavXData();
 		sensors.navX.zero();
 		
-		dash.add("Update Rate", Robot::getUpdateRate);
+		dash.add("Update Rate", Robot::getFps);
+		dash.add("Robot x", tracker::getX);
+		dash.add("Robot y", tracker::getY);
+		dash.add("Robot heading", tracker::getHeading);
 	}
 
 	private double last;
 	private static double fps;
 
-	public static double getUpdateRate() {
+	public static double getFps() {
 		return fps;
 	}
 
@@ -97,6 +105,7 @@ public class Robot extends TimedRobot {
 		last = Timer.getFPGATimestamp();
 		DriverStationData.gotPlatePositions();
 		Scheduler.getInstance().run();
+		tracker.addPoint();
 	}
 
 	@Override
